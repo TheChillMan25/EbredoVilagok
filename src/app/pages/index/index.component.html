@@ -1,11 +1,11 @@
 <div id="page">
   <div id="page-blur"></div>
   <div id="content">
-    <span id="title">Ébredő Világok</span>
-    <span id="subtitle">Enciklopédia</span>
+    <span class="title">Ébredő Világok</span>
+    <span class="subtitle">Enciklopédia</span>
     <div id="card-container">
       @for (card of cards; track $index) {
-      <div class="card">
+      <div class="card" [routerLink]="['/'+card.id]">
         <div class="img-container">
           <img [id]="card.id" [src]="card.img" [alt]="card.name" />
         </div>
@@ -13,7 +13,7 @@
       </div>
       }
     </div>
-    <div id="forum-button">
+    <div id="forum-button" [routerLink]="['/wandering-forum']">
       <span>Fórum</span>
       <mat-icon>forum</mat-icon>
     </div>

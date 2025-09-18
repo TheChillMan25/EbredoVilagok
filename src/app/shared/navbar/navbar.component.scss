@@ -42,3 +42,14 @@ $text-hover-color: #333;
     }
   }
 }
+
+#loggers {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+
+  .navbar-link {
+    gap: 0.2rem;
+    cursor: pointer;
+  }
+}

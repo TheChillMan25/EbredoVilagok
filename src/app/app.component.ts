@@ -5,10 +5,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NavbarComponent } from './shared/navbar/navbar.component';
+import { RouterLink } from '@angular/router'; 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatButtonModule, MatSidenav, MatSidenavModule, MatToolbarModule, MatIconModule, NavbarComponent],
+  imports: [RouterOutlet, MatButtonModule, MatSidenav, MatSidenavModule, MatToolbarModule, MatIconModule, NavbarComponent, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

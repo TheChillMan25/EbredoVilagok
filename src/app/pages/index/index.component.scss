@@ -5,27 +5,10 @@ $primary-background: #333;
   background-image: url(/assets/img/backgrounds/bg.jpg);
 }
 
-#title,
-#subtitle,
 #card-container,
 #forum-button,
 #bottom-text {
   position: relative;
-}
-
-#title {
-  top: 8rem;
-  font-size: 5rem;
-}
-
-#title,
-#subtitle {
-  text-shadow: 0.2rem 0.2rem 0.2rem #000;
-}
-
-#subtitle {
-  top: 10rem;
-  font-size: 4rem;
 }
 
 #card-container {

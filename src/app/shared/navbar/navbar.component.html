@@ -1,16 +1,32 @@
 <div id="navbar">
-  <div id="enciklopedia" class="navbar-link">Enciklopédia
+  <div id="enciklopedia" class="navbar-link">
+    Enciklopédia
     <div id="enc-container" class="navbar-hover-container">
-        <div id="world" class="navbar-link">Világ</div>
-        <div id="system" class="navbar-link">Rendszer</div>
+      <div id="world" class="navbar-link" [routerLink]="['/world']">Világ</div>
+      <div id="system" class="navbar-link" [routerLink]="['/system']">Rendszer</div>
     </div>
   </div>
-  <div id="game-main" class="navbar-link">Próbáld ki
+  <div id="game-main" class="navbar-link">
+    Próbáld ki
     <div id="game-container" class="navbar-hover-container">
-        <div id="game" class="navbar-link">Játék</div>
-        <div id="character-creation" class="navbar-link">Karakter</div>
-        <div id="adventure-creation" class="navbar-link">Kaland</div>
+      <div id="game" class="navbar-link" [routerLink]="['/game']">Játék</div>
+      <div id="character-creation" class="navbar-link" [routerLink]="['/character-creation']">Karakter</div>
+      <div id="adventure-creation" class="navbar-link" [routerLink]="['/adventure-creation']">Kaland</div>
     </div>
   </div>
-  <div id="forum" class="navbar-link">Fórum</div>
+  <div id="forum" class="navbar-link" [routerLink]="['/wandering-forum']" style="cursor: pointer;">Fórum</div>
+  <div id="loggers">
+    @if(isLoggedIn){
+    <div id="profile" class="navbar-link" [routerLink]="['/profile']">
+      <span id="username">Chad</span><mat-icon>person</mat-icon>
+    </div>
+    <div id="sign-out" class="navbar-link" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </div>
+    } @if(!isLoggedIn){
+    <div id="login-container" class="navbar-link" [routerLink]="['/login']">
+      <span id="login">Bejelentkezés</span><mat-icon>login</mat-icon>
+    </div>
+    }
+  </div>
 </div>
