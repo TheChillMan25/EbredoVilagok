@@ -1,83 +1,85 @@
 $secondary-color: #f2c480;
 $primary-background: #333;
 
-#page{
-    background-image: url(/assets/img/backgrounds/bg.jpg);
-    backdrop-filter: none;
-    align-items: center;
+#page {
+  background-image: url(/assets/img/backgrounds/bg.jpg);
 }
 
-#title, #subtitle, #card-container, #forum-button, #bottom-text{
-    position: relative;
+#title,
+#subtitle,
+#card-container,
+#forum-button,
+#bottom-text {
+  position: relative;
 }
 
-#title{
-    top: 8rem;
-    font-size: 5rem;
+#title {
+  top: 8rem;
+  font-size: 5rem;
 }
 
-#title, #subtitle{
-    text-shadow: .2rem .2rem .2rem #000;
+#title,
+#subtitle {
+  text-shadow: 0.2rem 0.2rem 0.2rem #000;
 }
 
-#subtitle{
-    top: 10rem;
-    font-size: 4rem;
+#subtitle {
+  top: 10rem;
+  font-size: 4rem;
 }
 
-#card-container{
-    top: 15rem;
-    display: flex;
-    gap: 4rem;
+#card-container {
+  top: 15rem;
+  display: flex;
+  gap: 4rem;
 }
 
-.card{
-    position: relative;
-    display: grid;
-    background-color: $primary-background;
-    padding: .3rem;
-    border-radius: .3rem;
-    cursor: pointer;
+.card {
+  position: relative;
+  display: grid;
+  background-color: $primary-background;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
 }
 
-.img-container{
-    width: 17rem;
-    overflow: hidden;
-    object-fit: cover;
+.img-container {
+  width: 17rem;
+  overflow: hidden;
+  object-fit: cover;
 }
 
-img{
-    width: 100%;
-    border-radius: .3rem .3rem .3rem 50%;
+img {
+  width: 100%;
+  border-radius: 0.3rem 0.3rem 0.3rem 50%;
 }
 
-.card-title{
-    position: relative;
-    font-size: x-large;
-    color: $secondary-color;
-    text-indent: .2rem;
+.card-title {
+  position: relative;
+  font-size: x-large;
+  color: $secondary-color;
+  text-indent: 0.2rem;
 }
 
-#forum-button{
-    top: 18rem;
-    padding: 1rem;
-    color: $secondary-color;
-    display: flex;
-    gap: 1rem;
-    background-color: $primary-background;
-    align-items: center;
-    justify-content: center;
-    border-radius: .5rem;
+#forum-button {
+  top: 18rem;
+  padding: 1rem;
+  color: $secondary-color;
+  display: flex;
+  gap: 1rem;
+  background-color: $primary-background;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
 
-#forum-button:hover{
-    background-color: $secondary-color;
-    color: $primary-background;
+#forum-button:hover {
+  background-color: $secondary-color;
+  color: $primary-background;
 }
 
-
-
-#bottom-text{
+#bottom-text {
   font-size: x-large;
   top: 22rem;
 }

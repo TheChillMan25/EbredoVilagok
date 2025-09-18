@@ -1,19 +1,24 @@
 <div id="page">
-  <span id="title">Ébredő Világok</span>
-  <span id="subtitle">Enciklopédia</span>
-  <div id="card-container">
-    @for (card of cards; track $index) {
-    <div class="card">
-      <div class="img-container">
-        <img [id]="card.id" [src]="card.img" [alt]="card.name" />
+  <div id="page-blur"></div>
+  <div id="content">
+    <span id="title">Ébredő Világok</span>
+    <span id="subtitle">Enciklopédia</span>
+    <div id="card-container">
+      @for (card of cards; track $index) {
+      <div class="card">
+        <div class="img-container">
+          <img [id]="card.id" [src]="card.img" [alt]="card.name" />
+        </div>
+        <span class="card-title">{{ card.name }}</span>
       </div>
-      <span class="card-title">{{ card.name }}</span>
+      }
     </div>
-    }
+    <div id="forum-button">
+      <span>Fórum</span>
+      <mat-icon>forum</mat-icon>
+    </div>
+    <span id="bottom-text"
+      >Egy felejthetetlen kaland, amiben Te is részt vehetsz!</span
+    >
   </div>
-  <div id="forum-button">
-    <span>Fórum</span>
-    <mat-icon>forum</mat-icon>
-  </div>
-  <span id="bottom-text">Egy felejthetetlen kaland, amiben Te is részt vehetsz!</span>
 </div>
