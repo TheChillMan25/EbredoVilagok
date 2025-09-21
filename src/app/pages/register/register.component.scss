@@ -1,0 +1,36 @@
+#page {
+  background-image: url(/assets/img/backgrounds/bg.jpg);
+}
+
+#content {
+  flex-direction: row-reverse !important;
+  justify-content: space-between;
+  .title {
+    position: static;
+    margin-right: 2rem;
+  }
+
+  #panel {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 2rem;
+    background-color: #222;
+    form.register-form {
+      display: flex;
+      flex-direction: column;
+
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+
+        a {
+          color: whitesmoke;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

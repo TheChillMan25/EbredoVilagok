@@ -17,7 +17,7 @@
   <div id="forum" class="navbar-link" [routerLink]="['/wandering-forum']" style="cursor: pointer;">Fórum</div>
   <div id="loggers">
     @if(isLoggedIn){
-    <div id="profile" class="navbar-link" [routerLink]="['/profile']">
+    <div id="profile" class="navbar-link" [routerLink]="['/register']">
       <span id="username">Chad</span><mat-icon>person</mat-icon>
     </div>
     <div id="sign-out" class="navbar-link" (click)="logout()">

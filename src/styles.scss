@@ -10,6 +10,7 @@
 
 $text-primary: #f5f5f5;
 $text-secondary: #f2c480;
+$primary-background: #333;
 
 /* html {
   @include mat.theme((
@@ -89,4 +90,15 @@ app-navbar {
 .subtitle {
   top: 10rem;
   font-size: 4rem;
+}
+
+button {
+  color: $text-secondary !important;
+  background-color: $primary-background !important;
+  border-radius: 0.5rem !important;
+}
+
+button:hover {
+  color: $primary-background !important;
+  background-color: $text-secondary !important;
 }

@@ -9,8 +9,16 @@ export const routes: Routes = [
     component: IndexComponent,
   },
   {
+    path: 'register',
+    title: 'Regisztráció',
+    loadComponent: () =>
+      import('./pages/register/register.component').then(
+        m => m.RegisterComponent
+      ),
+  },
+  {
     path: '',
-    redirectTo: '/index',
+    redirectTo: 'index',
     pathMatch: 'full',
   },
   {
