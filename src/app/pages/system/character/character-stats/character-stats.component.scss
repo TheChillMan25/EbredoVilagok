@@ -1,0 +1,26 @@
+$text-primary: whitesmoke;
+$text-secondary: #f2c480;
+ul,
+ol {
+  display: grid;
+  row-gap: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #333;
+  text-align: center;
+  td {
+    border: #111 solid .15rem;
+    padding: 0.5rem;
+    color: $text-primary;
+  }
+  tr:first-child,
+  td:first-child {
+    color: $text-secondary;
+    td {
+      color: $text-secondary;
+    }
+  }
+}

@@ -1,0 +1,39 @@
+<h3>
+  Karakteralkotáskor először a fajodat kell kiválasztanod. Ez határozza meg az eredetedet, hogy ki vagy és azt, hogy milyen egyéb plusz tudásod van ebből fakadólag.
+</h3>
+<mat-table [dataSource]="nationDataSource">
+  <ng-container matColumnDef="diceNum1">
+    <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+    <mat-cell *matCellDef="let nation">
+      {{ nation.left?.diceNum }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="nationName1">
+    <mat-header-cell *matHeaderCellDef>Nép neve</mat-header-cell>
+    <mat-cell *matCellDef="let nation">
+      {{ nation.left?.nationName }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="diceNum2">
+    <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+    <mat-cell *matCellDef="let nation">
+      {{ nation.right?.diceNum }}
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="nationName2">
+    <mat-header-cell *matHeaderCellDef>Nép neve</mat-header-cell>
+    <mat-cell *matCellDef="let nation">
+      {{ nation.right?.nationName }}
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+</mat-table>
+<p>
+  Mindegyik néphez tartozik 6 (1d6) népi tulajdonság és 6 (1d6) "Otthon", mely a
+  hátterét képezi a karakterednek. Ezek plusz előnyt hordoznak magukban.
+</p>

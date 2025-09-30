@@ -1,0 +1,23 @@
+<h2>Felszerelés - tárgyak</h2>
+<p>
+  Minden eszköz 1 helyet foglal el a karaktereknél, a
+  <strong>parányi (P)</strong> eszközök <strong>nem foglalnak</strong>, míg a
+  <strong>robosztus (R)</strong> tárgyak <strong>2 helyet foglalnak</strong> el.
+  Karakteralkotásnál dobj 3-szor 1d100-al hogy megkapd a karakter kezdő
+  eszközeit, vagy válasz ki 3 tárgyat a listáról.
+</p>
+<div class="table-container">
+  <mat-table [dataSource]="itemDataSource">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Tárgy</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="desc">
+      <mat-header-cell *matHeaderCellDef>Leírás</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.desc }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>

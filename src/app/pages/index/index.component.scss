@@ -1,3 +1,4 @@
+$text-primary: whitesmoke;
 $secondary-color: #f2c480;
 $primary-background: #333;
 
@@ -5,61 +6,23 @@ $primary-background: #333;
   background-image: url(/assets/img/backgrounds/bg.jpg);
 }
 
-#card-container,
-#forum-button,
-#bottom-text {
-  position: relative;
+#title {
+  top: 8rem;
+  font-size: 5rem;
 }
 
-#card-container {
-  top: 15rem;
-  display: flex;
-  gap: 4rem;
+#title,
+#subtitle {
+  text-shadow: 0.2rem 0.2rem 0.2rem #000;
 }
 
-.card {
-  position: relative;
-  display: grid;
-  background-color: $primary-background;
-  padding: 0.3rem;
-  border-radius: 0.3rem;
-  cursor: pointer;
-}
-
-.img-container {
-  width: 17rem;
-  overflow: hidden;
-  object-fit: cover;
-}
-
-img {
-  width: 100%;
-  border-radius: 0.3rem 0.3rem 0.3rem 50%;
-}
-
-.card-title {
-  position: relative;
-  font-size: x-large;
-  color: $secondary-color;
-  text-indent: 0.2rem;
+#subtitle {
+  top: 10rem;
+  font-size: 4rem;
 }
 
 #forum-button {
   top: 18rem;
-  padding: 1rem;
-  color: $secondary-color;
-  display: flex;
-  gap: 1rem;
-  background-color: $primary-background;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  cursor: pointer;
-}
-
-#forum-button:hover {
-  background-color: $secondary-color;
-  color: $primary-background;
 }
 
 #bottom-text {

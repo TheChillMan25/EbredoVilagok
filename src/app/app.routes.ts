@@ -9,13 +9,25 @@ export const routes: Routes = [
     component: IndexComponent,
   },
   {
+    path: 'world',
+    title: 'Ágas és Bogas | Világ',
+    loadComponent: () =>
+      import('./pages/world/world.component').then((m) => m.WorldComponent),
+  },
+  {
+    path: 'system',
+    title: 'Ágas és Bogas | Rendszer',
+    loadComponent: () =>
+      import('./pages/system/system.component').then((m) => m.SystemComponent),
+  },
+  /* {
     path: 'register',
     title: 'Regisztráció',
     loadComponent: () =>
       import('./pages/register/register.component').then(
-        m => m.RegisterComponent
+        (m) => m.RegisterComponent
       ),
-  },
+  }, */
   {
     path: '',
     redirectTo: 'index',
