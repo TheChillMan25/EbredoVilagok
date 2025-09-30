@@ -1,0 +1,52 @@
+<h2>Felszerelés - fegyverek és páncél</h2>
+<p>
+  Karakteralkotáskor legfeljebb kettő fegyvert választhatsz. Ezeket később
+  lecserélheted természetesen és nem kötelező két fegyver választása sem.
+</p>
+<div class="table-container">
+  <mat-table [dataSource]="weaponsDataSource">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Fegyver</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="dice">
+      <mat-header-cell *matHeaderCellDef>Sebzés</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.dice }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <mat-header-cell *matHeaderCellDef>Ár</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.price }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedWeaponColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedWeaponColumns"></mat-row>
+  </mat-table>
+</div>
+<div class="table-container" style="margin-top: 1rem">
+  <mat-table [dataSource]="armourDataSource">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Páncél</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="defValue">
+      <mat-header-cell *matHeaderCellDef>Védelmi érték</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.defValue }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="dexMod">
+      <mat-header-cell *matHeaderCellDef
+        ><abbr title="Lopakodás és egyéb próbák nehezítésére szolgáló modosító"
+          >Módosító</abbr
+        ></mat-header-cell
+      >
+      <mat-cell *matCellDef="let element">{{ element.dexMod }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <mat-header-cell *matHeaderCellDef>Ár</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.price }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedArmourColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedArmourColumns"></mat-row>
+  </mat-table>
+</div>
+<p>Fegyver és páncél kiválasztását három másik tárgy kiválasztása követi.</p>
