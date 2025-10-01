@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { CardContainerComponent } from "../../shared/functional/card-container/card-container.component";
+import { CardContainerComponent } from '../../shared/functional/card-container/card-container.component';
 import { setBackground } from '../../shared/functional/functions';
 
 @Component({
@@ -11,14 +11,14 @@ import { setBackground } from '../../shared/functional/functions';
   styleUrl: './index.component.scss',
 })
 export class IndexComponent {
-  background: string = '/assets/img/backgrounds/bg.jpg';
+  background: string = 'bg.jpg';
   cards = [
-    { name: 'Világ', img: 'assets/img/fooldal/vilag.jpg', id: 'world' },
-    { name: 'Játék', img: 'assets/img/fooldal/jatek.jpg', id: 'game' },
-    { name: 'Rendszer', img: 'assets/img/fooldal/rendszer.jpg', id: 'system' },
+    { name: 'Világ', img: 'assets/img/fooldal/vilag.jpg', id: 'vilag' },
+    { name: 'Játék', img: 'assets/img/fooldal/jatek.jpg', id: 'jatek' },
+    { name: 'Rendszer', img: 'assets/img/fooldal/rendszer.jpg', id: 'rendszer' },
   ];
 
   ngOnInit() {
-    setBackground(this.background)
+    setBackground(this.background);
   }
 }

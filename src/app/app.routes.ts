@@ -9,13 +9,13 @@ export const routes: Routes = [
     component: IndexComponent,
   },
   {
-    path: 'world',
+    path: 'vilag',
     title: 'Ágas és Bogas | Világ',
     loadComponent: () =>
       import('./pages/world/world.component').then((m) => m.WorldComponent),
   },
   {
-    path: 'system',
+    path: 'rendszer',
     title: 'Ágas és Bogas | Rendszer',
     loadComponent: () =>
       import('./pages/system/system.component').then((m) => m.SystemComponent),
@@ -28,6 +28,22 @@ export const routes: Routes = [
         (m) => m.RegisterComponent
       ),
   }, */
+  {
+    path: 'fajok',
+    title: 'Ágas és Bogas | Fajok',
+    loadComponent: () =>
+      import('./pages/world/species/species.component').then(
+        (m) => m.SpeciesComponent
+      ),
+  },
+  {
+    path: 'fajok/:id',
+    title: 'Fajok',
+    loadComponent: () =>
+      import(
+        './pages/world/species/species-template/species-template.component'
+      ).then((m) => m.SpeciesTemplateComponent),
+  },
   {
     path: '',
     redirectTo: 'index',

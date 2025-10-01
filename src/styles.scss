@@ -115,17 +115,15 @@ app-card-container {
 }
 
 app-card-container {
-  top: 15rem;
   display: flex;
-  gap: 4rem;
 }
 
 .hoverable-card {
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .hoverable-card:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .fake-button {
