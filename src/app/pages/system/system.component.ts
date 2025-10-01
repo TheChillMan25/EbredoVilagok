@@ -32,7 +32,7 @@ interface VirtueDisadvBase {
   styleUrl: './system.component.scss',
 })
 export class SystemComponent {
-  background: string = '/assets/img/backgrounds/table.jpg';
+  background: string = 'table.jpg';
   activeSegmentName: 'character' | 'adventure' | 'actions' = 'character';
   activePageIndex: number = 0;
   maxPageIndex: number = 3;
