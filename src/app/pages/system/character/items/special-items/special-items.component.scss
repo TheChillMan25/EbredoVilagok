@@ -1,0 +1,15 @@
+.spec-drink-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  row-gap: 0.5rem;
+  span:last-child {
+    grid-column: span 2;
+  }
+}
+
+.scrollable-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: .5rem;
+}

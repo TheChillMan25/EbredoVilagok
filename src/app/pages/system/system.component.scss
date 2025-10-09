@@ -132,6 +132,10 @@
     top: 50%;
     transform: translateY(-50%);
     height: 6rem;
+
+    mat-icon {
+      cursor: pointer;
+    }
   }
 
   #prev {
@@ -143,12 +147,28 @@
 }
 
 app-character-main,
+app-character-species,
 app-character-virtues,
+app-character-stats,
 app-character-disadvantages,
 app-character-equipment,
-app-character-items {
+app-character-items,
+app-mandatory-items,
+app-special-items,
+app-cigar-items,
+app-adventure-main,
+app-adventure-event,
+app-adventure-npc,
+app-actions-main,
+app-actions-camp,
+app-actions-camp2,
+app-actions-fight,
+app-actions-loot,
+app-actions-loot2,
+app-actions-loot3 {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  justify-content: space-around;
 }

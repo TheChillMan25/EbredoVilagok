@@ -2,19 +2,40 @@
   <div id="enciklopedia" class="navbar-link">
     Enciklopédia
     <div id="enc-container" class="navbar-hover-container">
-      <div id="world" class="navbar-link" [routerLink]="['/world']">Világ</div>
-      <div id="system" class="navbar-link" [routerLink]="['/system']">Rendszer</div>
+      <div id="world" class="navbar-link" [routerLink]="['/vilag']">Világ</div>
+      <div id="system" class="navbar-link" [routerLink]="['/rendszer']">
+        Rendszer
+      </div>
     </div>
   </div>
   <div id="game-main" class="navbar-link">
     Próbáld ki
     <div id="game-container" class="navbar-hover-container">
-      <div id="game" class="navbar-link" [routerLink]="['/game']">Játék</div>
-      <div id="character-creation" class="navbar-link" [routerLink]="['/character-creation']">Karakter</div>
-      <div id="adventure-creation" class="navbar-link" [routerLink]="['/adventure-creation']">Kaland</div>
+      <div id="game" class="navbar-link" [routerLink]="['/jatek']">Játék</div>
+      <div
+        id="character-creation"
+        class="navbar-link"
+        [routerLink]="['/karakter-keszites']"
+      >
+        Karakter
+      </div>
+      <div
+        id="adventure-creation"
+        class="navbar-link"
+        [routerLink]="['/kaland-keszites']"
+      >
+        Kaland
+      </div>
     </div>
   </div>
-  <div id="forum" class="navbar-link" [routerLink]="['/wandering-forum']" style="cursor: pointer;">Fórum</div>
+  <div
+    id="forum"
+    class="navbar-link"
+    [routerLink]="['/wandering-forum']"
+    style="cursor: pointer"
+  >
+    Fórum
+  </div>
   <div id="loggers">
     @if(isLoggedIn){
     <div id="profile" class="navbar-link" [routerLink]="['/register']">

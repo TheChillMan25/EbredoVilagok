@@ -1,0 +1,41 @@
+<h2>Tábori akciók</h2>
+<article>
+  <p class="sub-title">Alap tábori feladatok</p>
+  <p>
+    Ezek azok az akciók, amiket minden kalandor végre tud hajtani az útjától
+    függetlenül.
+  </p>
+</article>
+<div class="scrollable-container">
+  @for (action of regularCampActions; track $index) {
+  <div class="action-container">
+    <span class="action-name action-main-prop"
+      >{{ action.name }} -
+      <span class="action-main-prop">( {{ action.cost }} ) TA</span></span
+    >
+    @if(action.name === "Növény gyűjtés"){
+
+    <p class="action-desc action-main-prop">
+      Még a legszárazabb kriptában is találhatók túlélést segítő növények —
+      hasonló a
+      <strong class="page-link" (click)="showPage(7)">szüreteléshez</strong>, de
+      csak egy ember végezheti.
+    </p>
+    } @else {
+    <p class="action-desc action-main-prop">{{ action.desc }}</p>
+    }
+    <table>
+      <tr>
+        <th>Akció</th>
+        <th>Leírás</th>
+      </tr>
+      @for (method of action.methods; track $index) {
+      <tr>
+        <td>{{ method.name }}</td>
+        <td>{{ method.prop }}</td>
+      </tr>
+      }
+    </table>
+  </div>
+  }
+</div>

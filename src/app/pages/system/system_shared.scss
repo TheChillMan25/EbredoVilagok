@@ -1,0 +1,85 @@
+* {
+  cursor: default;
+}
+.scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+}
+p,
+div {
+  text-align: justify;
+}
+
+p {
+  margin: 0.5rem 0;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+.italic-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-style: italic;
+}
+
+.title {
+  top: 0;
+  display: block;
+  font-size: 3rem;
+  text-shadow: none;
+  width: 100%;
+  text-align: center;
+  margin: 2rem 0;
+}
+.sub-title {
+  font-size: larger;
+  text-decoration: underline;
+}
+.hoverable {
+  font-style: italic;
+  cursor: help;
+}
+.harvesting-name {
+  font-weight: bold;
+}
+ol,
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.5rem 0;
+}
+
+app-table-template {
+  display: block;
+  height: fit-content;
+}
+table {
+  font-family: "Times New Roman";
+  color: whitesmoke;
+  border-collapse: collapse;
+  text-align: left;
+  tr:nth-child(even) {
+    background-color: #444;
+  }
+  tr:nth-child(odd) {
+    background-color: #333;
+  }
+  tr:first-child,
+  td:first-child {
+    color: #f2c480;
+  }
+
+  th {
+    background-color: #222;
+  }
+
+  th,
+  td {
+    font-weight: normal;
+    padding: 1rem;
+  }
+}

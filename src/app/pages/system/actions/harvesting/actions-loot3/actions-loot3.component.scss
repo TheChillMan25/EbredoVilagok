@@ -1,0 +1,14 @@
+mat-table:first-child {
+  mat-cell:last-child,
+  mat-header-cell:last-child {
+    flex: 3 !important;
+    justify-content: center;
+  }
+  mat-cell:last-child {
+    color: whitesmoke;
+  }
+}
+
+.scrollable-container{
+  padding: 0.5rem;
+}

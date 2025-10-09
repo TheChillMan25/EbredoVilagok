@@ -1,0 +1,48 @@
+<h2>NPC-k és ellenfelek</h2>
+<p>
+  Az eseményekhez hozzáadthatóak személyek is, ezek lehetnek a pillanatban
+  kitaláltak, vagy akár a saját karaktereid egyike.
+</p>
+<p>
+  A legfontosabb meghatározni, hogy egy karakter ellenséges-e, vagy sem. Ebből
+  fakadólag hozzárendelhetőek
+  <strong title="beszéd, kereskedelem, harc,stb.">akciók</strong>, amiket a
+  játékosok tudnak vele végezni.
+</p>
+<p>
+  Minden NPC-hez készíthető egy leírás, melyben a történetüket és érdekességeket
+  lehet megadni a karakterről. Mindegyikük rendelkezik tulajdonságokkal is, ezek
+  a viselkedésüket befolyásolhatják (<strong
+    class="page-link"
+    (click)="showPage(1)"
+    >lásd</strong
+  >).
+</p>
+<p>
+  Következő lépés a felszerelés meghatározása, ha nincsen, vagy nem saját
+  karakter az adott NPC. Ezeket a
+  <strong class="page-link" (click)="showPage(2)">felszerelés</strong> és
+  <strong class="page-link" (click)="showPage(3)">tárgyak</strong> közül
+</p>
+<span class="sub-title">Példa:</span>
+<div id="example-npc" class="italic-text">
+  <span><strong>Név:</strong> Tihamér</span>
+  <span>Barátságos</span>
+  <strong>Akciók:</strong>
+  <ul>
+    <li>Beszéd</li>
+    <li>Kereskedelem</li>
+  </ul>
+  <strong>Leirás:</strong>
+  <span
+    >Szegény családból származó egyszerű kézműves, aki kosárfonással
+    foglalkozik.</span
+  >
+  <strong>Tulajdonságok:</strong>
+  <ul>
+    <li>Figyelmes</li>
+    <li>Makacs</li>
+  </ul>
+  <strong>Felszerelés</strong>
+  <span>25 pénz, Csikóbőrös kulacs, Csont furulya</span>
+</div>

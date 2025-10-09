@@ -3,7 +3,7 @@ $text-secondary: #f2c480;
 ul,
 ol {
   display: grid;
-  row-gap: 0.5rem;
+  row-gap: 0.2rem;
 }
 
 table {
@@ -12,13 +12,14 @@ table {
   background-color: #333;
   text-align: center;
   td {
-    border: #111 solid .15rem;
+    border: #111 solid 0.15rem;
     padding: 0.5rem;
     color: $text-primary;
   }
   tr:first-child,
   td:first-child {
     color: $text-secondary;
+    background-color: #222;
     td {
       color: $text-secondary;
     }
