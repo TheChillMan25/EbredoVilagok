@@ -1,0 +1,31 @@
+<h2>Szüretelés</h2>
+<p class="italic-text">
+  A javasasszonyok végtagokat visszanövesztő főzeteik, a mesteremberek valóságot
+  kibontó szerkezeteik, Egy mágus rejtett palotája téren és időn kívül, egy
+  tolvaj szarvasagancs formájú kulcsa, ami minden ajtót kinyit. Ez csak néhány
+  példa a mágikus tárgyakra amiket ez a világ felkínál, a megfelelő
+  alapanyagokért cserébe.
+</p>
+<p class="italic-text">
+  Amikor egy lény meghal, a lélek felszabadul a test pedig hátramarad. A halált
+  követően a megmaradt mágia fokozatosan elhagyja a tetemet, emiatt gyorsan be
+  kell szüretelni az alapanyagokat mielőtt elvesztik az erejüket. Egy harc
+  rögtön el kell kezdeni a szüretelést és végig kell csinálni, különben az
+  összes alapanyag kárba vész.
+</p>
+
+<span>Szüretelés fázisa</span>
+<ol>
+  @for (phase of harvestingPhases; track $index) {
+  <li>
+    <strong>{{ phase.name }}:</strong> {{ phase.desc }}
+  </li>
+  }
+</ol>
+
+<span class="harvesting-name">Leírás</span>
+<p>
+  A játékmester megnézi a szörnyhöz tartozó táblázatot és eldönti miket lehet
+  belőle kinyerni. Ha a szörnynek bármelyik végtagja sérült vagy levágták akkor
+  csökkentheti a kinyerhető alapanyagok számát.
+</p>

@@ -1,0 +1,23 @@
+#content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  app-card-container {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 500px) {
+  #content {
+    align-items: center;
+    justify-content: start;
+    overflow-y: auto;
+    padding: 1rem 0;
+  }
+  app-card-container {
+    flex-wrap: nowrap;
+    flex-direction: column;
+  }
+}

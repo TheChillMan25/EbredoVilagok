@@ -1,0 +1,16 @@
+<p>{{ creatureName }}</p>
+<div class="scrollable-container">
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="dice">
+      <mat-header-cell *matHeaderCellDef>Cél Érték</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.dice }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="loot">
+      <mat-header-cell *matHeaderCellDef>Szüretelhető</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.loot }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>

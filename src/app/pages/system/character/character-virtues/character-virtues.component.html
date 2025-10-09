@@ -1,0 +1,44 @@
+<h2>Erények</h2>
+<p>
+  Válassz két erényt: (1d100) <br />
+  Dobás során a karakter csak egyetlen erényt használhat, és azt is csak
+  egyszer.
+</p>
+<p>
+  -1 stressz = +4 a dobáshoz <br />-2 stressz =
+  <span
+    class="hoverable"
+    title="2 kocka dobása
+  után a magasabb érték érvényes"
+    >Előny</span
+  >
+  a dobásra
+</p>
+<div class="scrollable-container">
+  <mat-table [dataSource]="virtuesDataSource">
+    <ng-container matColumnDef="diceNum1">
+      <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.left?.diceNum }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name1">
+      <mat-header-cell *matHeaderCellDef>Név</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.left?.name }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="diceNum2">
+      <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{
+        element.right?.diceNum
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name2">
+      <mat-header-cell *matHeaderCellDef>Név</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.right?.name }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>

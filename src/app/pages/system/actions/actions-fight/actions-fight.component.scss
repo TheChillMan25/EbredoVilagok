@@ -1,0 +1,19 @@
+article {
+  columns: 2;
+  height: 55%;
+  text-align: justify;
+  .columns {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    height: 100%;
+    .column-content {
+      display: grid;
+      gap: 0.5rem;
+
+      span:first-child{
+        font-style: italic;
+      }
+    }
+  }
+}

@@ -1,0 +1,98 @@
+<div id="content">
+  <div id="book">
+    <div id="left"></div>
+    <div id="center"></div>
+    <div id="right"></div>
+    <div id="pages">
+      <div id="pages-blur"></div>
+      <div id="page1"></div>
+      <div id="page2"></div>
+      <div id="page-text-container">
+        <div id="page1-text" class="page-text-container">
+          @switch (activePageIndex) { @case (0) {
+          <app-character-main></app-character-main>
+          } @case (1){
+          <app-character-virtues></app-character-virtues>
+          } @case (2){
+          <app-character-stats></app-character-stats>
+          } @case (3) {
+          <app-character-items></app-character-items>
+          } @case (4) {
+          <app-special-items></app-special-items>
+          } @case (5){
+          <app-adventure-main></app-adventure-main>
+          } @case (6){
+          <app-adventure-npc
+            (showEquipmentEvent)="setActivePage($event)"
+          ></app-adventure-npc>
+          } @case (7) {
+          <app-actions-camp2
+            (showEvent)="setActivePage($event)"
+          ></app-actions-camp2>
+          } @case (8){
+          <app-actions-fight></app-actions-fight>
+          } @case (9){
+          <app-actions-loot2></app-actions-loot2>
+          } }
+        </div>
+        <div id="page2-text" class="page-text-container">
+          @switch(activePageIndex) { @case (0){
+          <app-character-species></app-character-species>
+          } @case (1){
+          <app-character-disadvantages></app-character-disadvantages>
+          } @case (2){
+          <app-character-equipment></app-character-equipment>
+          } @case (3) {
+          <app-mandatory-items></app-mandatory-items>
+          } @case (4) {
+          <app-cigar-items></app-cigar-items>
+          } @case (5) {
+          <app-adventure-event></app-adventure-event>
+          } @case (6){
+          <app-actions-camp></app-actions-camp>
+          } @case (7) {
+          <app-actions-main></app-actions-main>
+          } @case (8) {
+          <app-actions-loot></app-actions-loot>
+          } @case (9){
+          <app-actions-loot3></app-actions-loot3>
+          } }
+        </div>
+        <div id="markers">
+          <div
+            id="character"
+            class="marker"
+            (click)="setActiveSegment('character')"
+          >
+            Karakter
+          </div>
+          <div
+            id="adventure"
+            class="marker"
+            (click)="setActiveSegment('adventure')"
+          >
+            Kaland
+          </div>
+          <div
+            id="actions"
+            class="marker"
+            (click)="setActiveSegment('actions')"
+          >
+            Akciók
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="buttons">
+      @if(activePageIndex > 0){
+      <div id="prev" class="fake-button" (click)="prev()" title="Előző">
+        <mat-icon>arrow_back_ios_new</mat-icon>
+      </div>
+      } @if(activePageIndex < maxPageIndex){
+      <div id="next" class="fake-button" (click)="next()" title="Következő">
+        <mat-icon>arrow_forward_ios_new</mat-icon>
+      </div>
+      }
+    </div>
+  </div>
+</div>

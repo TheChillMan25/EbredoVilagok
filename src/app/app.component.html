@@ -1,1 +1,16 @@
-<button mat-button>Click me!</button>
+<mat-sidenav-container>
+  <mat-sidenav> </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar>
+      <div id="logo" [routerLink]="['/index']">
+        <img src="assets/img/icons/logo.png" alt="To index" id="logo-img" />
+      </div>
+      <app-navbar></app-navbar>
+      <p id="author">Ágas és Bogas</p>
+      <div id="page">
+        <div id="page-blur"></div>
+      </div>
+    </mat-toolbar>
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

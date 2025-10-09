@@ -1,0 +1,36 @@
+$text-primary: whitesmoke;
+$secondary-color: #f2c480;
+$primary-background: #333;
+
+#page {
+  background-image: url(/assets/img/backgrounds/bg.jpg);
+}
+
+#title {
+  top: 8rem;
+  font-size: 5rem;
+}
+
+#title,
+#subtitle {
+  text-shadow: 0.2rem 0.2rem 0.2rem #000;
+}
+
+#subtitle {
+  top: 10rem;
+  font-size: 4rem;
+}
+
+#forum-button {
+  top: 18rem;
+}
+
+#bottom-text {
+  font-size: x-large;
+  top: 22rem;
+}
+
+app-card-container {
+  gap: 4rem;
+  top: 15rem;
+}

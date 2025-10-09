@@ -1,0 +1,17 @@
+.action-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  .action-name {
+    font-weight: 900;
+  }
+
+  .action-desc {
+    font-style: italic;
+  }
+}
+
+.scrollable-container {
+  gap: 0.5rem;
+  display: grid;
+}

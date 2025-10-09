@@ -1,0 +1,32 @@
+$text-primary: whitesmoke;
+$text-secondary: #f2c480;
+$primary-background: #444;
+
+.small-card,
+.large-card {
+  position: relative;
+  display: grid;
+  background-color: $primary-background;
+  padding: 0.3rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 0.5rem #333;
+  cursor: pointer;
+
+  .img-container {
+    width: 17rem;
+    overflow: hidden;
+    object-fit: cover;
+
+    img {
+      width: 100%;
+      border-radius: 1rem 1rem 1rem 100%/1rem 1rem 1rem 50%;
+    }
+  }
+
+  .card-title {
+    position: relative;
+    font-size: x-large;
+    color: $text-secondary;
+    padding: 0.5rem;
+  }
+}

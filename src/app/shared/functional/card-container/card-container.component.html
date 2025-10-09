@@ -1,0 +1,15 @@
+@if(size === 'small'){ @for (card of cards; track $index) {
+<div class="{{ size }}-card hoverable-card" [routerLink]="['/' + card.id]">
+  <div class="img-container">
+    <img [id]="card.id" [src]="card.img" [alt]="card.name" />
+  </div>
+  <span class="card-title">{{ card.name }}</span>
+</div>
+} } @else if (size === 'large') { @for (card of cards; track $index) {
+<div class="{{ size }}-card hoverable-card" (click)="triggerAction(card.id)">
+  <div class="img-container">
+    <img [id]="card.id" [src]="card.img" [alt]="card.name" />
+  </div>
+  <span class="card-title">{{ card.name }}</span>
+</div>
+} }

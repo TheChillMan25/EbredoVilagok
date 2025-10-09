@@ -1,0 +1,44 @@
+<h2>Hibák</h2>
+<p>
+  Válassz egy hibát: (1d100) <br />
+  Dobáson kívül a tulajdonságok segítenek indokolni a karakter döntéseit és
+  cselekedeteit, a mesélő jutalmat adhat érte.
+</p>
+<p>
+  +1 stressz = -4 a dobáshoz <br />+2 stressz =
+  <span
+    class="hoverable"
+    title="2 kocka
+  dobása után az alacsonyabb érték érvényes"
+    >Hátrány</span
+  >
+  a dobásra
+</p>
+<div class="scrollable-container">
+  <mat-table [dataSource]="diadvantagesDataSource">
+    <ng-container matColumnDef="diceNum1">
+      <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.left?.diceNum }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name1">
+      <mat-header-cell *matHeaderCellDef>Név</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.left?.name }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="diceNum2">
+      <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{
+        element.right?.diceNum
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name2">
+      <mat-header-cell *matHeaderCellDef>Név</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.right?.name }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+</div>
