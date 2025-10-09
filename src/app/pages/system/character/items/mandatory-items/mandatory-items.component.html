@@ -1,0 +1,57 @@
+<h2>Elengedhetetlen eszközök</h2>
+<p>
+  Ezek a tárgyak minden kalandor arzenáljában megtalálhatók. Ezek nélkül az első
+  éjszakát se fogod túlélni a vadonban, bármilyen erős vagy bátornak is képzeled
+  magad.
+</p>
+<div class="scrollable-container">
+  <article>
+    <p class="sub-title">Élelem és Fejadagok</p>
+    <p class="italic-text">
+      Az étel az ember üzemagyaga, annyira létfontosságú mint a levegő amit
+      belélegzünk. Pihenéskor és táborozáskor ha nem eszik a karakter 1 kis
+      sebet kap, ha viszont van élelem amit el tud fogyasztani az étel
+      mennyiségéhez képest gyógyul kis sebeket. A nagy sebeket nem lehet
+      egyszerű pihenéssel és étellel begyógyítani.
+    </p>
+    <div class="scrollable-container">
+      <table style="text-align: center">
+        <tr>
+          @for (item of foodRations; track $index) {
+          <th>{{ item.name }}</th>
+          }
+        </tr>
+        <tr>
+          @for (item of foodRations; track $index) {
+          <td>( {{ item.portion }} ) fejadag</td>
+          }
+        </tr>
+        <tr>
+          @for (item of foodRations; track $index) {
+          <td>{{ item.desc }}</td>
+          }
+        </tr>
+        <tr>
+          @for (item of foodRations; track $index) {
+          <td>( {{ item.heal }} ) kis seb</td>
+          }
+        </tr>
+      </table>
+    </div>
+  </article>
+  <article>
+    <p class="sub-title">Gyógyszerek</p>
+    <p class="italic-text">
+      Évezredek óta használnak az emberek tinktúrákat és gyógyfüveket, a világ
+      változásával a kereslet és a kínálat is megnőtt egyaránt. Minden magára
+      bármit is adó kalandor visz magával kötszereket és varrótűt még a rutin
+      feladatok és békés utakra is. Egyes gyógyszerek
+      <strong>harc közben (HK)</strong> is használhatóak.
+    </p>
+  </article>
+  @for (item of medicalItems; track $index) {
+  <strong>{{ item.name }}:</strong>
+  <p class="italic-text">{{ item.desc }}</p>
+  <p>{{ item.effect }}</p>
+  }
+</div>

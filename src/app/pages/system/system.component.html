@@ -17,6 +17,22 @@
           <app-character-stats></app-character-stats>
           } @case (3) {
           <app-character-items></app-character-items>
+          } @case (4) {
+          <app-special-items></app-special-items>
+          } @case (5){
+          <app-adventure-main></app-adventure-main>
+          } @case (6){
+          <app-adventure-npc
+            (showEquipmentEvent)="setActivePage($event)"
+          ></app-adventure-npc>
+          } @case (7) {
+          <app-actions-camp2
+            (showEvent)="setActivePage($event)"
+          ></app-actions-camp2>
+          } @case (8){
+          <app-actions-fight></app-actions-fight>
+          } @case (9){
+          <app-actions-loot2></app-actions-loot2>
           } }
         </div>
         <div id="page2-text" class="page-text-container">
@@ -26,7 +42,21 @@
           <app-character-disadvantages></app-character-disadvantages>
           } @case (2){
           <app-character-equipment></app-character-equipment>
-          } @case (3) { } }
+          } @case (3) {
+          <app-mandatory-items></app-mandatory-items>
+          } @case (4) {
+          <app-cigar-items></app-cigar-items>
+          } @case (5) {
+          <app-adventure-event></app-adventure-event>
+          } @case (6){
+          <app-actions-camp></app-actions-camp>
+          } @case (7) {
+          <app-actions-main></app-actions-main>
+          } @case (8) {
+          <app-actions-loot></app-actions-loot>
+          } @case (9){
+          <app-actions-loot3></app-actions-loot3>
+          } }
         </div>
         <div id="markers">
           <div

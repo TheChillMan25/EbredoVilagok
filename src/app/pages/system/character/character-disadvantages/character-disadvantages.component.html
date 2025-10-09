@@ -1,14 +1,20 @@
-<h3>Hibák</h3>
+<h2>Hibák</h2>
 <p>
   Válassz egy hibát: (1d100) <br />
   Dobáson kívül a tulajdonságok segítenek indokolni a karakter döntéseit és
   cselekedeteit, a mesélő jutalmat adhat érte.
 </p>
 <p>
-  +1 stressz = -4 a dobáshoz <br />+2 stressz = Hátrány a dobásra (2 kocka
-  dobása után az alacsonyabb érték érvényes)
+  +1 stressz = -4 a dobáshoz <br />+2 stressz =
+  <span
+    class="hoverable"
+    title="2 kocka
+  dobása után az alacsonyabb érték érvényes"
+    >Hátrány</span
+  >
+  a dobásra
 </p>
-<div class="table-container">
+<div class="scrollable-container">
   <mat-table [dataSource]="diadvantagesDataSource">
     <ng-container matColumnDef="diceNum1">
       <mat-header-cell *matHeaderCellDef>Dobás</mat-header-cell>

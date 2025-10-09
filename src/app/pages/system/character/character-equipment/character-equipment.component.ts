@@ -8,7 +8,7 @@ import { Armour, Weapon } from '../character_interfaces';
   templateUrl: './character-equipment.component.html',
   styleUrls: [
     './character-equipment.component.scss',
-    '../character_shared.scss',
+    '../../system_shared.scss',
   ],
 })
 export class CharacterEquipmentComponent {

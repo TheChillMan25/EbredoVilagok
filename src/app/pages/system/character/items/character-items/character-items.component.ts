@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Item } from '../character_interfaces';
+import { Item } from '../../character_interfaces';
 
 @Component({
   selector: 'app-character-items',
   imports: [MatTableModule],
   templateUrl: './character-items.component.html',
-  styleUrls: ['./character-items.component.scss', '../character_shared.scss'],
+  styleUrls: [
+    './character-items.component.scss',
+    '../../../system_shared.scss',
+  ],
 })
 export class CharacterItemsComponent {
   items: Item[] = [

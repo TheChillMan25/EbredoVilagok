@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CharacterVirtues } from '../../virtues_disadvantages';
+import { CharacterVirtues } from '../virtues_disadvantages';
 import {
   VirtueDisadvBase,
   CombinedVirtueDisadvRow,
@@ -12,7 +12,7 @@ import {
   templateUrl: './character-virtues.component.html',
   styleUrls: [
     './character-virtues.component.scss',
-    './../character_shared.scss',
+    './../../system_shared.scss',
   ],
 })
 export class CharacterVirtuesComponent {

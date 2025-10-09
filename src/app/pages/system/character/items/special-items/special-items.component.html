@@ -1,0 +1,18 @@
+<h2>Különleges tárgyak és eszközök</h2>
+<p class="italic-text">
+  Ezek az eszközök nem szükségesek a kalandozáshoz, cserébe az okos használatuk
+  jelentheti az élet és halál közötti különbséget. Erős és mágikus eszközökről
+  van szó, emiatt viszont veszélyesek is, sokuk használata akár függőséget is
+  okozhat.
+</p>
+<p class="sub-title">A tájak italai</p>
+<div class="scrollable-container">
+  @for (item of specialDrinks; track $index) {
+  <div class="spec-drink-container">
+    <span
+      ><strong>{{ item.name }}:</strong> {{ item.desc }}</span
+    >
+    <span>- {{ item.effect }}</span>
+  </div>
+  }
+</div>

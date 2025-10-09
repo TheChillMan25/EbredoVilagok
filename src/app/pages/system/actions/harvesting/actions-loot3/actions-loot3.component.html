@@ -1,0 +1,31 @@
+<p class="sub-title">Szüretelési méret táblázat</p>
+<div class="scrollable-container">
+  <mat-table [dataSource]="harvestingSizeDataSource">
+    <ng-container matColumnDef="size">
+      <mat-header-cell *matHeaderCellDef>Méret</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.size }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="time">
+      <mat-header-cell *matHeaderCellDef>Idő</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.time }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="helpers">
+      <mat-header-cell *matHeaderCellDef
+        >Segítők maximális száma</mat-header-cell
+      >
+      <mat-cell *matCellDef="let element">{{ element.helpers }} db</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displaySizeColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displaySizeColumns"></mat-row>
+  </mat-table>
+</div>
+<p class="sub-title">Általános szüretelési listák</p>
+<div class="scrollable-container">
+  @for (item of sourceDatas; track $index) {
+  <app-table-template
+    [creatureName]="item.name"
+    [sourceData]="item.data"
+  ></app-table-template>
+  }
+</div>

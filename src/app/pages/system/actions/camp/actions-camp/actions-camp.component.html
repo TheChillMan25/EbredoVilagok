@@ -1,0 +1,52 @@
+<h2>Tábori akciók</h2>
+<div class="italic-text" style="display: block">
+  A pihenés még a legkitartóbb kalandornak is létfontosságú. Időt ad hogy
+  bekötözzétek a sebeiteket és egy pillanatnyi nyugalmat szerezzetek magatoknak.
+  Ezt az időt két részre csoportosítjuk az idejüktől függően.
+</div>
+
+<p>
+  A <strong>pihenés</strong> egy <strong>maximum</strong> 1 órás akció ami alatt
+  összeszedhetik magukat a kalandorok. Ez az idő elég arra hogy kifújd magad és
+  megszámold a sebeidet, de semmi másra.
+</p>
+<p>
+  <strong>Táborozáskor</strong> az egész csapat tábort ver az éjszakára,
+  étkeznek a fejadagokból és végrehajtják a (TA) tábori akcióikat. Egy tábori
+  akciót egy karakter csak egyszer hajthat végre ugyanaz a táborozás alatt.
+</p>
+
+<p>
+  <strong>Tábori akciók meghatározása:</strong> Kitartás / 2 +
+  <span class="italic-text hoverable" title="Karakter szintje" style="display: inline;"
+    >szint</span
+  >
+</p>
+
+<article>
+  <p class="sub-title">Kötelező feladatok</p>
+  <div>
+    Ezeket az akciókat minden táborozásnál meg kell csinálnia a csapat
+    valamelyik tagjának, különben megkockáztatnak egy rajtaütést, hiszen soha
+    nem lehet tudni ki vagy mi vár a tábortűz szélén.
+  </div>
+  <ol>
+    @for (item of campActions; track $index) {
+    <li title="{{ item.desc }}">
+      <strong>{{ item.name }}</strong> - ( {{ item.cost }} ) TA
+    </li>
+    }
+  </ol>
+</article>
+<p>
+  Ha a tábori feladatokból bármelyiket nem teljesítik, 1d4 dobást kell
+  végrehajtani, ahol minden nem teljesített akció számánál rajtaütnek a
+  kalandorokon. Ha mindegyiket teljesítik a kalandorok, nincs szükség dobásra.
+</p>
+<span class="sub-title">Példa:</span>
+<div class="italic-text">
+  A csapatotok meggyújtotta a tüzet, összerakta a sátrakat és felállította a
+  csapdákat, viszont a két ember közül csak az egyikőtök tudta ébren végig
+  csinálni az őrséget, így a 4. feladat teljesítetlen maradt. Így az 1d4
+  dobásnál ha a 4-et dob a játékmester, akkor rajtaütnek a csapaton.
+</div>
