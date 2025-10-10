@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,16 +16,22 @@ export class NavbarComponent {
 
   private authSubscription?: Subscription;
 
-  //constructor(private authService: AuthService){}
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = Boolean(localStorage.getItem('isLoggedIn'));
-    console.log(this.isLoggedIn);
+    this.authSubscription = this.authService.currentUser.subscribe((user) => {
+      this.isLoggedIn = !!user;
+      localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
+    });
   }
 
   logout(): void {
+    this.isLoggedOutEvent.emit(false);
     this.isLoggedIn = false;
-    localStorage.setItem('isLoggedIn', this.isLoggedIn ? 'true' : 'false');
-    
+    this.authService.signOut();
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
   }
 }
