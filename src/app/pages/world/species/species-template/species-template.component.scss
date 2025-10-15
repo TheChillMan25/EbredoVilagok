@@ -89,3 +89,41 @@
     overscroll-behavior-y: none;
   }
 }
+
+@media (max-width: 768px) {
+  #content {
+    .species-container {
+      flex-direction: column;
+      align-items: center;
+
+      .img-container {
+        width: 50%;
+      }
+
+      .species-desc-container {
+        width: 90%;
+        .fake-button {
+          margin: auto;
+        }
+      }
+    }
+  }
+
+  #ui-container {
+    .species-properties-container {
+      width: 100%;
+      height: 50%;
+      flex-direction: column;
+      overflow-y: auto;
+
+      .properties,
+      .homes {
+        width: 100%;
+
+        .property-inner-container {
+          overscroll-behavior-y: auto;
+        }
+      }
+    }
+  }
+}

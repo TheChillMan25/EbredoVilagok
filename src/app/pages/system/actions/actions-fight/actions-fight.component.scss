@@ -17,3 +17,13 @@ article {
     }
   }
 }
+
+@media (max-width: 900px){
+  article{
+    columns: unset;
+    height: auto;
+    .columns{
+      height: auto;
+    }
+  }
+}

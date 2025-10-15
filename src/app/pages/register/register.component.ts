@@ -72,8 +72,7 @@ export class RegisterComponent {
 
     this.authService
       .register(email, psw, username)
-      .then((userCredential) => {
-        console.log('Sikeres regisztráció: ', userCredential.user);
+      .then(() => {
         this.authService.updateLoginStatus(true);
         this.router.navigateByUrl('/index');
       })

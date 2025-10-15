@@ -58,41 +58,37 @@
           <app-actions-loot3></app-actions-loot3>
           } }
         </div>
-        <div id="markers">
-          <div
-            id="character"
-            class="marker"
-            (click)="setActiveSegment('character')"
-          >
-            Karakter
-          </div>
-          <div
-            id="adventure"
-            class="marker"
-            (click)="setActiveSegment('adventure')"
-          >
-            Kaland
-          </div>
-          <div
-            id="actions"
-            class="marker"
-            (click)="setActiveSegment('actions')"
-          >
-            Akciók
-          </div>
+      </div>
+      <div id="markers" [ngClass]="{visibleMarker: visibleMarkers}">
+        <div
+          id="character"
+          class="marker"
+          (click)="setActiveSegment('character')"
+        >
+          Karakter
+        </div>
+        <div
+          id="adventure"
+          class="marker"
+          (click)="setActiveSegment('adventure')"
+        >
+          Kaland
+        </div>
+        <div id="actions" class="marker" (click)="setActiveSegment('actions')">
+          Akciók
         </div>
       </div>
     </div>
-    <div id="buttons">
-      @if(activePageIndex > 0){
-      <div id="prev" class="fake-button" (click)="prev()" title="Előző">
-        <mat-icon>arrow_back_ios_new</mat-icon>
-      </div>
-      } @if(activePageIndex < maxPageIndex){
-      <div id="next" class="fake-button" (click)="next()" title="Következő">
-        <mat-icon>arrow_forward_ios_new</mat-icon>
-      </div>
-      }
+  </div>
+  <div id="buttons">
+    <div id="prev" class="fake-button" (click)="prev()" title="Előző">
+      <mat-icon>arrow_back_ios_new</mat-icon>
+    </div>
+    <div id="marker-toggle" (click)="toggleMarkers()">
+      <mat-icon>article</mat-icon>
+    </div>
+    <div id="next" class="fake-button" (click)="next()" title="Következő">
+      <mat-icon>arrow_forward_ios_new</mat-icon>
     </div>
   </div>
 </div>

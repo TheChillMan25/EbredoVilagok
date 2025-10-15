@@ -1,3 +1,20 @@
 app-card-container {
   gap: 4rem;
 }
+
+@media (max-width: 768px) {
+  #content {
+    app-card-container {
+      flex-flow: row wrap;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  #content {
+    app-card-container {
+      height: 70%;
+    }
+  }
+}
