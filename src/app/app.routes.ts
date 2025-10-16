@@ -20,14 +20,20 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/system/system.component').then((m) => m.SystemComponent),
   },
-  /* {
+  {
     path: 'register',
     title: 'Regisztráció',
     loadComponent: () =>
       import('./pages/register/register.component').then(
         (m) => m.RegisterComponent
       ),
-  }, */
+  },
+  {
+    path: 'login',
+    title: 'Bejelentkezés',
+    loadComponent: () =>
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
+  },
   {
     path: 'fajok',
     title: 'Ágas és Bogas | Fajok',

@@ -12,7 +12,7 @@ import {
 } from '@angular/fire/auth';
 import { collection } from 'firebase/firestore';
 import { doc, Firestore, setDoc } from '@angular/fire/firestore';
-import { User } from '../models/models';
+import { User } from '../../models/models';
 
 @Injectable({
   providedIn: 'root',

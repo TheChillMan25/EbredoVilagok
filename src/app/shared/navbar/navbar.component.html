@@ -37,9 +37,12 @@
     Fórum
   </div>
   <div id="loggers">
+    <div id="contact" class="navbar-link">
+      <mat-icon>mail</mat-icon>
+    </div>
     @if(isLoggedIn){
-    <div id="profile" class="navbar-link" [routerLink]="['/register']">
-      <span id="username">Chad</span><mat-icon>person</mat-icon>
+    <div id="profile" class="navbar-link" [routerLink]="['/profil']">
+      <mat-icon>person</mat-icon>
     </div>
     <div id="sign-out" class="navbar-link" (click)="logout()">
       <mat-icon>logout</mat-icon>
