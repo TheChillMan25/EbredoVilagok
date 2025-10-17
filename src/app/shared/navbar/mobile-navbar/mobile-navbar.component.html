@@ -74,12 +74,31 @@
     ><span class="mobile-nav-link-name">Fórum</span></a
   >
   @if(isLoggedIn){
-  <a mat-list-item class="mobile-nav-link" routerLink="/profile"
-    ><span class="mobile-nav-link-name">Profil</span></a
+  <a
+    mat-list-item
+    class="mobile-nav-link"
+    routerLink="/profil"
+    (click)="closeMenu()"
+    ><span class="mobile-nav-link-name"
+      >Profil <mat-icon>person</mat-icon></span
+    ></a
+  >
+  <a
+    mat-list-item
+    class="mobile-nav-link"
+    routerLink="/profil"
+    (click)="logout()"
+    ><span class="mobile-nav-link-name"
+      >Kilép <mat-icon>logout</mat-icon></span
+    ></a
   >
   }@else {
   <div id="login-container">
-    <a mat-list-item class="mobile-nav-link" routerLink="/login"
+    <a
+      mat-list-item
+      class="mobile-nav-link"
+      routerLink="/login"
+      (click)="closeMenu()"
       ><span class="mobile-nav-link-name"
         >Belép<mat-icon>login</mat-icon></span
       ></a

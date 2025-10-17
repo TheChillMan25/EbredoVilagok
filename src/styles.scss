@@ -106,15 +106,16 @@ button:hover {
   background-color: $text-secondary !important;
 }
 
-#title,
-#subtitle,
+.title,
+.subtitle,
 #forum-button,
-#bottom-text,
-app-card-container {
+#bottom-text {
   position: relative;
+  text-align: center;
 }
 
 app-card-container {
+  position: relative;
   display: flex;
   width: 100%;
   justify-content: center;
@@ -194,4 +195,80 @@ mat-cell:nth-child(even) {
 ::-webkit-scrollbar-thumb:hover {
   background: #f2c480;
   //background: #555;
+}
+
+@media (max-height: 685px) and (orientation: landscape) {
+  #content {
+    overflow-y: auto;
+    .title {
+      font-size: 2rem;
+    }
+    .subtitle {
+      font-size: 2rem;
+    }
+    #bottom-text {
+      font-size: medium;
+    }
+
+    .fake-button {
+      padding: 0.5rem;
+    }
+
+    app-card-container {
+      height: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        width: 0;
+      }
+    }
+  }
+}
+
+@media (max-height: 670px) and (orientation: landscape) and (max-width: 900px) {
+  #content {
+    gap: 0.5rem;
+    app-card-container {
+      height: 70%;
+      flex-direction: row;
+      justify-content: space-around;
+      scroll-snap-type: x mandatory;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  app-card-container {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: none;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    justify-content: space-between;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
+  }
+  .title {
+    font-size: 3rem;
+  }
+  .subtitle {
+    font-size: 2rem;
+  }
+  #bottom-text {
+    font-size: large;
+  }
+}
+
+@media (max-width: 425px) {
+  .title {
+    font-size: 2.5rem;
+  }
 }

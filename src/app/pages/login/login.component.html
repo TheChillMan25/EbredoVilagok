@@ -1,0 +1,37 @@
+<div id="content">
+  <span id="title">Bejelentkezés</span>
+  <div id="login-container">
+    @if (isLoading) {
+    <div class="loading-container">
+      <h2>Bejelentkezés folyamatban</h2>
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Kérlek várj...</p>
+    </div>
+    } @if (showLoginForm) {
+    <form (ngSubmit)="login()" class="login-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [formControl]="email" />
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [formControl]="password" />
+        <mat-icon matSuffix>lock</mat-icon>
+      </mat-form-field>
+
+      @if (loginError) {
+      <div class="error-message">
+        {{ loginError }}
+      </div>
+      }
+
+      <button mat-flat-button color="primary" type="submit">
+        Bejelentkezés
+      </button>
+      <a id="registerBtn" [routerLink]="['/register']"> Nincs még fiókom </a>
+    </form>
+    }
+  </div>
+</div>

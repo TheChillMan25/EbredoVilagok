@@ -12,7 +12,7 @@ import {
 } from '@angular/fire/auth';
 import { collection } from 'firebase/firestore';
 import { doc, Firestore, setDoc } from '@angular/fire/firestore';
-import { User } from '../models/models';
+import { Adventure, Character, User } from '../../models/models';
 
 @Injectable({
   providedIn: 'root',
@@ -55,8 +55,8 @@ export class AuthService {
         id: userCredential.user.uid,
         username: username,
         email: email,
-        characters: [] as string[],
-        adventures: [] as string[],
+        characters: [] as Character[],
+        adventures: [] as Adventure[],
       });
       return userCredential;
     } catch (error) {

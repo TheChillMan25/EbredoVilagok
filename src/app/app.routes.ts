@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { IndexComponent } from './pages/index/index.component';
 import { PagenotfoundComponent } from './shared/pagenotfound/pagenotfound.component';
+import { authGuard, publicGuard } from './shared/guards/auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,21 +14,40 @@ export const routes: Routes = [
     title: 'Ágas és Bogas | Világ',
     loadComponent: () =>
       import('./pages/world/world.component').then((m) => m.WorldComponent),
+    canActivate: [publicGuard],
   },
   {
     path: 'rendszer',
     title: 'Ágas és Bogas | Rendszer',
     loadComponent: () =>
       import('./pages/system/system.component').then((m) => m.SystemComponent),
+    canActivate: [publicGuard],
   },
-  /* {
+  {
     path: 'register',
     title: 'Regisztráció',
     loadComponent: () =>
       import('./pages/register/register.component').then(
         (m) => m.RegisterComponent
       ),
-  }, */
+    canActivate: [publicGuard],
+  },
+  {
+    path: 'login',
+    title: 'Bejelentkezés',
+    loadComponent: () =>
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
+    canActivate: [publicGuard],
+  },
+  {
+    path: 'profil',
+    title: 'Profil',
+    loadComponent: () =>
+      import('./pages/profile/profile.component').then(
+        (m) => m.ProfileComponent
+      ),
+    canActivate: [authGuard],
+  },
   {
     path: 'fajok',
     title: 'Ágas és Bogas | Fajok',
@@ -43,6 +63,15 @@ export const routes: Routes = [
       import(
         './pages/world/species/species-template/species-template.component'
       ).then((m) => m.SpeciesTemplateComponent),
+  },
+  {
+    path: 'tajak',
+    title: 'Tájak és Királyságok',
+    loadComponent: () =>
+      import('./pages/world/lands/lands.component').then(
+        (m) => m.LandsComponent
+      ),
+    canActivate: [publicGuard],
   },
   {
     path: '',

@@ -1,0 +1,154 @@
+#content {
+  flex-direction: row;
+  justify-content: center;
+  #profile-panel {
+    width: 20%;
+    height: 95%;
+    background-color: #333;
+    border-radius: 0.5rem 0 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    padding: 1rem;
+
+    #img-container {
+      width: 80%;
+      img {
+        width: 100%;
+        border-radius: 50%;
+      }
+    }
+
+    #profile-data {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      align-items: center;
+
+      #username {
+        font-size: 3rem;
+      }
+      #email {
+        font-size: 1.3rem;
+        display: block;
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
+        overflow-x: auto;
+      }
+    }
+  }
+  #main-container {
+    height: 95%;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    #containers {
+      width: 100%;
+      height: 85%;
+      background-color: rgba(51, 51, 51, 0.425);
+      border-radius: 0 0.5rem 0.5rem 0;
+      .container {
+        height: 50%;
+        width: 100%;
+      }
+    }
+    #button-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: fit-content;
+      padding: 1rem;
+      background-color: #333;
+      border-radius: 0 0 0.5rem 0.5rem;
+
+      .fake-button {
+        background-color: #555;
+        padding: 0.7rem;
+        font-size: x-large;
+        color: whitesmoke;
+        border-radius: 0.3rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  #content {
+    #profile-panel {
+      width: 25%;
+      #profile-data {
+        #username {
+          font-size: 1.5rem;
+        }
+      }
+    }
+    #main-container{
+      width: 70%;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #content {
+    padding: 1rem;
+    flex-direction: column;
+    #profile-panel {
+      width: 100%;
+      height: 15%;
+      border-radius: 0.5rem 0.5rem 0 0;
+      flex-direction: row;
+
+      #img-container {
+        width: 4rem;
+        height: 4rem;
+      }
+      #profile-data {
+        width: 100%;
+        align-items: start;
+        gap: 0;
+        #username {
+          font-size: 2rem;
+        }
+        #email {
+          display: block;
+        }
+      }
+    }
+    #main-container {
+      width: 100%;
+      #containers {
+        border-radius: 0 0 0.5rem 0.5rem;
+        flex: 2;
+      }
+      #button-container {
+        justify-content: space-around;
+        padding: 0.5rem;
+        width: 100%;
+        .fake-button {
+          font-size: large;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  #content {
+    #profile-panel {
+      #profile-data {
+        #username {
+          font-size: 1.25rem;
+        }
+        #email {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}

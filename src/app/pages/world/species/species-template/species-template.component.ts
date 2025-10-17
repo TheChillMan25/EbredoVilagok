@@ -28,8 +28,6 @@ export class SpeciesTemplateComponent {
     if (this.id) {
       this.currentSpecies = species[this.id];
     }
-    console.log(this.id);
-    console.log(this.currentSpecies)
   }
 
   showProperties(id: string) {

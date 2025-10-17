@@ -83,3 +83,37 @@ table {
     padding: 1rem;
   }
 }
+
+@media (max-width: 1300px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 3rem;
+  }
+
+  .scrollable-container {
+    height: auto;
+    overflow-y: unset;
+  }
+
+  mat-cell,
+  mat-header-cell {
+    padding: 0.3rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .title {
+    font-size: 1.5rem;
+  }
+}

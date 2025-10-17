@@ -21,6 +21,7 @@ import { ActionsLoot3Component } from './actions/harvesting/actions-loot3/action
 import { MandatoryItemsComponent } from './character/items/mandatory-items/mandatory-items.component';
 import { SpecialItemsComponent } from './character/items/special-items/special-items.component';
 import { CigarItemsComponent } from './character/items/cigar-items/cigar-items.component';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-system',
@@ -46,7 +47,8 @@ import { CigarItemsComponent } from './character/items/cigar-items/cigar-items.c
     MandatoryItemsComponent,
     SpecialItemsComponent,
     CigarItemsComponent,
-  ],
+    NgClass
+],
   templateUrl: './system.component.html',
   styleUrl: './system.component.scss',
 })
@@ -55,10 +57,13 @@ export class SystemComponent {
   activeSegmentName: 'character' | 'adventure' | 'actions' = 'character';
   activePageIndex: number = 0;
   maxPageIndex: number = 9;
+  visibleMarkers: boolean = true;
 
   mainPageIndexes = {
-    char: 0, adv: 5, act: 7
-  }
+    char: 0,
+    adv: 5,
+    act: 7,
+  };
 
   ngOnInit(): void {
     setBackground(this.background);
@@ -85,13 +90,21 @@ export class SystemComponent {
   }
 
   prev(): void {
-    if (this.activePageIndex > 0) this.activePageIndex--;
-    this.checkPage();
+    if (this.activePageIndex > 0) {
+      this.activePageIndex--;
+      this.checkPage();
+      this.manageScroll();
+    }
+    return;
   }
 
   next(): void {
-    if (this.activePageIndex < this.maxPageIndex) this.activePageIndex++;
-    this.checkPage();
+    if (this.activePageIndex < this.maxPageIndex) {
+      this.activePageIndex++;
+      this.checkPage();
+      this.manageScroll();
+    }
+    return;
   }
 
   setActivePage(index: number) {
@@ -101,7 +114,10 @@ export class SystemComponent {
   checkPage() {
     if (this.activePageIndex < this.mainPageIndexes['adv']) {
       this.handleMarkerVisualization('character');
-    } else if (this.activePageIndex >= this.mainPageIndexes['adv'] && this.activePageIndex < this.mainPageIndexes['act']) {
+    } else if (
+      this.activePageIndex >= this.mainPageIndexes['adv'] &&
+      this.activePageIndex < this.mainPageIndexes['act']
+    ) {
       this.handleMarkerVisualization('adventure');
     } else {
       this.handleMarkerVisualization('actions');
@@ -114,5 +130,26 @@ export class SystemComponent {
       ?.classList.remove('selectedMarker');
     this.activeSegmentName = segment;
     document.getElementById(segment)?.classList.add('selectedMarker');
+  }
+
+  toggleMarkers() {
+    this.visibleMarkers = !this.visibleMarkers;
+  }
+
+  manageScroll() {
+    const container = document.getElementById('page-text-container');
+    if (container) {
+      container.scrollTop = 0;
+    } else {
+      console.warn('Nincsen #page-text-container-hez');
+    }
+    const textContainers = document.querySelectorAll('.page-text-container');
+    if (textContainers) {
+      textContainers.forEach((page) => {
+        page.scrollTop = 0;
+      });
+    } else {
+      console.warn('Nincsenek .page-text-container-ek');
+    }
   }
 }

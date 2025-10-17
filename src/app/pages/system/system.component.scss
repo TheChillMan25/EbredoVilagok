@@ -65,62 +65,61 @@
 
     #markers {
       position: absolute;
-      z-index: 10;
+      z-index: 100;
       right: 0;
       display: flex;
       flex-direction: column;
       gap: 1rem;
-    }
+      #character {
+        background-color: purple;
+        top: 0;
+      }
+      #character::after {
+        border-left-color: purple;
+      }
+      #adventure {
+        background-color: darkblue;
+        top: 4rem;
+      }
+      #adventure::after {
+        border-left-color: darkblue;
+      }
+      #actions {
+        background-color: green;
+        top: 8rem;
+      }
+      #actions::after {
+        border-left-color: green;
+      }
 
-    #character {
-      background-color: purple;
-      top: 0;
-    }
-    #character::after {
-      border-left-color: purple;
-    }
-    #adventure {
-      background-color: darkblue;
-      top: 4rem;
-    }
-    #adventure::after {
-      border-left-color: darkblue;
-    }
-    #actions {
-      background-color: green;
-      top: 8rem;
-    }
-    #actions::after {
-      border-left-color: green;
-    }
+      .marker {
+        position: absolute;
+        width: 6rem;
+        padding: 1rem 0.5rem;
+        color: white;
+        cursor: pointer;
+      }
 
-    .marker {
-      position: absolute;
-      width: 6rem;
-      padding: 1rem 0.5rem;
-      color: white;
-      cursor: pointer;
-    }
+      .marker:hover {
+        width: 7rem;
+      }
 
-    .marker:hover {
-      width: 7rem;
-    }
+      .marker::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -30px;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 25px solid transparent;
+        border-bottom: 25px solid transparent;
+        border-left: 30px solid;
+      }
 
-    .marker::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -30px;
-      transform: translateY(-50%);
-      width: 0;
-      height: 0;
-      border-top: 25px solid transparent;
-      border-bottom: 25px solid transparent;
-      border-left: 30px solid;
-    }
-
-    .selectedMarker {
-      width: 7rem !important;
+      .selectedMarker {
+        width: 7rem !important;
+      }
     }
   }
 }
@@ -139,10 +138,14 @@
   }
 
   #prev {
-    left: -10%;
+    left: 10%;
   }
   #next {
-    right: -10%;
+    right: 10%;
+  }
+
+  #marker-toggle {
+    display: none;
   }
 }
 
@@ -170,5 +173,66 @@ app-actions-loot3 {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  justify-content: space-around;
+  overflow-y: auto;
+}
+.visibleMarker {
+  display: flex !important;
+}
+
+@media (max-width: 900px) {
+  #content {
+    justify-content: space-between;
+    #book {
+      width: 98%;
+      #pages {
+        #page-text-container {
+          flex-direction: column;
+          overflow-y: auto;
+          .page-text-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: unset;
+            padding: 0.5rem;
+          }
+        }
+        #markers {
+          display: none;
+          left: 0;
+        }
+      }
+    }
+    #buttons {
+      display: flex;
+      width: 100%;
+      background-color: #444;
+      z-index: 30;
+      .fake-button {
+        position: relative;
+        height: auto;
+        width: 4rem;
+        height: 2rem;
+        z-index: 32;
+        border-radius: 0;
+
+        mat-icon {
+          cursor: pointer;
+        }
+      }
+
+      #marker-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f2c480;
+        margin: auto;
+      }
+
+      #prev {
+        left: 0;
+      }
+      #next {
+        right: 0;
+      }
+    }
+  }
 }
