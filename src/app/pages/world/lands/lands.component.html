@@ -1,0 +1,79 @@
+<div id="content">
+  <article>
+    <h1>Tájak és Királyságok</h1>
+    <p>
+      Évszázadokkal ezelőtt történt hogy az akkori tudósok változást észleltek a
+      mágia áramlásában. De mit értek mágia alatt? Nem egyszerű láthatatlan
+      erőt, a mágia az alkotás és létezés maga. Benne van minden élő és
+      élettelenben, minden ki- és belégzésben. Az élőlények, így az emberek is
+      termelik a mágiát.
+    </p>
+    <p>
+      A levegővel amit beszívunk, az étellel amit megeszünk és az itallal amit
+      megiszunk mind mágiát szívunk magunkba. Az amit léleknek nevezünk az
+      igazából tömény mágia, egy végtelen könyv amibe minden emlékünk és
+      gondolatunkat beleírjuk. A saját lelkünk és a környezet mágiájának a
+      koncentrált használatával vagyunk képesek arra a csodálatos dologra amit
+      egyszerűen úgy hívunk hogy varázslás. A tudósok azt vették észre hogy a
+      mágus egyetemeken (ebbe inkább nem megyek most bele) a tanoncok évről évre
+      jobban teljesítettek és egyre többen jelentek meg természet adta
+      aptitűddel. Jobb alatt nem a tudásukra gondolok, hanem a természetes
+      képességükre hogy felszívják és tárolják a mágiát a környezetükből. Ez
+      eljutott a pontra hogy még egy átlag földműves is képes volt tüzet
+      csiholni egy csettintéssel ha eleget gyakorolta.
+    </p>
+    <p>
+      Egy kézen fogható magyarázat volt erre, több mágia lett a világban. Senki
+      sem gondolta volna hogy ez a kis kibillenés az egyensúlyban egy áradáshoz
+      vezet ami elmossa az ősi királyságok nagyobb részét. Ez az árvíz minden
+      félévben visszahúzódik és elfeledett nevű paloták és városok romjai jönnek
+      a felszínre.
+    </p>
+    <p>
+      Az emberek, szokásukhoz híven, alkalmazkodtak. A megnövekedett
+      varázserőnek köszönhetően az újra rajzolódott térképen a túlélők új
+      otthont építettek fel röpke évtizedek alatt. A világot három nagy
+      területre osztották szét. Nyugatvég, ahol az év felében a toronyvárosoknak
+      nevezett, felhőkig érő kőoszlopokra vagy hegyekre épített nagyvárosok
+      emelkednek ki a víztömegből. Folyóköz amit minden oldalról hegyvonulatok
+      vesznek körül így szinte semmi pusztítást nem végzett az áradás és a
+      Keleti tájak ahol nemrég egy hatalmas mágikus gátat húztak fel hogy
+      megvédjék magukat az özönvíz pusztítása elől.
+    </p>
+    <p>
+      A három fő tájékon kívül délre helyezkedik el az Üvegsivatag, de az azt a
+      fő kontinenssel összekötő hegyvonulaton nem egyszerű átjutni, az északi
+      szigeteket pedig mindenki elveszettnek hitte amíg nem jöttek hírek
+      ismeretlen tiszta fém hajókról a toronyvárosok közelében. Nem egy vagy
+      kettő kósza hajóról, de flottákról amit egy hegyeket is áttörő anyahajó
+      kísér. A beszámolókban volt jelentés egy szigetről is fából fémből és
+      füstből. Mindig is hajós népek voltak, ezen az áradás csak segített.
+    </p>
+    <p>
+      A mágia nem csak katasztrófát és királyságok pusztulását hozta magával,
+      hanem a túlélés kulcsát is. A növények és az állatok rohamos evolúción
+      mentek keresztül hogy alkalmazkodjanak az új környezetükhöz. Ember méretű
+      bogarak repdesnek a faként parádézó virágok között, alakváltó lények,
+      állatok amik vizet isznak és felhőket alkotnak. Az embereknél voltak talán
+      a legdrasztikusabb változások, az elzárva élő népek pár generáció
+      leforgása alatt felismerhetetlenné, szinte más fajjá változtak. Az eszmei
+      és technikai fejlődés viszont megállt pár száz évre, de a városokat
+      újraépítettük, a fegyvereket újra kovácsoltuk, és ami a legfontosabb, újra
+      felfedeztük a puskaport és annak a csodálatos tulajdonságait. A mágia az
+      egyenlítő erő a puska és a tőr között. A birtokosuk ad nekik erőt, és mint
+      tudjuk puszta szavakkal is lehet háborúkat nyerni.
+    </p>
+  </article>
+  @for (land of lands; track $index) {
+  <div class="land-container">
+    <div class="img-container">
+      <img src="assets/img/regions/{{ land.img }}" alt="{{ land.name }}" />
+    </div>
+    <div class="desc-container">
+      <div class="land-name">{{ land.name }}</div>
+      <hr />
+      <div class="land-desc">{{ land.desc }}</div>
+    </div>
+  </div>
+  }
+</div>

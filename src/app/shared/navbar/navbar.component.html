@@ -48,8 +48,15 @@
       <mat-icon>logout</mat-icon>
     </div>
     } @if(!isLoggedIn){
+    <div
+      id="register-container"
+      class="navbar-link"
+      [routerLink]="['/register']"
+    >
+      <mat-icon>person_add</mat-icon>
+    </div>
     <div id="login-container" class="navbar-link" [routerLink]="['/login']">
-      <span id="login">Bejelentkezés</span><mat-icon>login</mat-icon>
+      <mat-icon>login</mat-icon>
     </div>
     }
   </div>
