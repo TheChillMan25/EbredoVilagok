@@ -74,6 +74,13 @@ export const routes: Routes = [
     canActivate: [publicGuard],
   },
   {
+    path: 'forum',
+    title: 'Ébredő Világok Fórum',
+    loadComponent: () =>
+      import('./pages/forum/forum.component').then((m) => m.ForumComponent),
+    canActivate: [publicGuard],
+  },
+  {
     path: '',
     redirectTo: 'index',
     pathMatch: 'full',

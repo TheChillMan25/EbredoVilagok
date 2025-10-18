@@ -18,7 +18,7 @@ type SpeciesId =
 const SPECIES_NAME_MAP: Record<SpeciesId, string> = {
   folyokoz: 'Folyóköz',
   toronyvarosok: 'Toronyvárosok',
-  'kelet_nepe': 'Kelet Népe',
+  kelet_nepe: 'Kelet Népe',
   novenyszerzetek: 'Növényszerzetek',
   gepszulottek: 'Gépszülöttek',
   atkozottak: 'Átkozottak',

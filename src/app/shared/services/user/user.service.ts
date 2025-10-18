@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from '../auth/auth.service';
 import { from, Observable, of, switchMap } from 'rxjs';
-import { Adventure, Character, User } from '../../models/models';
+import {
+  Adventure,
+  Character,
+  ForumPost,
+  ForumUser,
+  User,
+} from '../../models/models';
 import {
   collection,
   doc,
@@ -44,6 +50,26 @@ export class UserService {
     );
   }
 
+  getForumUserProfile(): Observable<{
+    user: ForumUser | null;
+    posts: ForumPost[];
+  }> {
+    return (
+      this,
+      this.authService.currentUser.pipe(
+        switchMap((authUser) => {
+          if (!authUser) {
+            return of({
+              user: null,
+              posts: [],
+            });
+          }
+          return from(this.fetchUserWithForumData(authUser.uid));
+        })
+      )
+    );
+  }
+
   private async fetchUserWidthData(userID: string): Promise<{
     user: User | null;
     username: string;
@@ -69,34 +95,8 @@ export class UserService {
       const userData = userSnapshot.data() as User;
       const user = { ...userData, id: userID };
 
-      switch (this.checkMissingData(user)) {
-        case 'c':
-          return {
-            user,
-            username: user.username ?? '',
-            email: user.email ?? '',
-            characters: [],
-            adventures: user.adventures,
-          };
-        case 'a':
-          return {
-            user,
-            username: user.username ?? '',
-            email: user.email ?? '',
-            characters: user.characters,
-            adventures: [],
-          };
-        case 'ca':
-          return {
-            user,
-            username: user.username ?? '',
-            email: user.email ?? '',
-            characters: [],
-            adventures: [],
-          };
-        default:
-          break;
-      }
+      let missingData = this.checkMissingData(user);
+      if (missingData !== null) return missingData;
 
       const characterCollection = collection(this.firestore, 'Characters');
       const q = query(characterCollection, where('id', 'in', user.characters));
@@ -148,10 +148,92 @@ export class UserService {
     }
   }
 
+  private async fetchUserWithForumData(userID: string): Promise<{
+    user: ForumUser | null;
+    posts: ForumPost[];
+  }> {
+    try {
+      const userDocRef = doc(this.firestore, 'Users', userID);
+      const userSnapshot = await getDoc(userDocRef);
+
+      if (!userSnapshot.exists()) {
+        console.warn('Usersnapshot not found!');
+        return {
+          user: null,
+          posts: [],
+        };
+      }
+
+      const userData = userSnapshot.data() as ForumUser;
+      const user = { ...userData, id: userID };
+
+      if (!user.posts || user.posts.length === 0) {
+        return {
+          user,
+          posts: [] as ForumPost[],
+        };
+      }
+
+      const postCollection = collection(this.firestore, 'ForumPosts');
+      const q = query(postCollection, where('id', 'in', user.posts));
+      const postsSnapShot = await getDocs(q);
+
+      const posts: ForumPost[] = [];
+      postsSnapShot.forEach((doc) => {
+        const postData = doc.data();
+        const post: ForumPost = {
+          id: doc.id,
+          title: postData?.['title'] ?? '',
+          type: postData?.['type'] ?? '',
+          text: postData?.['text'] ?? '',
+          attachments: postData?.['attachments'] ?? '',
+        };
+        posts.push(post);
+      });
+      return {
+        user,
+        posts,
+      };
+    } catch (error) {
+      console.error('Hiba a forumfelhasználó betöltésekor: ' + error);
+      return {
+        user: null,
+        posts: [],
+      };
+    }
+  }
+
   checkMissingData(user: User) {
     let missingData = '';
     if (!user.characters || user.characters.length === 0) missingData += 'c';
     if (!user.adventures || user.adventures.length === 0) missingData += 'a';
-    return missingData;
+    switch (missingData) {
+      case 'c':
+        return {
+          user,
+          username: user.username ?? '',
+          email: user.email ?? '',
+          characters: [],
+          adventures: user.adventures,
+        };
+      case 'a':
+        return {
+          user,
+          username: user.username ?? '',
+          email: user.email ?? '',
+          characters: user.characters,
+          adventures: [],
+        };
+      case 'ca':
+        return {
+          user,
+          username: user.username ?? '',
+          email: user.email ?? '',
+          characters: [],
+          adventures: [],
+        };
+      default:
+        return null;
+    }
   }
 }

@@ -185,6 +185,13 @@ app-actions-loot3 {
     #book {
       width: 98%;
       #pages {
+        height: 98%;
+        #page1{
+          width: 100%;
+        }
+        #page2{
+          display: none;
+        }
         #page-text-container {
           flex-direction: column;
           overflow-y: auto;

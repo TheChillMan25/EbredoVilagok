@@ -70,6 +70,14 @@ export class RegisterComponent {
     const email = this.registerForm.value.email || '';
     const psw = this.registerForm.value.psw || '';
 
+    if (username.length > 16) {
+      this.isLoading = false;
+      this.showForm = true;
+      this.registerError =
+        'Használj rövidebb felhasználó nevet. (max 16 karakter)';
+      return;
+    }
+
     this.authService
       .register(email, psw, username)
       .then(() => {
