@@ -57,7 +57,7 @@ export class SystemComponent {
   activeSegmentName: 'character' | 'adventure' | 'actions' = 'character';
   activePageIndex: number = 0;
   maxPageIndex: number = 9;
-  visibleMarkers: boolean = true;
+  visibleMarkers: boolean = false;
 
   mainPageIndexes = {
     char: 0,
