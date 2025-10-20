@@ -6,22 +6,20 @@
   Folyóköz mélyén. A dohányt és a cigarettákat egyaránt színes papírba
   csomagolják, ami elárulja a különböző hatásukat.
 </p>
-<div class="scrollable-container">
-  <mat-table [dataSource]="cigarSourceData">
-    <ng-container matColumnDef="color">
-      <mat-header-cell *matHeaderCellDef>Szín</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.color }}</mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="spice">
-      <mat-header-cell *matHeaderCellDef>Ízesítés</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.spice }}</mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="effect">
-      <mat-header-cell *matHeaderCellDef>Hatás</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.effect }}</mat-cell>
-    </ng-container>
+<mat-table [dataSource]="cigarSourceData">
+  <ng-container matColumnDef="color">
+    <mat-header-cell *matHeaderCellDef>Szín</mat-header-cell>
+    <mat-cell *matCellDef="let element">{{ element.color }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="spice">
+    <mat-header-cell *matHeaderCellDef>Ízesítés</mat-header-cell>
+    <mat-cell *matCellDef="let element">{{ element.spice }}</mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="effect">
+    <mat-header-cell *matHeaderCellDef>Hatás</mat-header-cell>
+    <mat-cell *matCellDef="let element">{{ element.effect }}</mat-cell>
+  </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let rows; columns: displayedColumns"></mat-row>
-  </mat-table>
-</div>
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let rows; columns: displayedColumns"></mat-row>
+</mat-table>
