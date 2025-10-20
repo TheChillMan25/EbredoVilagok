@@ -13,6 +13,7 @@ import {
   styleUrls: [
     './character-virtues.component.scss',
     './../../system_shared.scss',
+    '../../shared-mobile.scss',
   ],
 })
 export class CharacterVirtuesComponent {

@@ -110,6 +110,14 @@ table {
   .title {
     font-size: 2rem;
   }
+
+  .scrollable-container {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
+  }
 }
 
 @media (max-width: 320px) {

@@ -9,3 +9,9 @@ td:first-child {
 .scrollable-container {
   padding: 0.5rem;
 }
+
+@media (max-width: 450px) {
+  .scrollable-container {
+    overflow-x: auto;
+  }
+}

@@ -1,3 +1,12 @@
-mat-cell:nth-child(odd):not(:first-child){
-    color: whitesmoke
+mat-cell:nth-child(odd):not(:first-child) {
+  color: whitesmoke;
+}
+
+#weapons {
+  mat-table {
+    mat-cell:first-child,
+    mat-header-cell:first-child {
+      flex: 2;
+    }
+  }
 }

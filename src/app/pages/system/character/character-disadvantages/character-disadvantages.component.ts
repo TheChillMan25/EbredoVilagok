@@ -13,6 +13,7 @@ import {
   styleUrls: [
     './character-disadvantages.component.scss',
     './../../system_shared.scss',
+    '../../shared-mobile.scss',
   ],
 })
 export class CharacterDisadvantagesComponent {

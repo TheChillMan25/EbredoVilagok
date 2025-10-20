@@ -16,7 +16,11 @@ interface CombinedNationROw {
   selector: 'app-character-species',
   imports: [MatTableModule],
   templateUrl: './character-species.component.html',
-  styleUrls: ['./character-species.component.scss','./../../system_shared.scss']
+  styleUrls: [
+    './character-species.component.scss',
+    './../../system_shared.scss',
+    '../../shared-mobile.scss',
+  ],
 })
 export class CharacterSpeciesComponent {
   nationData: any = NationData;

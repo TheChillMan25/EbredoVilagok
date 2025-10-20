@@ -47,8 +47,8 @@ import { NgClass } from '@angular/common';
     MandatoryItemsComponent,
     SpecialItemsComponent,
     CigarItemsComponent,
-    NgClass
-],
+    NgClass,
+  ],
   templateUrl: './system.component.html',
   styleUrl: './system.component.scss',
 })
@@ -87,6 +87,8 @@ export class SystemComponent {
         break;
       }
     }
+    this.manageScroll();
+    this.visibleMarkers = false;
   }
 
   prev(): void {
