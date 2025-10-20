@@ -6,8 +6,8 @@ ol {
   row-gap: 0.2rem;
 }
 
-.scrollable-container {
-  height: auto !important;
+.table-container {
+  overflow-y: unset !important;
   table {
     width: 100%;
     border-collapse: collapse;

@@ -1,10 +1,6 @@
 * {
   cursor: default;
 }
-.scrollable-container {
-  height: 100%;
-  overflow-y: auto;
-}
 p,
 div {
   text-align: justify;
@@ -95,11 +91,6 @@ table {
     font-size: 3rem;
   }
 
-  .scrollable-container {
-    height: auto;
-    overflow-y: unset;
-  }
-
   mat-cell,
   mat-header-cell {
     padding: 0.3rem !important;
@@ -111,7 +102,7 @@ table {
     font-size: 2rem;
   }
 
-  .scrollable-container {
+  .table-container {
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
