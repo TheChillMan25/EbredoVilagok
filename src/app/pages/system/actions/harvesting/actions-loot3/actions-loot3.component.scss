@@ -9,6 +9,7 @@ mat-table:first-child {
   }
 }
 
-.scrollable-container{
+.scrollable-container {
   padding: 0.5rem;
+  overflow-y: unset !important;
 }

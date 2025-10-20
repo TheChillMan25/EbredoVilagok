@@ -12,6 +12,9 @@ td:first-child {
 
 @media (max-width: 450px) {
   .scrollable-container {
-    overflow-x: auto;
+    overflow-y: unset !important;
+    .scrollable-container {
+      overflow-x: auto;
+    }
   }
 }
