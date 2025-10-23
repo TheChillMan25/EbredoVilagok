@@ -1,7 +1,7 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.dev/guide/theming
 @use "@angular/material" as mat;
-@import url(./app/themes/grey_theme-colors.scss);
+@import url(./app/themes/greytheme.css);
 
 @font-face {
   font-family: "Modern Antiqua";
@@ -194,7 +194,11 @@ mat-cell:nth-child(even) {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #f2c480;
-  //background: #555;
+}
+
+.mat-mdc-text-field-wrapper{
+  background-color: #444;
+  border-radius: .5rem !important;
 }
 
 @media (max-height: 685px) and (orientation: landscape) {

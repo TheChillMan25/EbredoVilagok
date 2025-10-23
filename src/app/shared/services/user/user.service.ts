@@ -95,39 +95,56 @@ export class UserService {
       const userData = userSnapshot.data() as User;
       const user = { ...userData, id: userID };
 
-      let missingData = this.checkMissingData(user);
-      if (missingData !== null) return missingData;
-
-      const characterCollection = collection(this.firestore, 'Characters');
-      const q = query(characterCollection, where('id', 'in', user.characters));
-      const charSnapShot = await getDocs(q);
-
       const characters: Character[] = [];
-      charSnapShot.forEach((doc) => {
-        const characterData = doc.data();
-        const character: Character = {
-          id: doc.id,
-          name: characterData?.['name'] ?? '',
-        };
-        characters.push(character);
-      });
+      if (user.characters && user.characters.length > 0) {
+        const characterCollection = collection(this.firestore, 'Characters');
+        const q = query(
+          characterCollection,
+          where('id', 'in', user.characters)
+        );
+        const charSnapShot = await getDocs(q);
 
-      const adventureCollection = collection(this.firestore, 'Adventures');
-      const q_a = query(
-        adventureCollection,
-        where('id', 'in', user.adventures)
-      );
-      const advSnapShot = await getDocs(q_a);
+        charSnapShot.forEach((doc) => {
+          const characterData = doc.data();
+          const character: Character = {
+            id: doc.id,
+            name: characterData?.['name'] ?? '',
+            species: characterData?.['species'] ?? '',
+            class: characterData?.['class'] ?? '',
+            level: characterData?.['level'] ?? 1,
+            specialProperties: characterData?.['specialProperties'] ?? {},
+            stats: characterData?.['stats'] ?? {},
+            equipment: characterData?.['equipment'] ?? {},
+            virtues: characterData?.['virtues'] ?? {},
+            items: characterData?.['items'] ?? {
+              food: [],
+              specialItems: [],
+              otherItems: [],
+              weaponItems: [],
+            },
+          };
+          characters.push(character);
+        });
+      }
 
       const adventures: Adventure[] = [];
-      advSnapShot.forEach((doc) => {
-        const adventureData = doc.data();
-        const adventure: Adventure = {
-          id: doc.id,
-          name: adventureData?.['name'] ?? '',
-        };
-        adventures.push(adventure);
-      });
+      if (user.adventures && user.adventures.length > 0) {
+        const adventureCollection = collection(this.firestore, 'Adventures');
+        const q_a = query(
+          adventureCollection,
+          where('id', 'in', user.adventures)
+        );
+        const advSnapShot = await getDocs(q_a);
+
+        advSnapShot.forEach((doc) => {
+          const adventureData = doc.data();
+          const adventure: Adventure = {
+            id: doc.id,
+            name: adventureData?.['name'] ?? '',
+          };
+          adventures.push(adventure);
+        });
+      }
 
       return {
         user,
@@ -200,40 +217,6 @@ export class UserService {
         user: null,
         posts: [],
       };
-    }
-  }
-
-  checkMissingData(user: User) {
-    let missingData = '';
-    if (!user.characters || user.characters.length === 0) missingData += 'c';
-    if (!user.adventures || user.adventures.length === 0) missingData += 'a';
-    switch (missingData) {
-      case 'c':
-        return {
-          user,
-          username: user.username ?? '',
-          email: user.email ?? '',
-          characters: [],
-          adventures: user.adventures,
-        };
-      case 'a':
-        return {
-          user,
-          username: user.username ?? '',
-          email: user.email ?? '',
-          characters: user.characters,
-          adventures: [],
-        };
-      case 'ca':
-        return {
-          user,
-          username: user.username ?? '',
-          email: user.email ?? '',
-          characters: [],
-          adventures: [],
-        };
-      default:
-        return null;
     }
   }
 }

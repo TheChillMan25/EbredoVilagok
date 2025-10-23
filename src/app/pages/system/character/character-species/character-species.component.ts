@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { NationData } from '../NationData';
+import { NationData } from '../../../../shared/models/NationData';
 
 interface Nation {
   diceNum: number;

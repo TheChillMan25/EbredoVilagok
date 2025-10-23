@@ -81,6 +81,15 @@ export const routes: Routes = [
     canActivate: [publicGuard],
   },
   {
+    path: 'karakter-keszito',
+    title: 'Karakter készítő',
+    loadComponent: () =>
+      import('./pages/creator/karakter/karakter.component').then(
+        (m) => m.KarakterComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     redirectTo: 'index',
     pathMatch: 'full',

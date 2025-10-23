@@ -45,7 +45,6 @@ export class AuthService {
     username: string
   ): Promise<UserCredential> {
     try {
-
       const userCredential = await createUserWithEmailAndPassword(
         this.auth,
         email,
@@ -56,8 +55,8 @@ export class AuthService {
         id: userCredential.user.uid,
         username: username,
         email: email,
-        characters: [] as Character[],
-        adventures: [] as Adventure[],
+        characters: [],
+        adventures: [],
       });
       return userCredential;
     } catch (error) {

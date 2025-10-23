@@ -22,8 +22,8 @@ export class ProfileComponent {
   constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.loadUserProfile();
     setBackground('bg.jpg');
+    this.loadUserProfile();
   }
 
   ngOnDestroy() {
@@ -34,13 +34,15 @@ export class ProfileComponent {
     this.isLoading = true;
     this.profileSubscription = this.userService.getUserProfile().subscribe({
       next: (data) => {
-        (this.user = data.user),
-          (this.username = data.username),
-          (this.email = data.email);
+        this.user = data.user;
+        this.characters = data.characters;
+        this.username = data.username;
+        this.email = data.email;
         this.isLoading = false;
       },
-      error(err) {
+      error: (err) => {
         console.error('Hiba a profil betöltésekor: ' + err);
+        this.isLoading = false;
       },
     });
   }
