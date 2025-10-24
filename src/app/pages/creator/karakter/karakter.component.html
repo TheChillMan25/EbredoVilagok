@@ -65,31 +65,61 @@
       <span id="error">{{ errorMessage }}</span>
     </div>
   </div>
-  <div id="stats" class="container" formGroupName="stats">
-    <div id="diceMenu" class="fake-button" (click)="diceRollingMenu()">
-      <mat-icon>casino</mat-icon>
-    </div>
-    <span class="groupName">Tulajdonságok </span>
-    @for (item of statsForm; track $index) {
-    <div
-      [id]="item.controlName"
-      [formGroupName]="item.controlName"
-      class="stat-container"
-    >
-      @for (field of item.fields; track $index) {
-      <mat-form-field appearance="outline">
-        <mat-label>{{ field.labelText }}</mat-label>
-        <input
-          type="number"
-          [min]="item.interval.min"
-          [max]="item.interval.max"
-          matInput
-          [formControlName]="field.groupName"
-        />
-      </mat-form-field>
+  <div id="stat-virtue-container">
+    <div id="stats" class="container" formGroupName="stats">
+      <span class="groupName">Tulajdonságok </span>
+      @for (item of statsForm; track $index) {
+      <div
+        [id]="item.controlName"
+        [formGroupName]="item.controlName"
+        class="stat-container"
+      >
+        @for (field of item.fields; track $index) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.labelText }}</mat-label>
+          <input
+            type="number"
+            [min]="item.interval.min"
+            [max]="item.interval.max"
+            matInput
+            [formControlName]="field.groupName"
+          />
+        </mat-form-field>
+        }
+      </div>
       }
+      <div id="diceMenu" class="fake-button" (click)="diceRollingMenu()">
+        <mat-icon>casino</mat-icon>
+      </div>
     </div>
-    }
+    <div id="virtues" class="container" formGroupName="virtues">
+      <span class="groupName">Erények</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Erény</mat-label>
+        <mat-select formControlName="firstVirtue">
+          @for (item of virtues; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Erény</mat-label>
+        <mat-select formControlName="secondVirtue">
+          @for (item of virtues; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <span class="groupName">Hátrány</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Hátrány</mat-label>
+        <mat-select formControlName="disadvantage">
+          @for (item of disadvantages; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
   <div id="equipment" class="container" formGroupName="equipment">
     <span class="groupName">Felszerelés</span>
@@ -241,34 +271,6 @@
         </mat-select>
       </mat-form-field>
     </div>
-  </div>
-  <div id="virtues" class="container" formGroupName="virtues">
-    <span class="groupName">Erények</span>
-    <mat-form-field appearance="outline">
-      <mat-label>Erény</mat-label>
-      <mat-select formControlName="firstVirtue">
-        @for (item of virtues; track $index) {
-        <mat-option value="{{ $index }}">{{ item }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Erény</mat-label>
-      <mat-select formControlName="secondVirtue">
-        @for (item of virtues; track $index) {
-        <mat-option value="{{ $index }}">{{ item }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <span class="groupName">Hátrány</span>
-    <mat-form-field appearance="outline">
-      <mat-label>Hátrány</mat-label>
-      <mat-select formControlName="disadvantage">
-        @for (item of disadvantages; track $index) {
-        <mat-option value="{{ $index }}">{{ item }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
   </div>
   <div id="dice-rolling-menu">
     <div class="fake-button">d4</div>
