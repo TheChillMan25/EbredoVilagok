@@ -50,7 +50,7 @@
         >
       </mat-form-field>
       <div id="other-properties">
-        <span id="bonus-text">Bónusz tulajdonságok</span>
+        <span id="bonus-text">Bónusz ismeretek</span>
         @for (item of currentHome?.bonus; track $index) {
         <div class="other-property">
           <span>{{ item.name }}</span>
@@ -94,22 +94,24 @@
     </div>
     <div id="virtues" class="container" formGroupName="virtues">
       <span class="groupName">Erények</span>
-      <mat-form-field appearance="outline">
-        <mat-label>Erény</mat-label>
-        <mat-select formControlName="firstVirtue">
-          @for (item of virtues; track $index) {
-          <mat-option value="{{ $index }}">{{ item }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Erény</mat-label>
-        <mat-select formControlName="secondVirtue">
-          @for (item of virtues; track $index) {
-          <mat-option value="{{ $index }}">{{ item }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+      <div formGroupName="virtues">
+        <mat-form-field appearance="outline">
+          <mat-label>Erény</mat-label>
+          <mat-select formControlName="virtue1">
+            @for (item of virtues; track $index) {
+            <mat-option value="{{ $index }}">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Erény</mat-label>
+          <mat-select formControlName="virtue2">
+            @for (item of virtues; track $index) {
+            <mat-option value="{{ $index }}">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
       <span class="groupName">Hátrány</span>
       <mat-form-field appearance="outline">
         <mat-label>Hátrány</mat-label>
@@ -179,52 +181,37 @@
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
         <mat-select formControlName="item1">
-          <mat-optgroup lable="Gyógyszerek">
-            <mat-label>Gyógyszerek</mat-label>
-            @for (item of medicalItems; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
-          <mat-optgroup lable="Tájak italai">
-            <mat-label>Tájak italai</mat-label>
-            @for (item of specialDrinks; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
         <mat-select formControlName="item2">
-          <mat-optgroup lable="Gyógyszerek">
-            <mat-label>Gyógyszerek</mat-label>
-            @for (item of medicalItems; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
-          <mat-optgroup lable="Tájak italai">
-            <mat-label>Tájak italai</mat-label>
-            @for (item of specialDrinks; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
         <mat-select formControlName="item3">
-          <mat-optgroup lable="Gyógyszerek">
-            <mat-label>Gyógyszerek</mat-label>
-            @for (item of medicalItems; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
-          <mat-optgroup lable="Tájak italai">
-            <mat-label>Tájak italai</mat-label>
-            @for (item of specialDrinks; track $index) {
-            <mat-option value="{{ $index }}">{{ item }}</mat-option>
-            }
-          </mat-optgroup>
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </div>

@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import {
+  convertSpeciesNameToKey,
+  createStats,
+  getStat,
   setBackground,
   setDisplay,
 } from '../../../shared/functional/functions';
@@ -26,6 +29,7 @@ import {
 import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
+import { classes } from '../../../shared/models/classes';
 
 @Component({
   selector: 'app-karakter',
@@ -91,6 +95,10 @@ export class KarakterComponent {
     name: food.name,
     portion: food.portion,
   }));
+  specialIndex = 0;
+  specialItems = medicalItems
+    .map((item) => item.name)
+    .concat(specialDrinks.map((drink) => drink.name));
 
   medicalItems = medicalItems.map((item) => item.name);
   specialDrinks = specialDrinks.map((drink) => drink.name);
@@ -103,6 +111,7 @@ export class KarakterComponent {
   ) {}
 
   ngOnInit() {
+    console.log(this.medicalItems.length, this.specialDrinks.length);
     setBackground('paper_bg.jpg');
     this.initForm();
     /* this.mainForm.patchValue({ name: 'Stefan' });
@@ -159,8 +168,10 @@ export class KarakterComponent {
         armour: [''],
       }),
       virtues: this.fb.group({
-        firstVirtue: [''],
-        secondVirtue: [''],
+        virtues: this.fb.group({
+          virtue1: [''],
+          virtue2: [''],
+        }),
         disadvantage: [''],
       }),
       items: this.fb.group({
@@ -191,72 +202,143 @@ export class KarakterComponent {
         'Karakter nem készíthető el, tölts ki minden kötelező mezőt!';
       return;
     }
-    if (random) console.log('Creating random character...');
-
     const formValue = this.mainForm.value;
-    let newCharacter: Omit<Character, 'id'> = {
-      name: formValue.name || '',
-      species: formValue.species || '',
-      class: formValue.class || '',
-      level: 1,
-      specialProperties: formValue.specialProperties || {
-        speciesProperty: 0,
-        home: 0,
-      },
-      stats: formValue.stats || {
-        physical: {
-          ero: 1,
-          ugyesseg: 1,
-          kitartas: 1,
+    if (random) {
+      if (formValue.name === '') {
+        this.errorMessage = ' Adj meg egy nevet!';
+        return;
+      }
+      console.log('Creating random character...');
+      let stats = createStats();
+      let randomCharacter: Omit<Character, 'id'> = {
+        name: formValue.name || '',
+        species: NationData.map((nation) => nation.nationName)[
+          Math.floor(Math.random() * 17)
+        ],
+        class: classes[Math.floor(Math.random() * 4)],
+        level: 1,
+        specialProperties: {
+          speciesProperty: Math.floor(Math.random() * 6),
+          home: Math.floor(Math.random() * 6),
         },
-        mental: {
-          esz: 1,
-          fortely: 1,
-          akaratero: 1,
+        stats: {
+          physical: {
+            ero: getStat(stats),
+            ugyesseg: getStat(stats),
+            kitartas: getStat(stats),
+          },
+          mental: {
+            esz: getStat(stats),
+            fortely: getStat(stats),
+            akaratero: getStat(stats),
+          },
+          main: {
+            hp: Math.ceil(Math.random() * 6),
+            sp:
+              Math.ceil(Math.random() * 4) +
+              Math.ceil(Math.random() * 4) +
+              Math.ceil(Math.random() * 4),
+          },
         },
-        main: {
-          hp: 1,
-          sp: 1,
+        equipment: {
+          left: Math.floor(Math.random() * weapons.length - 1),
+          right: Math.floor(Math.random() * weapons.length - 1),
+          armour: Math.floor(Math.random() * armours.length - 1),
         },
-      },
-      equipment: formValue.equipment || {
-        left: '',
-        right: '',
-        armour: '',
-      },
-      virtues: formValue.virtues || {
-        firstVirtue: '',
-        secondVirtue: '',
-        disadvantage: '',
-      },
-      items: formValue.items || {
-        mandatoryItems: {
-          food: '',
-          item1: '',
-          item2: '',
-          item3: '',
+        virtues: {
+          virtues: [
+            Math.floor(Math.random() * this.virtues.length - 1),
+            Math.floor(Math.random() * this.virtues.length - 1),
+          ],
+          disadv: [Math.floor(Math.random() * this.disadvantages.length - 1)],
         },
-        otherItems: {
-          item1: '',
-          item2: '',
-          item3: '',
-          item4: '',
-          item5: '',
+        items: {
+          food: [Math.floor(Math.random() * foodRations.length)],
+          specialItems: [
+            Math.floor(Math.random() * this.specialItems.length),
+            Math.floor(Math.random() * this.specialItems.length),
+            Math.floor(Math.random() * this.specialItems.length),
+          ],
+          otherItems: [
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+          ],
+          weaponItems: [],
         },
-      },
-    };
-    this.charService
-      .addCharacter(newCharacter)
-      .then(() => {
-        this.mainForm.reset();
-      })
-      .catch((error) => {
-        console.error('Hiba a karakter létrehozása során: ', error);
-      })
-      .finally(() => {
-        console.log('Karakter létrehozva: ', newCharacter);
-        this.router.navigateByUrl('/profil');
-      });
+      };
+      this.charService
+        .addCharacter(randomCharacter)
+        .then(() => {
+          this.mainForm.reset();
+        })
+        .catch((error) => {
+          console.error('Hiba a karakter létrehozása során: ', error);
+        })
+        .finally(() => {
+          console.log('Karakter létrehozva: ', randomCharacter);
+          this.router.navigateByUrl('/profil');
+        });
+    } else {
+      let newCharacter: Omit<Character, 'id'> = {
+        name: formValue.name || '',
+        species: formValue.species || '',
+        class: formValue.class || '',
+        level: 1,
+        specialProperties: formValue.specialProperties || {
+          speciesProperty: 0,
+          home: 0,
+        },
+        stats: formValue.stats || {
+          physical: {
+            ero: 1,
+            ugyesseg: 1,
+            kitartas: 1,
+          },
+          mental: {
+            esz: 1,
+            fortely: 1,
+            akaratero: 1,
+          },
+          main: {
+            hp: 1,
+            sp: 1,
+          },
+        },
+        equipment: formValue.equipment || {
+          left: '',
+          right: '',
+          armour: '',
+        },
+        virtues: formValue.virtues || {
+          virtues: {
+            virtue1: '',
+            virtue2: '',
+          },
+          disadvantage: '',
+        },
+        items: formValue.items || {
+          specialItems: [],
+          otherItems: [],
+          weaponItems: [],
+        },
+      };
+
+      this.charService
+        .addCharacter(newCharacter)
+        .then(() => {
+          this.mainForm.reset();
+        })
+        .catch((error) => {
+          console.error('Hiba a karakter létrehozása során: ', error);
+        })
+        .finally(() => {
+          console.log('Karakter létrehozva: ', newCharacter);
+          this.router.navigateByUrl('/profil');
+        });
+    }
   }
 
   selectHome(index: any) {
@@ -264,54 +346,11 @@ export class KarakterComponent {
   }
 
   setRelevantSpeciesData(value: any) {
-    let currentSpecies = this.convertSpeciesNameToKey(value);
+    let currentSpecies = convertSpeciesNameToKey(value);
     this.currentSpeciesProperties =
-      species[currentSpecies!.landID][
-        currentSpecies!.speciesID
-      ].nationalProperties;
+      species[currentSpecies!.landID][currentSpecies!.speciesID].speciesSpecial;
     this.currentSpeciesHomes =
       species[currentSpecies!.landID][currentSpecies!.speciesID].homes;
-  }
-
-  convertSpeciesNameToKey(
-    name: string
-  ): { landID: string; speciesID: number } | undefined {
-    if (['Folyóköz', 'Magasföld', 'Holtág'].includes(name)) {
-      return {
-        landID: 'folyokoz',
-        speciesID: ['Folyóköz', 'Magasföld', 'Holtág'].indexOf(name),
-      };
-    } else if (['Denn Karadenn', 'Cha’Me’Rén', 'Doma Altiora'].includes(name)) {
-      return {
-        landID: 'toronyvarosok',
-        speciesID: ['Denn Karadenn', 'Cha’Me’Rén', 'Doma Altiora'].indexOf(
-          name
-        ),
-      };
-    } else if (['Édd', 'Vadin', 'Monor'].includes(name)) {
-      return {
-        landID: 'kelet_nepe',
-        speciesID: ['Édd', 'Vadin', 'Monor'].indexOf(name),
-      };
-    } else if (['Rügysze', 'Kérgeláb', 'Kalapos'].includes(name)) {
-      return {
-        landID: 'novenyszerzetek',
-        speciesID: ['Rügysze', 'Kérgeláb', 'Kalapos'].indexOf(name),
-      };
-    } else if (
-      ['Au-1. Fenntartó', 'Au-2. Utód', 'Au-Cust. Örző'].includes(name)
-    ) {
-      return {
-        landID: 'gepszulottek',
-        speciesID: ['Au-1. Fenntartó', 'Au-2. Utód', 'Au-Cust. Örző'].indexOf(
-          name
-        ),
-      };
-    } else
-      return {
-        landID: 'atkozottak',
-        speciesID: ['Abominus', 'Vámpír'].indexOf(name),
-      };
   }
 
   diceRollingMenu() {

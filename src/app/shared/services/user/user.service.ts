@@ -149,7 +149,7 @@ export class UserService {
       return {
         user,
         username: user.username ?? '',
-        email: user.username ?? '',
+        email: user.email ?? '',
         characters,
         adventures,
       };

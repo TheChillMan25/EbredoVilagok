@@ -2,7 +2,7 @@ export const NationData = [
   { diceNum: 1, nationName: 'Folyóköz' },
   { diceNum: 2, nationName: 'Magasföld' },
   { diceNum: 3, nationName: 'Holtág' },
-  { diceNum: 4, nationName: 'Denn Karadenn' },
+  { diceNum: 4, nationName: 'Den Karadenn' },
   { diceNum: 5, nationName: 'Cha’Me’Rén' },
   { diceNum: 6, nationName: 'Doma Altiora' },
   { diceNum: 7, nationName: 'Édd' },
