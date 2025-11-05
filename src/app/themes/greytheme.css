@@ -4,7 +4,7 @@ html {
   color-scheme: light;
 
   /* Primary palette variables */
-  --mat-sys-primary: light-dark(#5d5f5f, #c6c6c7);
+  --mat-sys-primary: light-dark(#f2c480, #c6c6c7);
   --mat-sys-on-primary: light-dark(#ffffff, #2f3131);
   --mat-sys-primary-container: light-dark(#e2e2e2, #454747);
   --mat-sys-on-primary-container: light-dark(#1a1c1c, #e2e2e2);
@@ -298,4 +298,5 @@ html {
   /* Custom values*/
   --mdc-outlined-text-field-outline-width: 0.2rem;
   --mat-list-active-indicator-shape: 0;
+  --mdc-outlined-text-field-focus-label-text-color: #f2c480;
 }

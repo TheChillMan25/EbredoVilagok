@@ -90,6 +90,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'kaland-keszito',
+    title: 'Kaland készítő',
+    loadComponent: () =>
+      import('./pages/creator/adventure/adventure.component').then(
+        (m) => m.AdventureComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     redirectTo: 'index',
     pathMatch: 'full',

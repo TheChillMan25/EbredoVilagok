@@ -31,6 +31,7 @@ export class ProfileComponent {
 
   ngOnDestroy() {
     if (this.profileSubscription) this.profileSubscription.unsubscribe();
+    console.log(this.characters)
   }
 
   loadUserProfile() {

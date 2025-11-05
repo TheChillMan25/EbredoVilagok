@@ -92,6 +92,11 @@
     }
     #virtues {
       flex-direction: column;
+
+      #virtue-container {
+        display: flex;
+        flex-direction: column;
+      }
     }
   }
 
@@ -143,6 +148,8 @@
 
     .container {
       flex-direction: column;
+      padding: 0;
+      background-color: transparent;
     }
   }
   --mat-sys-on-surface-variant: #f5f5f5;
@@ -157,6 +164,10 @@
     top: 4rem;
     width: fit-content;
     transform: translateX(-50%);
+
+    &.show {
+      display: flex;
+    }
   }
 }
 mat-option {

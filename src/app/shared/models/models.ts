@@ -74,3 +74,18 @@ export interface ForumPost {
   text: string;
   attachments: string[];
 }
+
+export interface AdventureEvent {
+  id: number;
+  name: string;
+  desc: string;
+  story: string;
+  NPCs: NPC[];
+  location: string;
+}
+
+export interface NPC {
+  character: Character;
+  attitude: 'neutral' | 'hostile';
+  actions: string[];
+}

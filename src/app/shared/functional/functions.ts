@@ -1,4 +1,19 @@
 import { species as Species } from '../../pages/world/species/species_desc_data';
+import { Character } from '../models/models';
+import { NationData } from '../models/NationData';
+import { classes } from '../models/classes';
+import { weapons, armours } from '../models/equipment';
+import { foodRations, medicalItems, specialDrinks } from '../models/items';
+import {
+  CharacterVirtues,
+  CharacterDisadvantages,
+} from '../models/virtues_disadvantages';
+
+let virtues = CharacterVirtues.map((virtue) => virtue.name);
+let disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
+let specialItems = medicalItems
+  .map((item) => item.name)
+  .concat(specialDrinks.map((drink) => drink.name));
 
 export function setBackground(path: string, color: boolean = false) {
   const pageElement = document.getElementById('page');
@@ -160,7 +175,6 @@ export function getStat(stats: number[]) {
 
 const edges = [6, 8, 12, 14, 16];
 export function checkStatNumbers(numbers: number[]) {
-  let bonusPoints: number = 2;
   let onEdges: number[] = [];
   for (let number of numbers) {
     for (let edge of edges) {
@@ -170,4 +184,73 @@ export function checkStatNumbers(numbers: number[]) {
     }
   }
   console.log('On edges: ' + onEdges);
+}
+
+export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
+  if (typeof charName !== 'string')
+    throw new Error('Nem megfelelő névérték: ' + charName);
+  console.log(charName);
+  let stats = createStats();
+  let randomCharacter: Omit<Character, 'id'> = {
+    name: charName || '',
+    species: NationData.map((nation) => nation.nationName)[
+      Math.floor(Math.random() * 17)
+    ],
+    class: classes[Math.max(Math.floor(Math.random() * classes.length - 1))],
+    level: 1,
+    specialProperties: {
+      speciesProperty: Math.floor(Math.random() * 6),
+      home: Math.floor(Math.random() * 6),
+    },
+    stats: {
+      physical: {
+        ero: getStat(stats),
+        ugyesseg: getStat(stats),
+        kitartas: getStat(stats),
+      },
+      mental: {
+        esz: getStat(stats),
+        fortely: getStat(stats),
+        akaratero: getStat(stats),
+      },
+      main: {
+        hp: Math.ceil(Math.random() * 6),
+        sp:
+          Math.ceil(Math.random() * 4) +
+          Math.ceil(Math.random() * 4) +
+          Math.ceil(Math.random() * 4),
+      },
+    },
+    equipment: {
+      left: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
+      right: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
+      armour: Math.max(Math.floor(Math.random() * armours.length - 1), 0),
+    },
+    virtues: {
+      virtues: [
+        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
+        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
+      ],
+      disadv: [
+        Math.max(Math.floor(Math.random() * disadvantages.length - 1), 0),
+      ],
+    },
+    items: {
+      food: [Math.max(Math.floor(Math.random() * foodRations.length - 1), 0)],
+      specialItems: [
+        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
+        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
+        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
+      ],
+      otherItems: [
+        Math.floor(Math.random() * 99),
+        Math.floor(Math.random() * 99),
+        Math.floor(Math.random() * 99),
+        Math.floor(Math.random() * 99),
+        Math.floor(Math.random() * 99),
+      ],
+      weaponItems: [],
+    },
+  };
+  return randomCharacter;
 }

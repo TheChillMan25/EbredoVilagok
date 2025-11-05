@@ -1,0 +1,174 @@
+#adventure-form {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+
+  > div {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+  background-color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#main-controls {
+  height: 100%;
+  flex: 3;
+  display: flex;
+  gap: 1rem;
+
+  > .container {
+    flex: 1;
+  }
+
+  #events-container,
+  #npcs-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+
+    .npc,
+    .event {
+      display: flex;
+      padding: 0.5rem;
+      background-color: #444;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .npc mat-icon {
+      margin-left: auto;
+    }
+    .event {
+      cursor: pointer;
+    }
+
+    .event.select {
+      border: 0.1rem solid #f5f5f5;
+    }
+  }
+
+  #location {
+    flex: 3;
+    gap: 1rem;
+
+    #map-container {
+      width: 100%;
+      height: calc(100% - 2rem);
+      z-index: 5;
+    }
+  }
+}
+
+.header-text {
+  font-size: x-large;
+  color: #f2c480;
+}
+
+.fake-button {
+  padding: 0.5rem;
+  align-self: center;
+  gap: 0.5rem;
+}
+
+#ui-container {
+  z-index: 10;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  position: absolute;
+  justify-content: space-between;
+  grid-template-columns: 50% 50%;
+  gap: 1rem;
+  cursor: not-allowed;
+
+  &.show {
+    display: flex;
+  }
+
+  .ui-container {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    width: 25%;
+    height: 100%;
+    background-color: #222;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    gap: 1rem;
+    overflow-y: auto;
+    border: 0.2rem solid #777;
+    cursor: auto;
+
+    &.show {
+      display: flex;
+    }
+  }
+
+  #add-npc-ui {
+    left: 75%;
+  }
+}
+
+#event-form,
+#npcForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#npcForm {
+  .header-text {
+    display: flex;
+    align-self: flex-start;
+  }
+  mat-radio-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #actions-container {
+    display: flex;
+    justify-content: space-around;
+  }
+  .checkbox-container {
+    display: flex;
+    flex-direction: column;
+    .header-text {
+      width: 100%;
+      justify-content: center;
+    }
+
+    &.disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+}

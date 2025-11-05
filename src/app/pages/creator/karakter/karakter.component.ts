@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 import {
   convertSpeciesNameToKey,
-  createStats,
-  getStat,
+  createRandomCharacter,
   setBackground,
-  setDisplay,
 } from '../../../shared/functional/functions';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import {
+  FormGroup,
+  Validators,
+  FormBuilder,
+  FormControl,
+  FormArray,
+} from '@angular/forms';
 import { MatLabel, MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -15,7 +19,7 @@ import { NationData } from '../../../shared/models/NationData';
 import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
 import { armours, weapons } from '../../../shared/models/equipment';
-import { Armour, Weapon } from '../../../shared/models/character_interfaces';
+import { Armour } from '../../../shared/models/character_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,
@@ -29,7 +33,7 @@ import {
 import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
-import { classes } from '../../../shared/models/classes';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-karakter',
@@ -40,6 +44,7 @@ import { classes } from '../../../shared/models/classes';
     MatInputModule,
     MatSelectModule,
     MatIcon,
+    NgClass,
   ],
   templateUrl: './karakter.component.html',
   styleUrl: './karakter.component.scss',
@@ -103,6 +108,8 @@ export class KarakterComponent {
   medicalItems = medicalItems.map((item) => item.name);
   specialDrinks = specialDrinks.map((drink) => drink.name);
   otherItems = items.map((item) => item.name);
+
+  showDiceMenu: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -168,26 +175,26 @@ export class KarakterComponent {
         armour: [''],
       }),
       virtues: this.fb.group({
-        virtues: this.fb.group({
-          virtue1: [''],
-          virtue2: [''],
-        }),
-        disadvantage: [''],
+        virtues: this.fb.array<FormControl<number>>([
+          new FormControl(),
+          new FormControl(),
+        ]),
+        disadvantage: this.fb.array<FormControl<number>>([new FormControl()]),
       }),
       items: this.fb.group({
-        mandatoryItems: this.fb.group({
-          food: [''],
-          item1: [''],
-          item2: [''],
-          item3: [''],
-        }),
-        otherItems: this.fb.group({
-          item1: [''],
-          item2: [''],
-          item3: [''],
-          item4: [''],
-          item5: [''],
-        }),
+        food: this.fb.array<FormControl<number>>([new FormControl()]),
+        specialItems: this.fb.array<FormControl<number>>([
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+        ]),
+        otherItems: this.fb.array<FormControl<number>>([
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+        ]),
       }),
     });
   }
@@ -205,70 +212,13 @@ export class KarakterComponent {
     const formValue = this.mainForm.value;
     if (random) {
       if (formValue.name === '') {
-        this.errorMessage = ' Adj meg egy nevet!';
+        this.errorMessage = 'Adj meg egy nevet!';
         return;
       }
       console.log('Creating random character...');
-      let stats = createStats();
-      let randomCharacter: Omit<Character, 'id'> = {
-        name: formValue.name || '',
-        species: NationData.map((nation) => nation.nationName)[
-          Math.floor(Math.random() * 17)
-        ],
-        class: classes[Math.floor(Math.random() * 4)],
-        level: 1,
-        specialProperties: {
-          speciesProperty: Math.floor(Math.random() * 6),
-          home: Math.floor(Math.random() * 6),
-        },
-        stats: {
-          physical: {
-            ero: getStat(stats),
-            ugyesseg: getStat(stats),
-            kitartas: getStat(stats),
-          },
-          mental: {
-            esz: getStat(stats),
-            fortely: getStat(stats),
-            akaratero: getStat(stats),
-          },
-          main: {
-            hp: Math.ceil(Math.random() * 6),
-            sp:
-              Math.ceil(Math.random() * 4) +
-              Math.ceil(Math.random() * 4) +
-              Math.ceil(Math.random() * 4),
-          },
-        },
-        equipment: {
-          left: Math.floor(Math.random() * weapons.length - 1),
-          right: Math.floor(Math.random() * weapons.length - 1),
-          armour: Math.floor(Math.random() * armours.length - 1),
-        },
-        virtues: {
-          virtues: [
-            Math.floor(Math.random() * this.virtues.length - 1),
-            Math.floor(Math.random() * this.virtues.length - 1),
-          ],
-          disadv: [Math.floor(Math.random() * this.disadvantages.length - 1)],
-        },
-        items: {
-          food: [Math.floor(Math.random() * foodRations.length)],
-          specialItems: [
-            Math.floor(Math.random() * this.specialItems.length),
-            Math.floor(Math.random() * this.specialItems.length),
-            Math.floor(Math.random() * this.specialItems.length),
-          ],
-          otherItems: [
-            Math.floor(Math.random() * 100),
-            Math.floor(Math.random() * 100),
-            Math.floor(Math.random() * 100),
-            Math.floor(Math.random() * 100),
-            Math.floor(Math.random() * 100),
-          ],
-          weaponItems: [],
-        },
-      };
+      let randomCharacter =
+      createRandomCharacter(formValue.name);
+      console.log(randomCharacter);
       this.charService
         .addCharacter(randomCharacter)
         .then(() => {
@@ -282,6 +232,7 @@ export class KarakterComponent {
           this.router.navigateByUrl('/profil');
         });
     } else {
+      console.log('Creating new character');
       let newCharacter: Omit<Character, 'id'> = {
         name: formValue.name || '',
         species: formValue.species || '',
@@ -313,19 +264,17 @@ export class KarakterComponent {
           armour: '',
         },
         virtues: formValue.virtues || {
-          virtues: {
-            virtue1: '',
-            virtue2: '',
-          },
-          disadvantage: '',
+          virtues: [],
+          disadvantage: [],
         },
         items: formValue.items || {
+          food: [],
           specialItems: [],
           otherItems: [],
           weaponItems: [],
         },
       };
-
+      console.log(newCharacter);
       this.charService
         .addCharacter(newCharacter)
         .then(() => {
@@ -354,10 +303,10 @@ export class KarakterComponent {
   }
 
   diceRollingMenu() {
-    const diceMenu = document.getElementById('dice-rolling-menu');
-    if (diceMenu && diceMenu.style.display === 'none')
-      setDisplay(diceMenu, 'flex');
-    else if (diceMenu && diceMenu.style.display !== 'none')
-      setDisplay(diceMenu, 'none');
+    this.showDiceMenu = !this.showDiceMenu;
+  }
+
+  getInputs(which: string): FormArray<FormControl<number>> {
+    return this.mainForm.get(which) as FormArray<FormControl<number>>;
   }
 }

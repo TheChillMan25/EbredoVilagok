@@ -93,7 +93,6 @@ export class KarakterTemplateComponent {
         container.textContent = this.speciesSpecial.desc;
       }
     }
-    console.log(this.home.desc, this.speciesSpecial.desc);
   }
 
   hideSpecDescs() {

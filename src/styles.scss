@@ -96,9 +96,9 @@ app-mobile-navbar {
 }
 
 button {
-  color: $text-secondary !important;
-  background-color: $primary-background !important;
-  border-radius: 0.5rem !important;
+  font-size: large;
+  font-family: 'Modern Antiqua';
+  border: none;
 }
 
 button:hover {
@@ -132,11 +132,12 @@ app-card-container {
 }
 
 .fake-button {
+  width: fit-content;
   padding: 1rem;
   color: $text-secondary;
   display: flex;
   gap: 1rem;
-  background-color: $primary-background;
+  background-color: #444;
   align-items: center;
   justify-content: center;
   border-radius: 0.5rem;
@@ -196,9 +197,9 @@ mat-cell:nth-child(even) {
   background: #f2c480;
 }
 
-.mat-mdc-text-field-wrapper{
-  background-color: #444;
-  border-radius: .5rem !important;
+.mat-mdc-text-field-wrapper {
+  background-color: #444 !important;
+  border-radius: 0.5rem !important;
 }
 
 @media (max-height: 685px) and (orientation: landscape) {

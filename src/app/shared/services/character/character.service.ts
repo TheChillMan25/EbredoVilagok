@@ -72,16 +72,14 @@ export class CharacterService {
           const characterCollection = collection(this.firestore, 'Characters');
           const characters: Character[] = [];
 
-          for (let i = 0; i < charIDs.length; i++) {
-            const q = query(
-              characterCollection,
-              where('id', 'in', userData.characters)
-            );
-            const snapShot = await getDocs(q);
-            snapShot.forEach((doc) => {
-              characters.push({ ...doc.data(), id: doc.id } as Character);
-            });
-          }
+          const q = query(
+            characterCollection,
+            where('id', 'in', userData.characters)
+          );
+          const snapShot = await getDocs(q);
+          snapShot.forEach((doc) => {
+            characters.push({ ...doc.data(), id: doc.id } as Character);
+          });
 
           return characters;
         } catch (error) {
