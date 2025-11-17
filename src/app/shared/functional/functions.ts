@@ -192,6 +192,7 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   console.log(charName);
   let stats = createStats();
   let randomCharacter: Omit<Character, 'id'> = {
+    currentAdventure: '',
     name: charName || '',
     species: NationData.map((nation) => nation.nationName)[
       Math.floor(Math.random() * 17)

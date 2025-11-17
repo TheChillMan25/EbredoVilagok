@@ -245,6 +245,7 @@ export class AdventureComponent {
     const npcValues = this.npcForm.value;
     console.log(npcValues);
     let npc: NPC = {
+      id: `${this.selectedAdventureEvent?.name}-${this.selectedAdventureEvent?.NPCs.length}`,
       actions: npcValues.actions,
       attitude: npcValues.attitude,
       character: npcValues.character,

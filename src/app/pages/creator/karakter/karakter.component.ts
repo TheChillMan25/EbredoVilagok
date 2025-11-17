@@ -234,6 +234,7 @@ export class KarakterComponent {
     } else {
       console.log('Creating new character');
       let newCharacter: Omit<Character, 'id'> = {
+        currentAdventure: '',
         name: formValue.name || '',
         species: formValue.species || '',
         class: formValue.class || '',

@@ -14,6 +14,7 @@ export interface ForumUser {
 
 export interface Character {
   id: string;
+  currentAdventure: string;
   name: string;
   species: string;
   class: string;
@@ -85,7 +86,8 @@ export interface AdventureEvent {
 }
 
 export interface NPC {
+  id: string;
   character: Character;
   attitude: 'neutral' | 'hostile';
-  actions: string[];
+  actions: boolean[];
 }

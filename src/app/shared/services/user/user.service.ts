@@ -108,6 +108,7 @@ export class UserService {
           const characterData = doc.data();
           const character: Character = {
             id: doc.id,
+            currentAdventure: characterData?.['currentAdventure'],
             name: characterData?.['name'] ?? '',
             species: characterData?.['species'] ?? '',
             class: characterData?.['class'] ?? '',
