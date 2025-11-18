@@ -41,7 +41,7 @@ export const routes: Routes = [
   },
   {
     path: 'profil',
-    title: 'Profil',
+    title: 'Ébredő Világok | Profil',
     loadComponent: () =>
       import('./pages/profile/profile.component').then(
         (m) => m.ProfileComponent
@@ -58,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'fajok/:id',
-    title: 'Fajok',
+    title: 'Ágas és Bogas | Fajok',
     loadComponent: () =>
       import(
         './pages/world/species/species-template/species-template.component'
@@ -75,14 +75,14 @@ export const routes: Routes = [
   },
   {
     path: 'terkep',
-    title: 'Térkép',
+    title: 'Ébredő Világok | Térkép',
     loadComponent: () =>
       import('./pages/map/map.component').then((m) => m.MapComponent),
     canActivate: [publicGuard],
   },
   {
     path: 'forum',
-    title: 'Ébredő Világok Fórum',
+    title: 'Ébredő Világok | Fórum',
     loadComponent: () =>
       import('./pages/forum/forum.component').then((m) => m.ForumComponent),
     canActivate: [publicGuard],
@@ -103,6 +103,13 @@ export const routes: Routes = [
       import('./pages/creator/adventure/adventure.component').then(
         (m) => m.AdventureComponent
       ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'jatek',
+    title: 'Játék',
+    loadComponent: () =>
+      import('./pages/game/game.component').then((m) => m.GameComponent),
     canActivate: [authGuard],
   },
   {

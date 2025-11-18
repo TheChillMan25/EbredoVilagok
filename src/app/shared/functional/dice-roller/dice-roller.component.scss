@@ -1,0 +1,14 @@
+.dice-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; // Fontos, hogy a renderer ne lógjon ki
+  z-index: 0;
+}
+
+button {
+  position: relative;
+  z-index: 1;
+}

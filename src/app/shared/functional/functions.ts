@@ -3,7 +3,12 @@ import { Character } from '../models/models';
 import { NationData } from '../models/NationData';
 import { classes } from '../models/classes';
 import { weapons, armours } from '../models/equipment';
-import { foodRations, medicalItems, specialDrinks } from '../models/items';
+import {
+  foodRations,
+  items,
+  medicalItems,
+  specialDrinks,
+} from '../models/items';
 import {
   CharacterVirtues,
   CharacterDisadvantages,
@@ -254,4 +259,16 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
     },
   };
   return randomCharacter;
+}
+
+export function getItem(type: string, index: number) {
+  const map: Record<string, any> = {
+    food: foodRations,
+    otherItems: items,
+    specialItems: medicalItems.concat(specialDrinks),
+  };
+
+  if (map[type][index]) {
+    return map[type][index];
+  }
 }
