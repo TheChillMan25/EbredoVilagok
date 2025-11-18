@@ -1,55 +1,53 @@
 <div id="content">
   <form id="adventure-form">
-    <div id="main-controls">
-      <div id="events" class="container">
-        <div class="header">
-          <span class="header-text">Események</span>
-          <div class="add-button fake-button" (click)="showUIs('events')">
-            <mat-icon>add</mat-icon>
-          </div>
-        </div>
-        <div id="events-container">
-          @for (event of events; track $index) {
-          <div
-            class="event"
-            (click)="selectEvent($index)"
-            [ngClass]="{ select: selectedEventIndex === $index }"
-          >
-            <span>{{ event.name }}</span>
-            <div class="fake-button" (click)="openEditEvent($index)">
-              <mat-icon>edit</mat-icon>
-            </div>
-          </div>
-          }
+    <div id="events" class="container">
+      <div class="header">
+        <span class="header-text">Események</span>
+        <div class="add-button fake-button" (click)="showUIs('events')">
+          <mat-icon>add</mat-icon>
         </div>
       </div>
-      <div id="location" class="container">
-        <div class="header">
-          <span class="header-text">Helyszín</span>
-          <div class="add-button fake-button"><mat-icon>add</mat-icon></div>
+      <div id="events-container">
+        @for (event of events; track $index) {
+        <div
+          class="event"
+          (click)="selectEvent($index)"
+          [ngClass]="{ select: selectedEventIndex === $index }"
+        >
+          <span>{{ event.name }}</span>
+          <div class="fake-button" (click)="openEditEvent($index)">
+            <mat-icon>edit</mat-icon>
+          </div>
         </div>
-        <div id="map-container"></div>
+        }
       </div>
-      <div id="npcs" class="container">
-        <div class="header">
-          <span class="header-text">NPC-k</span>
-          <div class="add-button fake-button" (click)="showUIs('npcs')">
-            <mat-icon>add</mat-icon>
+    </div>
+    <div id="location" class="container">
+      <div class="header">
+        <span class="header-text">Helyszín</span>
+        <div class="add-button fake-button"><mat-icon>add</mat-icon></div>
+      </div>
+      <div id="map-container"></div>
+    </div>
+    <div id="npcs" class="container">
+      <div class="header">
+        <span class="header-text">NPC-k</span>
+        <div class="add-button fake-button" (click)="showUIs('npcs')">
+          <mat-icon>add</mat-icon>
+        </div>
+      </div>
+      <div id="npcs-container">
+        @for (npc of selectedAdventureEvent?.NPCs; track $index) {
+        <div class="npc">
+          <span class="npc-name">{{ npc.name }}</span>
+          <mat-icon>
+            @if (npc.attitude === "neutral") { handshake }@else { close }
+          </mat-icon>
+          <div class="fake-button">
+            <mat-icon>edit</mat-icon>
           </div>
         </div>
-        <div id="npcs-container">
-          @for (npc of selectedAdventureEvent?.NPCs; track $index) {
-          <div class="npc">
-            <span class="npc-name">{{ npc.character }}</span>
-            <mat-icon>
-              @if (npc.attitude === "neutral") { handshake }@else { close }
-            </mat-icon>
-            <div class="fake-button">
-              <mat-icon>edit</mat-icon>
-            </div>
-          </div>
-          }
-        </div>
+        }
       </div>
     </div>
   </form>
@@ -111,6 +109,10 @@
         </div>
       </div>
       <form id="npcForm" (ngSubmit)="addNPC()" [formGroup]="npcForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Név</mat-label>
+          <input matInput type="text" formControlName="name" />
+        </mat-form-field>
         <span class="header-text">Hozzáállás</span>
         <mat-radio-group id="attitude" formControlName="attitude">
           <mat-radio-button

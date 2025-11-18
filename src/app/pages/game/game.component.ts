@@ -3,10 +3,13 @@ import { getItem, setBackground } from '../../shared/functional/functions';
 import { Character, NPC } from '../../shared/models/models';
 import { MatIconModule } from '@angular/material/icon';
 import { DiceRollerComponent } from '../../shared/functional/dice-roller/dice-roller.component';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions } from "@angular/material/card";
+import { MatButton } from "@angular/material/button";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-game',
-  imports: [MatIconModule, DiceRollerComponent],
+  imports: [MatIconModule, DiceRollerComponent, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions, MatButton, RouterLink],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })
@@ -78,6 +81,7 @@ export class GameComponent {
       turn: 'Vége',
       npc: {
         id: 'npc-1',
+        name: 'NPC1',
         actions: [],
         attitude: 'neutral',
         character: {
