@@ -10,12 +10,28 @@
   </div>
   <div id="main-container">
     <div id="containers">
-      <div id="character-container" class="container"></div>
-      <div id="adventure-container" class="container"></div>
+      <div
+        id="character-container"
+        class="container"
+        [ngClass]="{ show: showCharacter }"
+      >
+        @for (character of characters; track $index) {
+        <app-karakter-template [character]="character"></app-karakter-template>
+        }
+      </div>
+      <div
+        id="adventure-container"
+        class="container"
+        [ngClass]="{ show: !showCharacter }"
+      >
+        asd
+      </div>
     </div>
     <div id="button-container">
-      <div class="fake-button">Karakterek</div>
-      <div class="fake-button">Kalandok</div>
+      <div class="fake-button" (click)="showContainer('character')">
+        Karakterek
+      </div>
+      <div class="fake-button" (click)="showContainer()">Kalandok</div>
     </div>
   </div>
 </div>

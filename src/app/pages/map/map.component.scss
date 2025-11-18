@@ -1,0 +1,93 @@
+#content {
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 0.5rem;
+  padding: 1rem;
+
+  #control-toggle {
+    display: none;
+  }
+
+  .container {
+    background-color: #333;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 100%;
+
+    &#control-panel {
+      display: flex;
+      flex-direction: column;
+      width: 20rem;
+      justify-content: space-between;
+      gap: 1rem;
+
+      #marker-toggle-container {
+        width: 100%;
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: #444;
+      }
+
+      #search-results {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background-color: #444;
+        height: 60%;
+        width: 100%;
+        border-radius: 0.5rem;
+
+        .fake-button {
+          padding: 1rem;
+          justify-content: start;
+          color: whitesmoke;
+
+          &:hover{
+            color: #333;
+          }
+        }
+      }
+
+      .fake-button {
+        padding: 0.5rem;
+        background-color: #333;
+        width: 100%;
+        &:hover {
+          background-color: #f2c480;
+        }
+      }
+    }
+
+    &#map-container {
+      width: 80%;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #content {
+    #control-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+    }
+    .container {
+      &#control-panel {
+        display: none;
+
+        &.show {
+          display: flex;
+        }
+      }
+
+      &#map-container {
+        width: 100%;
+      }
+    }
+  }
+}

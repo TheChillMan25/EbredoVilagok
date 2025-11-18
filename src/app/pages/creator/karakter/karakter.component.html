@@ -1,0 +1,273 @@
+<form [formGroup]="mainForm" id="content">
+  <div id="main" class="container">
+    <span class="groupName">Egyéni tulajdonságok</span>
+    <mat-form-field appearance="outline">
+      <mat-label>Név</mat-label>
+      <input matInput type="text" formControlName="name" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Faj</mat-label>
+      <mat-select
+        formControlName="species"
+        (selectionChange)="setRelevantSpeciesData($event.value)"
+      >
+        @for (nation of speciesList; track $index) {
+        <mat-option value="{{ nation }}">{{ nation }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Szerep</mat-label>
+      <mat-select formControlName="class">
+        <mat-option value="Alkimista">Alkimista</mat-option>
+        <mat-option value="Excentrikus">Excentrikus</mat-option>
+        <mat-option value="Gépész">Gépész</mat-option>
+        <mat-option value="Ördöglakatos">Ördöglakatos</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div id="specialProperties" formGroupName="specialProperties">
+      <mat-form-field appearance="outline">
+        <mat-label>Népi tulajdonság</mat-label>
+        <mat-select formControlName="speciesProperty">
+          @for (item of currentSpeciesProperties; track $index) {
+          <mat-option class="padded-option" value="{{ $index }}">{{
+            item.desc
+          }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Otthon</mat-label>
+        <mat-select
+          formControlName="home"
+          (selectionChange)="selectHome($event.value)"
+        >
+          @for (item of currentSpeciesHomes; track $index) {
+          <mat-option class="padded-option" value="{{ $index }}">{{
+            item.desc
+          }}</mat-option>
+          }</mat-select
+        >
+      </mat-form-field>
+      <div id="other-properties">
+        <span id="bonus-text">Bónusz ismeretek</span>
+        @for (item of currentHome?.bonus; track $index) {
+        <div class="other-property">
+          <span>{{ item.name }}</span>
+          <span>{{ item.mod }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    <div id="buttons">
+      <button class="fake-button" (click)="createCharacter()">
+        Létrehozás
+      </button>
+      <button class="fake-button" (click)="createCharacter(true)">
+        Random
+      </button>
+      <span id="error">{{ errorMessage }}</span>
+    </div>
+  </div>
+  <div id="stat-virtue-container">
+    <div id="stats" class="container" formGroupName="stats">
+      <span class="groupName">Tulajdonságok </span>
+      @for (item of statsForm; track $index) {
+      <div
+        [id]="item.controlName"
+        [formGroupName]="item.controlName"
+        class="stat-container"
+      >
+        @for (field of item.fields; track $index) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.labelText }}</mat-label>
+          <input
+            type="number"
+            [min]="item.interval.min"
+            [max]="item.interval.max"
+            matInput
+            [formControlName]="field.groupName"
+          />
+        </mat-form-field>
+        }
+      </div>
+      }
+      <div id="diceMenu" class="fake-button" (click)="diceRollingMenu()">
+        <mat-icon>casino</mat-icon>
+      </div>
+    </div>
+    <div id="virtues" class="container" formGroupName="virtues">
+      <span class="groupName">Erények</span>
+      <div id="virtue-container" formGroupName="virtues">
+        <mat-form-field appearance="outline">
+          <mat-label>Erény</mat-label>
+          <mat-select [formControl]="getInputs('virtues.virtues').at(0)">
+            @for (item of virtues; track $index) {
+            <mat-option value="{{ $index }}">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Erény</mat-label>
+          <mat-select [formControl]="getInputs('virtues.virtues').at(1)">
+            @for (item of virtues; track $index) {
+            <mat-option value="{{ $index }}">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <span class="groupName">Hátrány</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Hátrány</mat-label>
+        <mat-select [formControl]="getInputs('virtues.disadvantage').at(0)">
+          @for (item of disadvantages; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div id="equipment" class="container" formGroupName="equipment">
+    <span class="groupName">Felszerelés</span>
+    <div class="rect">
+      <mat-form-field appearance="outline">
+        <mat-label>Bal kéz</mat-label>
+        <mat-select formControlName="left">
+          @for (weapon of weapons; track $index) {
+          <mat-option class="padded-option" value="{{ $index }}">{{
+            weapon
+          }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="rect">
+      <mat-form-field appearance="outline">
+        <mat-label>Jobb kéz</mat-label>
+        <mat-select formControlName="right">
+          @for (weapon of weapons; track $index) {
+          <mat-option class="padded-option" value="{{ $index }}">{{
+            weapon
+          }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div id="shield">
+      <mat-form-field id="armour-field" appearance="outline">
+        <mat-label>Páncél</mat-label>
+        <mat-select formControlName="armour">
+          @for (armour of armours; track $index) {
+          <mat-option class="padded-option" value="{{ $index }}"
+            ><span class="option-text"
+              >{{ armour.name }} - {{ armour.defValue }}
+              <mat-icon>shield</mat-icon></span
+            ></mat-option
+          >
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div id="items" formGroupName="items" class="container">
+    <span class="groupName">Elengedhetetlen tárgyak</span>
+    <mat-form-field appearance="outline">
+      <mat-label>Élelem</mat-label>
+      <mat-select [formControl]="getInputs('items.food').at(0)">
+        @for (item of foods; track $index) {
+        <mat-option value="{{ $index }}"
+          >{{ item.name }} - {{ item.portion }} fejadag</mat-option
+        >
+        }
+      </mat-select>
+    </mat-form-field>
+    <div id="mandatory-items" class="container" formGroupName="specialItems">
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.specialItems').at(0)">
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.specialItems').at(1)">
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.specialItems').at(2)">
+          @for (item of specialItems; track $index) { @if($index === 0){
+          <mat-optgroup label="Gyógyszerek"></mat-optgroup>
+          } @else if($index === 11){
+          <mat-optgroup label="Tájak italai"></mat-optgroup>
+          }
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div id="otherItems" class="container" formGroupName="otherItems">
+      <span class="groupName">Egyéb tárgyak</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.otherItems').at(0)">
+          @for (item of otherItems; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.otherItems').at(1)">
+          @for (item of otherItems; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.otherItems').at(2)">
+          @for (item of otherItems; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.otherItems').at(3)">
+          @for (item of otherItems; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select [formControl]="getInputs('items.otherItems').at(4)">
+          @for (item of otherItems; track $index) {
+          <mat-option value="{{ $index }}">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div id="dice-rolling-menu" [ngClass]="{ show: showDiceMenu }">
+    <div class="fake-button">d4</div>
+    <div class="fake-button">d6</div>
+    <div class="fake-button">d10</div>
+    <div class="fake-button">d20</div>
+    <div class="fake-button">d100</div>
+  </div>
+</form>

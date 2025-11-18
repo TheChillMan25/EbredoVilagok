@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CharacterVirtues } from '../virtues_disadvantages';
+import { CharacterVirtues } from '../../../../shared/models/virtues_disadvantages';
 import {
   VirtueDisadvBase,
   CombinedVirtueDisadvRow,
-} from '../character_interfaces';
+} from '../../../../shared/models/character_interfaces';
 
 @Component({
   selector: 'app-character-virtues',

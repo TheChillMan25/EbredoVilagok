@@ -1,0 +1,79 @@
+<div id="content">
+  <div id="players">
+    <span class="headerText">Játékosok</span>
+    @for (player of players; track $index) {
+    <div id="{{ player.userID }}" class="player">
+      <div class="player-header">
+        <span class="player-name">{{ player.username }}</span>
+        <span
+          >HP: {{ player.character.stats.main.hp }} SP:
+          {{ player.character.stats.main.sp }}</span
+        >
+      </div>
+      <span class="effect">Hatás: {{ player.effect }}</span>
+      <div class="player-action">
+        Kör: <span>{{ player.turn }}</span>
+      </div>
+    </div>
+    }
+  </div>
+  <div id="backpack">
+    <span class="headerText">Hátizsák</span>
+    <div id="food-container" class="item-container">
+      <span class="headerText">Élelem</span>
+      @for (item of players[0].character.items.food; track $index) {
+      <div class="item">
+        {{ getItem("food", item).name }}
+      </div>
+      }
+    </div>
+    <div id="special-item-container" class="item-container">
+      <span class="headerText">Különleges tárgyak</span>
+      @for (item of players[0].character.items.specialItems; track $index) {
+      <div class="item">
+        {{ getItem("specialItems", item).name }}
+      </div>
+      }
+    </div>
+    <div id="item-container" class="item-container">
+      <span class="headerText">Tárgyak</span>
+      @for (item of players[0].character.items.otherItems; track $index) {
+      <div class="item">
+        {{ getItem("otherItems", item).name }}
+      </div>
+      }
+    </div>
+  </div>
+  <div id="actions">
+    <span class="headerText">Akciók</span>
+    <div id="action-container">
+      <div class="fake-button">
+        <mat-icon>close</mat-icon>
+        <div class="tooltip">Támadás az elsődleges fegyverrel</div>
+      </div>
+      <div class="fake-button">
+        <mat-icon>electric_bolt</mat-icon>
+        <div class="tooltip">Elektromos csapás.</div>
+      </div>
+    </div>
+  </div>
+  <div id="npcs">
+    <span class="headerText">NPC-k és ellenfelek</span>
+    @for (npc of npcs; track $index) {
+    <div id="{{ npc.npc.character.id }}" class="npc">
+      <div class="npc-header">
+        <span class="npc-name">{{ npc.npc.character.name }}</span>
+        <span
+          >HP: {{ npc.npc.character.stats.main.hp }} SP:
+          {{ npc.npc.character.stats.main.sp }}</span
+        >
+      </div>
+      <span class="effect">Hatás: {{ npc.effect }}</span>
+      <div class="npc-action">
+        Kör: <span>{{ npc.turn }}</span>
+      </div>
+    </div>
+    }
+  </div>
+  <div id="map"></div>
+</div>

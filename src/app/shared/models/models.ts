@@ -2,8 +2,8 @@ export interface User {
   id: string | null | undefined;
   username: string | null | undefined;
   email: string | null | undefined;
-  characters: Character[];
-  adventures: Adventure[];
+  characters: string[];
+  adventures: string[];
 }
 
 export interface ForumUser {
@@ -14,7 +14,46 @@ export interface ForumUser {
 
 export interface Character {
   id: string;
+  currentAdventure: string;
   name: string;
+  species: string;
+  class: string;
+  level: number;
+  specialProperties: {
+    speciesProperty: number;
+    home: number;
+  };
+  stats: {
+    physical: {
+      ero: number;
+      ugyesseg: number;
+      kitartas: number;
+    };
+    mental: {
+      esz: number;
+      fortely: number;
+      akaratero: number;
+    };
+    main: {
+      hp: number;
+      sp: number;
+    };
+  };
+  equipment: {
+    left: number;
+    right: number;
+    armour: number;
+  };
+  virtues: {
+    virtues: number[];
+    disadv: number[];
+  };
+  items: {
+    food: number[];
+    specialItems: number[];
+    otherItems: number[];
+    weaponItems: string[];
+  };
 }
 
 export interface Adventure {
@@ -35,4 +74,20 @@ export interface ForumPost {
   type: PostType;
   text: string;
   attachments: string[];
+}
+
+export interface AdventureEvent {
+  id: number;
+  name: string;
+  desc: string;
+  story: string;
+  NPCs: NPC[];
+  location: string;
+}
+
+export interface NPC {
+  id: string;
+  character: Character;
+  attitude: 'neutral' | 'hostile';
+  actions: boolean[];
 }

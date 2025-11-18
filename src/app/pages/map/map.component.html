@@ -1,0 +1,29 @@
+<div id="content">
+  <div
+    id="control-panel"
+    class="container"
+    [ngClass]="{ show: controlVisible }"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Keresés</mat-label>
+      <input matInput type="text" [formControl]="search" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <div id="marker-toggle-container">
+      @for (toggle of markerToggles; track $index) {
+      <div id="{{ toggle.id }}-toggle" class="fake-button">
+        {{ toggle.text }}
+      </div>
+      }
+    </div>
+    <div id="search-results">
+      @for (result of searchResults; track $index) {
+      <div class="map-location fake-button">{{ result.name }}</div>
+      }
+    </div>
+  </div>
+  <div id="map-container" class="container"></div>
+  <div id="control-toggle" class="fake-button" (click)="toggleControlPanel()">
+    <mat-icon>search_gear</mat-icon>
+  </div>
+</div>

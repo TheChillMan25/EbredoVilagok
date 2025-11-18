@@ -24,7 +24,7 @@ export class WorldComponent {
       img: 'assets/img/vilag/market.jpg',
       id: 'fajok',
     },
-    { name: 'Térkép', img: 'assets/img/vilag/terkep.jpg', id: 'map' },
+    { name: 'Térkép', img: 'assets/img/vilag/terkep.jpg', id: 'terkep' },
     {
       name: 'Bestiárium',
       img: 'assets/img/vilag/bestiarium.jpg',

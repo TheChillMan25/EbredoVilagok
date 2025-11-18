@@ -8,7 +8,7 @@
       <p>Kérlek várj...</p>
     </div>
     } @if (showLoginForm) {
-    <form (ngSubmit)="login()" class="login-form">
+    <form class="login-form">
       <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
         <input matInput type="email" [formControl]="email" />
@@ -27,9 +27,9 @@
       </div>
       }
 
-      <button mat-flat-button color="primary" type="submit">
+      <div id="loginBtn" class="fake-button" (click)="login()">
         Bejelentkezés
-      </button>
+      </div>
       <a id="registerBtn" [routerLink]="['/register']"> Nincs még fiókom </a>
     </form>
     }

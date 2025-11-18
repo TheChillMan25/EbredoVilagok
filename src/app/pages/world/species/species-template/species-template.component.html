@@ -26,7 +26,7 @@
     <div class="properties">
       <h3>Népi tulajdonságok</h3>
       <div class="property-inner-container">
-        @for (element of item.nationalProperties; track $index) {
+        @for (element of item.speciesSpecial; track $index) {
         <p>{{ $index + 1 }} - {{ element.desc }}</p>
         }
       </div>

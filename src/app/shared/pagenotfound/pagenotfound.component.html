@@ -1,14 +1,14 @@
-<div id="not-found-container">
+<div id="content">
   <mat-card>
     <mat-card-content>
       <div id="not-found-content">
         <mat-icon>error</mat-icon>
         <h1>Az oldal nem található</h1>
         <p>Az oldal, amit keresel nem létezik.</p>
-        <button [routerLink]="['/index']">
+        <div class="fake-button" [routerLink]="['/index']">
           <mat-icon>home</mat-icon>
           Vissza a főoldalra
-        </button>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
