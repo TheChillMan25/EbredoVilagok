@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../shared/services/auth/auth.service';
+import { setBackground } from '../../shared/functional/functions';
 
 @Component({
   selector: 'app-register',
@@ -48,6 +49,10 @@ export class RegisterComponent {
   });
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(){
+    setBackground('bg.jpg');
+  }
 
   register() {
     if (!this.registerForm.valid) {

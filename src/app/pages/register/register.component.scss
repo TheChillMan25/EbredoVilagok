@@ -3,7 +3,7 @@
 }
 
 #content {
-  flex-direction: row-reverse !important;
+  flex-direction: row-reverse;
   justify-content: space-between;
   .title {
     position: static;
@@ -32,6 +32,19 @@
           text-decoration: none;
         }
       }
+    }
+  }
+}
+
+@media (max-width: 768px){
+  #content{
+    justify-content: space-evenly;
+    flex-direction: column;
+
+    #panel{
+      width: fit-content;
+      height: fit-content;
+      border-radius: .5rem;
     }
   }
 }

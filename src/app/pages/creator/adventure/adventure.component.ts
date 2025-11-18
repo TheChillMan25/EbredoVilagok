@@ -156,6 +156,7 @@ export class AdventureComponent {
       story: [''],
     });
     this.npcForm = this.fb.group({
+      name: ['', [Validators.required]],
       attitude: ['neutral', [Validators.required]],
       actions: this.fb.array<FormControl<boolean | null>>([
         new FormControl(false),
@@ -246,6 +247,7 @@ export class AdventureComponent {
     console.log(npcValues);
     let npc: NPC = {
       id: `${this.selectedAdventureEvent?.name}-${this.selectedAdventureEvent?.NPCs.length}`,
+      name: npcValues.name,
       actions: npcValues.actions,
       attitude: npcValues.attitude,
       character: npcValues.character,

@@ -87,7 +87,8 @@ export interface AdventureEvent {
 
 export interface NPC {
   id: string;
-  character: Character;
+  name: string,
+  character: Character | null;
   attitude: 'neutral' | 'hostile';
   actions: boolean[];
 }
