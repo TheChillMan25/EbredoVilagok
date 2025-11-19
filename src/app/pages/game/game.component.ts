@@ -2,14 +2,30 @@ import { Component } from '@angular/core';
 import { getItem, setBackground } from '../../shared/functional/functions';
 import { Character, NPC } from '../../shared/models/models';
 import { MatIconModule } from '@angular/material/icon';
-import { DiceRollerComponent } from '../../shared/functional/dice-roller/dice-roller.component';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions } from "@angular/material/card";
-import { MatButton } from "@angular/material/button";
-import { RouterLink } from "@angular/router";
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+  MatCardActions,
+} from '@angular/material/card';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-game',
-  imports: [MatIconModule, DiceRollerComponent, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions, MatButton, RouterLink],
+  imports: [
+    MatIconModule,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardActions,
+    MatButton,
+    RouterLink,
+  ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })

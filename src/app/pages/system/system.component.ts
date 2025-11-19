@@ -22,6 +22,15 @@ import { MandatoryItemsComponent } from './character/items/mandatory-items/manda
 import { SpecialItemsComponent } from './character/items/special-items/special-items.component';
 import { CigarItemsComponent } from './character/items/cigar-items/cigar-items.component';
 import { NgClass } from '@angular/common';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+  MatCardActions,
+} from '@angular/material/card';
+import { MatButton, MatIconButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-system',
@@ -48,6 +57,14 @@ import { NgClass } from '@angular/common';
     SpecialItemsComponent,
     CigarItemsComponent,
     NgClass,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardActions,
+    MatButton,
+    MatIconButton,
   ],
   templateUrl: './system.component.html',
   styleUrl: './system.component.scss',
@@ -57,7 +74,11 @@ export class SystemComponent {
   activeSegmentName: 'character' | 'adventure' | 'actions' = 'character';
   activePageIndex: number = 0;
   maxPageIndex: number = 9;
+
   visibleMarkers: boolean = false;
+  showUseManual: boolean = false;
+
+  firstVisit!: boolean;
 
   mainPageIndexes = {
     char: 0,
@@ -68,6 +89,7 @@ export class SystemComponent {
   ngOnInit(): void {
     setBackground(this.background);
     this.setActiveSegment('character');
+    this.checkFirstVisit();
   }
 
   setActiveSegment(segment: 'character' | 'adventure' | 'actions'): void {
@@ -152,6 +174,31 @@ export class SystemComponent {
       });
     } else {
       console.warn('Nincsenek .page-text-container-ek');
+    }
+  }
+
+  openUseManual() {
+    this.showUseManual = true;
+  }
+
+  hideUseManual() {
+    this.showUseManual = false;
+  }
+
+  checkFirstVisit() {
+    let value = localStorage.getItem('firstEnciklopedyVisit');
+    if (value !== null) {
+      this.firstVisit = value === 'true';
+      if (this.firstVisit) {
+        this.firstVisit = false;
+        localStorage.setItem('firstEnciklopedyVisit', 'false');
+      }
+    } else {
+      this.firstVisit = true;
+      localStorage.setItem('firstEnciklopedyVisit', 'true');
+    }
+    if (this.firstVisit) {
+      this.showUseManual = true;
     }
   }
 }

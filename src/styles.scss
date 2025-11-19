@@ -97,7 +97,7 @@ app-mobile-navbar {
 
 button {
   font-size: large;
-  font-family: 'Modern Antiqua';
+  font-family: "Modern Antiqua";
   border: none;
 }
 
@@ -208,6 +208,26 @@ mat-cell:nth-child(even) {
   text-align: center;
 }
 
+mat-card {
+  min-width: 50%;
+  gap: 1rem;
+  padding: 1rem;
+  border: 0.2rem solid #222;
+
+  mat-card-header {
+    justify-content: space-between;
+
+    mat-card-title,
+    mat-icon {
+      color: #f2c480;
+    }
+  }
+
+  mat-card-content {
+    text-align: justify;
+  }
+}
+
 @media (max-height: 685px) and (orientation: landscape) {
   #content {
     overflow-y: auto;
@@ -281,5 +301,16 @@ mat-cell:nth-child(even) {
 @media (max-width: 425px) {
   .title {
     font-size: 2.5rem;
+  }
+
+  mat-card {
+    mat-card-header {
+      mat-card-title {
+        font-size: x-large !important;
+      }
+      mat-card-subtitle {
+        font-size: large !important;
+      }
+    }
   }
 }
