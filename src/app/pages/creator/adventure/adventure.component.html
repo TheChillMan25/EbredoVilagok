@@ -140,11 +140,13 @@
             <mat-checkbox
               class="example-margin"
               [formControl]="getActions().at(0)"
+              [disabled]="attitude !== 'neutral'"
               >Beszéd</mat-checkbox
             >
             <mat-checkbox
               class="example-margin"
               [formControl]="getActions().at(1)"
+              [disabled]="attitude !== 'neutral'"
               >Kereskedés</mat-checkbox
             >
           </div>
@@ -157,15 +159,18 @@
             <mat-checkbox
               class="example-margin"
               [formControl]="getActions().at(2)"
+              [disabled]="attitude !== 'hostile'"
               >Támadás</mat-checkbox
             >
             <mat-checkbox
               class="example-margin"
               [formControl]="getActions().at(3)"
+              [disabled]="attitude !== 'hostile'"
               >Lopás</mat-checkbox
             >
           </div>
         </div>
+        @if(this.attitude === "hostile"){
         <mat-form-field appearance="outline">
           <mat-label>Karakter</mat-label>
           <mat-select formControlName="character">
@@ -176,6 +181,10 @@
             }
           </mat-select>
         </mat-form-field>
+        } @if(npcError !== ''){
+
+        <div id="npc-error" class="error-message">{{ npcError }}</div>
+        }
         <button class="fake-button" type="submit">
           {{ eventAction }}<mat-icon>{{ eventActionIcon }}</mat-icon>
         </button>

@@ -1,5 +1,46 @@
 #content {
   justify-content: center;
+
+  > .fake-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 100;
+    border-radius: 50%;
+    padding: 0.7rem;
+    background-color: #f2c480;
+    color: #333;
+
+    &:hover {
+      background-color: #333;
+      color: #f2c480;
+    }
+  }
+  #use-manual {
+    height: 100%;
+    width: 100%;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: #3333333a;
+    padding: 1rem;
+
+    mat-card {
+      width: 50%;
+
+      strong {
+        color: #f2c480;
+      }
+    }
+
+    &.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
 #book {
@@ -187,6 +228,16 @@ app-actions-loot3 {
 @media (max-width: 900px) {
   #content {
     justify-content: space-between;
+
+    > .fake-button {
+      background-color: #333;
+      color: #f2c480;
+
+      &:hover {
+        background-color: #f2c480;
+        color: #333;
+      }
+    }
     #book {
       width: 98%;
       #pages {
@@ -221,7 +272,7 @@ app-actions-loot3 {
     #buttons {
       display: flex;
       width: 100%;
-      background-color: #444;
+      background-color: #333;
       z-index: 30;
       .fake-button {
         position: relative;
@@ -230,9 +281,15 @@ app-actions-loot3 {
         height: 2rem;
         z-index: 32;
         border-radius: 0;
+        background-color: #333;
 
         mat-icon {
           cursor: pointer;
+        }
+
+        &.hide {
+          pointer-events: none;
+          opacity: 0;
         }
       }
 
@@ -249,6 +306,36 @@ app-actions-loot3 {
       }
       #next {
         right: 0;
+      }
+    }
+
+    #use-manual {
+      mat-card {
+        min-width: 80%;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  #content {
+    #use-manual {
+      mat-card {
+        min-width: 95%;
+      }
+    }
+  }
+}
+
+@media (max-width: 425px) {
+  #content {
+    > .fake-button {
+      font-size: smaller;
+      padding: 0.5rem;
+    }
+    #use-manual {
+      mat-card {
+        min-width: 100%;
       }
     }
   }

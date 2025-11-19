@@ -39,10 +39,10 @@
       }
     </div>
   </div>
-  <div
-    [id]="character?.id"
-    class="text-container"
-    [ngClass]="{ show: showSpecDescs }"
-    (click)="hideSpecDescs()"
-  ></div>
+  <div class="spec-container" [ngClass]="{ show: showSpecDescs }">
+    <div [id]="character?.id" class="text-container"></div>
+    <div class="fake-button" (click)="hideSpecDescs()">
+      <mat-icon>close</mat-icon>
+    </div>
+  </div>
 </div>
