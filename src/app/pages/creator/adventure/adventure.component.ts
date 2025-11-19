@@ -78,7 +78,7 @@ export class AdventureComponent {
 
   eventForm!: FormGroup;
   npcForm!: FormGroup;
-  npcCharacterForm!: FormGroup;
+  npcError: string = '';
 
   npcCharacter = {
     species: NationData.map((nation) => nation.nationName),
@@ -241,6 +241,7 @@ export class AdventureComponent {
     if (!this.npcForm.valid) {
       console.error('Hibás kitöltés');
       console.log(this.npcForm.value);
+      this.npcError = 'Töltsd ki a kötelező mezőket';
       return;
     }
     const npcValues = this.npcForm.value;
@@ -259,6 +260,12 @@ export class AdventureComponent {
   }
 
   setAttitude(which: string) {
+    switch (which){
+      case 'neutral':
+        break;
+      case 'hostile':
+        break;
+    }
     this.attitude = which;
   }
 

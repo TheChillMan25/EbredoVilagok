@@ -5,10 +5,11 @@ import {
   getSpeciesSpecial,
 } from '../../../shared/functional/functions';
 import { NgClass } from '@angular/common';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-karakter-template',
-  imports: [NgClass],
+  imports: [NgClass, MatIcon],
   templateUrl: './karakter-template.component.html',
   styleUrl: './karakter-template.component.scss',
 })
