@@ -63,13 +63,6 @@
         overflow-y: auto;
       }
 
-      #character-container {
-        app-karakter-template {
-          width: fit-content;
-          height: fit-content;
-        }
-      }
-
       .show {
         display: flex;
       }
@@ -137,10 +130,16 @@
       }
     }
     #main-container {
+      height: 85%;
       width: 100%;
       #containers {
         border-radius: 0 0 0.5rem 0.5rem;
         flex: 2;
+        #character-container {
+          app-karakter-template {
+            width: 100%;
+          }
+        }
       }
       #button-container {
         justify-content: space-around;

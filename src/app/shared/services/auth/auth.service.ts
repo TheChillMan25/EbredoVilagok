@@ -57,6 +57,7 @@ export class AuthService {
         email: email,
         characters: [],
         adventures: [],
+        posts: [],
       });
       return userCredential;
     } catch (error) {

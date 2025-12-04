@@ -30,7 +30,7 @@ import {
   MatCardContent,
   MatCardActions,
 } from '@angular/material/card';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-system',
@@ -64,7 +64,6 @@ import { MatButton, MatIconButton } from '@angular/material/button';
     MatCardContent,
     MatCardActions,
     MatButton,
-    MatIconButton,
   ],
   templateUrl: './system.component.html',
   styleUrl: './system.component.scss',

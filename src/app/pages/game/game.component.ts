@@ -86,6 +86,10 @@ export class GameComponent {
           otherItems: [0, 1, 2, 3, 4],
           weaponItems: [],
         },
+        wounds: {
+          small: 0,
+          large: 0,
+        },
       },
     },
   ];
@@ -141,6 +145,10 @@ export class GameComponent {
             specialItems: [0, 1, 2],
             otherItems: [0, 1, 2, 3, 4],
             weaponItems: [],
+          },
+          wounds: {
+            small: 0,
+            large: 0,
           },
         },
       },

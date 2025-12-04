@@ -123,6 +123,10 @@ export class UserService {
               otherItems: [],
               weaponItems: [],
             },
+            wounds: characterData?.['wounds'] ?? {
+              small: 0,
+              large: 0,
+            },
           };
           characters.push(character);
         });
@@ -142,6 +146,9 @@ export class UserService {
           const adventure: Adventure = {
             id: doc.id,
             name: adventureData?.['name'] ?? '',
+            events: adventureData?.['events'] ?? '',
+            players: adventureData?.['players'] ?? '',
+            currentPlayer: adventureData?.['currentPlayer'] ?? '',
           };
           adventures.push(adventure);
         });
@@ -202,9 +209,9 @@ export class UserService {
         const post: ForumPost = {
           id: doc.id,
           title: postData?.['title'] ?? '',
-          type: postData?.['type'] ?? '',
           text: postData?.['text'] ?? '',
           attachments: postData?.['attachments'] ?? '',
+          sentDate: postData?.['sentDate'] ?? '',
         };
         posts.push(post);
       });

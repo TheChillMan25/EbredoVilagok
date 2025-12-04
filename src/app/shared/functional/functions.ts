@@ -257,6 +257,10 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
       ],
       weaponItems: [],
     },
+    wounds: {
+      small: 0,
+      large: 0,
+    },
   };
   return randomCharacter;
 }

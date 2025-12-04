@@ -1,0 +1,7 @@
+<svg width="220" height="220" viewBox="-128 -128 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Nagy rombusz (fehér keret, átlátszó belseje) -->
+  <path d="M 0.5,128 L 128,0.5 L 255.5,128 L 128,255.5 Z" 
+        fill="none" 
+        stroke="white" 
+        stroke-width="20"/>
+</svg>
