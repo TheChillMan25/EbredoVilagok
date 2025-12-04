@@ -123,6 +123,10 @@ export class UserService {
               otherItems: [],
               weaponItems: [],
             },
+            wounds: characterData?.['wounds'] ?? {
+              small: 0,
+              large: 0,
+            },
           };
           characters.push(character);
         });

@@ -5,10 +5,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { setBackground } from '../../shared/functional/functions';
 import { NgClass } from '@angular/common';
-import {
-  Location,
-  MapContainerComponent,
-} from '../../shared/functional/map-container/map-container.component';
+import { MapContainerComponent } from '../../shared/functional/map-container/map-container.component';
+import { Location } from '../../shared/models/map_locations';
 
 interface Marker {
   id: string;
@@ -77,8 +75,8 @@ export class MapComponent {
 
   searchFor(what: string) {
     this.searchResults = [];
-    if (what.length !== 0) {
-      for (let l of this.map.locations) {
+    if (what && what.length !== 0) {
+      Object.values(this.map.locationsMap).forEach((l) => {
         for (let loc of l.values()) {
           if (
             loc.name.toLocaleLowerCase().includes(what.toLowerCase()) ||
@@ -86,7 +84,7 @@ export class MapComponent {
           )
             this.searchResults.push(loc);
         }
-      }
+      });
     }
     this.searchResults.sort((a, b) => a.name.localeCompare(b.name));
   }

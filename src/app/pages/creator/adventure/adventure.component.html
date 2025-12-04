@@ -15,8 +15,15 @@
           [ngClass]="{ select: selectedEventIndex === $index }"
         >
           <span>{{ event.name }}</span>
-          <div class="fake-button" (click)="openEditEvent($index)">
+          <div
+            class="fake-button"
+            style="margin-left: auto"
+            (click)="openEditEvent($index)"
+          >
             <mat-icon>edit</mat-icon>
+          </div>
+          <div class="fake-button" (click)="remove(event.id, 'event')">
+            <mat-icon>delete</mat-icon>
           </div>
         </div>
         }
@@ -24,27 +31,33 @@
     </div>
     <div id="location" class="container">
       <div class="header">
-        <span class="header-text">Helyszín</span>
-        <div class="add-button fake-button"><mat-icon>add</mat-icon></div>
+        <span class="header-text">Térkép</span>
       </div>
-      <div id="map-container"></div>
+      <div id="map-container">
+        <app-map-container [canSelect]="true" (selectedLocation)="selectLocation($event)"></app-map-container>
+      </div>
     </div>
     <div id="npcs" class="container">
       <div class="header">
         <span class="header-text">NPC-k</span>
+        @if(selectedAdventureEvent){
         <div class="add-button fake-button" (click)="showUIs('npcs')">
           <mat-icon>add</mat-icon>
         </div>
+        }
       </div>
       <div id="npcs-container">
         @for (npc of selectedAdventureEvent?.NPCs; track $index) {
         <div class="npc">
-          <span class="npc-name">{{ npc.name }}</span>
+          <span id="{{ npc.id }}" class="npc-name">{{ npc.name }}</span>
           <mat-icon>
             @if (npc.attitude === "neutral") { handshake }@else { close }
           </mat-icon>
           <div class="fake-button">
             <mat-icon>edit</mat-icon>
+          </div>
+          <div class="fake-button" (click)="remove(npc.id, 'npc')">
+            <mat-icon>delete</mat-icon>
           </div>
         </div>
         }
@@ -72,7 +85,7 @@
           <mat-label>Helyszín</mat-label>
           <mat-select formControlName="location">
             @for (location of locations; track $index) {
-            <mat-option [value]="location">{{ location }}</mat-option>
+            <mat-option [value]="location.name">{{ location.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>

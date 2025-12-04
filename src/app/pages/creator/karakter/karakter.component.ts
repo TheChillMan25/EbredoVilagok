@@ -216,8 +216,7 @@ export class KarakterComponent {
         return;
       }
       console.log('Creating random character...');
-      let randomCharacter =
-      createRandomCharacter(formValue.name);
+      let randomCharacter = createRandomCharacter(formValue.name);
       console.log(randomCharacter);
       this.charService
         .addCharacter(randomCharacter)
@@ -273,6 +272,10 @@ export class KarakterComponent {
           specialItems: [],
           otherItems: [],
           weaponItems: [],
+        },
+        wounds: {
+          small: 0,
+          large: 0,
         },
       };
       console.log(newCharacter);

@@ -55,6 +55,10 @@ export interface Character {
     otherItems: number[];
     weaponItems: string[];
   };
+  wounds: {
+    small: number;
+    large: number;
+  };
 }
 
 export interface Forum {
