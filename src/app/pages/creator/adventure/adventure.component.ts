@@ -68,15 +68,15 @@ export class AdventureComponent {
   showEvents: boolean = false;
   showUIContainer: boolean = false;
   showNPCs: boolean = false;
-  modifyEvent: boolean = false;
+  modify: boolean = false;
   attitude: string = 'neutral';
 
   modifyingIndex: number | null = null;
 
   selectedEventIndex: number = -1;
 
-  eventAction: string = 'Hozzáad';
-  eventActionIcon: string = 'add';
+  action: string = 'Hozzáad';
+  actionIcon: string = 'add';
 
   locations: Location[] = [];
 
@@ -132,14 +132,16 @@ export class AdventureComponent {
         this.showNPCs = true;
         break;
     }
-    this.eventAction = 'Hozzáad';
-    this.eventActionIcon = 'add';
+    this.action = 'Hozzáad';
+    this.actionIcon = 'add';
   }
 
   hideUIs() {
     this.showUIContainer = false;
     this.showEvents = false;
     this.showNPCs = false;
+    this.modify = false;
+    this.modifyingIndex = null;
   }
 
   initForms() {
@@ -162,11 +164,16 @@ export class AdventureComponent {
     this.npcForm = this.fb.group({
       name: ['', [Validators.required]],
       attitude: ['neutral', [Validators.required]],
-      actions,
+      actions: this.fb.group({
+        talk: [false],
+        trade: [false],
+        fight: [false],
+        steal: [false],
+      }),
       character: [''],
     });
 
-    this.toggleActions('neutral'); // első betöltés
+    this.toggleActions('neutral');
 
     this.npcForm
       .get('attitude')
@@ -177,17 +184,18 @@ export class AdventureComponent {
   }
 
   private toggleActions(att: 'neutral' | 'hostile') {
-    const acts = this.getActions();
+    const { talk, trade, fight, steal } = this.getActions().controls;
+
     if (att === 'neutral') {
-      acts.at(0).enable();
-      acts.at(1).enable();
-      acts.at(2).disable();
-      acts.at(3).disable();
+      talk.enable();
+      trade.enable();
+      fight.disable();
+      steal.disable();
     } else {
-      acts.at(0).disable();
-      acts.at(1).disable();
-      acts.at(2).enable();
-      acts.at(3).enable();
+      talk.disable();
+      trade.disable();
+      fight.enable();
+      steal.enable();
     }
   }
 
@@ -197,13 +205,13 @@ export class AdventureComponent {
       return;
     }
     const eventValues = this.eventForm.value;
-    if (this.modifyEvent && this.modifyingIndex !== null) {
+    if (this.modify && this.modifyingIndex !== null) {
       let modifiedEvent = this.events[this.modifyingIndex];
       modifiedEvent.name = eventValues.name;
       modifiedEvent.location = eventValues.location;
       modifiedEvent.desc = eventValues.desc;
       modifiedEvent.story = eventValues.story;
-      this.modifyEvent = false;
+      this.modify = false;
       this.modifyingIndex = null;
     } else {
       let event: AdventureEvent = {
@@ -252,19 +260,31 @@ export class AdventureComponent {
     this.selectedEventIndex = index;
   }
 
-  openEditEvent(index: number) {
-    this.modifyEvent = true;
+  edit(index: number, type: 'events' | 'npcs') {
+    this.modify = true;
     this.modifyingIndex = index;
-    this.showUIs('events');
-    this.eventAction = 'Módosít';
-    this.eventActionIcon = 'settings';
-    let event = this.events[index];
-    this.eventForm.patchValue({
-      name: event.name,
-      location: event.location,
-      desc: event.desc,
-      story: event.story,
-    });
+    this.showUIs(type);
+    this.action = 'Módosít';
+    this.actionIcon = 'settings';
+    switch (type) {
+      case 'events':
+        let event = this.events[index];
+        this.eventForm.patchValue({
+          name: event.name,
+          location: event.location,
+          desc: event.desc,
+          story: event.story,
+        });
+        break;
+      case 'npcs':
+        let npc = this.selectedAdventureEvent?.NPCs[index];
+        this.npcForm.patchValue({
+          name: npc?.name,
+          attitude: npc?.attitude,
+          actions: npc?.actions,
+          character: npc?.character,
+        });
+    }
   }
 
   resetForm(resetable: FormGroup) {
@@ -272,7 +292,12 @@ export class AdventureComponent {
       resetable.reset({
         name: '',
         attitude: 'neutral',
-        actions: [false, false, false, false],
+        actions: {
+          talk: false,
+          trade: false,
+          fight: false,
+          steal: false,
+        },
         character: '',
       });
       this.attitude = 'neutral';
@@ -297,18 +322,30 @@ export class AdventureComponent {
     }
     const npcValues = this.npcForm.value;
 
-    if (this.attitude === 'hostile' && !npcValues.character) {
-      this.npcError = 'Adj meg egy karaktert';
-      return;
+    if (this.modify && this.modifyingIndex !== null) {
+      let modifiedNPC = this.selectedAdventureEvent?.NPCs[this.modifyingIndex];
+      if (modifiedNPC) {
+        modifiedNPC.name = npcValues.name;
+        modifiedNPC.attitude = npcValues.attitude;
+        modifiedNPC.actions = npcValues.actions;
+        modifiedNPC.character = npcValues.character;
+        this.modify = false;
+        this.modifyingIndex = null;
+      }
+    } else {
+      if (this.attitude === 'hostile' && !npcValues.character) {
+        this.npcError = 'Adj meg egy karaktert';
+        return;
+      }
+      let npc: NPC = {
+        id: `${this.selectedAdventureEvent?.name}-${this.selectedAdventureEvent?.NPCs.length}`,
+        name: npcValues.name,
+        actions: npcValues.actions,
+        attitude: npcValues.attitude,
+        character: npcValues.character,
+      };
+      this.selectedAdventureEvent?.NPCs.push(npc);
     }
-    let npc: NPC = {
-      id: `${this.selectedAdventureEvent?.name}-${this.selectedAdventureEvent?.NPCs.length}`,
-      name: npcValues.name,
-      actions: npcValues.actions,
-      attitude: npcValues.attitude,
-      character: npcValues.character,
-    };
-    this.selectedAdventureEvent?.NPCs.push(npc);
     this.hideUIs();
     this.resetForm(this.npcForm);
   }
@@ -323,8 +360,18 @@ export class AdventureComponent {
     this.attitude = which;
   }
 
-  getActions(): FormArray<FormControl<boolean>> {
-    return this.npcForm.get('actions') as FormArray<FormControl<boolean>>;
+  getActions(): FormGroup<{
+    talk: FormControl<boolean>;
+    trade: FormControl<boolean>;
+    fight: FormControl<boolean>;
+    steal: FormControl<boolean>;
+  }> {
+    return this.npcForm.get('actions') as FormGroup<{
+      talk: FormControl<boolean>;
+      trade: FormControl<boolean>;
+      fight: FormControl<boolean>;
+      steal: FormControl<boolean>;
+    }>;
   }
 
   getCharacterName(id: string): string {

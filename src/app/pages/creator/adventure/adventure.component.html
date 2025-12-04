@@ -18,7 +18,7 @@
           <div
             class="fake-button"
             style="margin-left: auto"
-            (click)="openEditEvent($index)"
+            (click)="edit($index, 'events')"
           >
             <mat-icon>edit</mat-icon>
           </div>
@@ -34,7 +34,10 @@
         <span class="header-text">Térkép</span>
       </div>
       <div id="map-container">
-        <app-map-container [canSelect]="true" (selectedLocation)="selectLocation($event)"></app-map-container>
+        <app-map-container
+          [canSelect]="true"
+          (selectedLocation)="selectLocation($event)"
+        ></app-map-container>
       </div>
     </div>
     <div id="npcs" class="container">
@@ -53,7 +56,7 @@
           <mat-icon>
             @if (npc.attitude === "neutral") { handshake }@else { close }
           </mat-icon>
-          <div class="fake-button">
+          <div class="fake-button" (click)="edit($index, 'npcs')">
             <mat-icon>edit</mat-icon>
           </div>
           <div class="fake-button" (click)="remove(npc.id, 'npc')">
@@ -110,7 +113,7 @@
           ></textarea>
         </mat-form-field>
         <button class="fake-button" type="submit">
-          {{ eventAction }}<mat-icon>{{ eventActionIcon }}</mat-icon>
+          {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
         </button>
       </form>
     </div>
@@ -152,13 +155,13 @@
             <span class="header-text">Semleges</span>
             <mat-checkbox
               class="example-margin"
-              [formControl]="getActions().at(0)"
+              [formControl]="getActions().controls.talk"
               [disabled]="attitude !== 'neutral'"
               >Beszéd</mat-checkbox
             >
             <mat-checkbox
               class="example-margin"
-              [formControl]="getActions().at(1)"
+              [formControl]="getActions().controls.trade"
               [disabled]="attitude !== 'neutral'"
               >Kereskedés</mat-checkbox
             >
@@ -171,13 +174,13 @@
             <span class="header-text">Ellenséges</span>
             <mat-checkbox
               class="example-margin"
-              [formControl]="getActions().at(2)"
+              [formControl]="getActions().controls.fight"
               [disabled]="attitude !== 'hostile'"
               >Támadás</mat-checkbox
             >
             <mat-checkbox
               class="example-margin"
-              [formControl]="getActions().at(3)"
+              [formControl]="getActions().controls.steal"
               [disabled]="attitude !== 'hostile'"
               >Lopás</mat-checkbox
             >
@@ -199,7 +202,7 @@
         <div id="npc-error" class="error-message">{{ npcError }}</div>
         }
         <button class="fake-button" type="submit">
-          {{ eventAction }}<mat-icon>{{ eventActionIcon }}</mat-icon>
+          {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
         </button>
       </form>
     </div>
