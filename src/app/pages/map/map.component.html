@@ -11,18 +11,26 @@
     </mat-form-field>
     <div id="marker-toggle-container">
       @for (toggle of markerToggles; track $index) {
-      <div id="{{ toggle.id }}-toggle" class="fake-button">
+      <div
+        id="{{ toggle.id }}-toggle"
+        class="fake-button"
+        (click)="toggleMarkers(toggle.id)"
+      >
         {{ toggle.text }}
       </div>
       }
     </div>
     <div id="search-results">
       @for (result of searchResults; track $index) {
-      <div class="map-location fake-button">{{ result.name }}</div>
+      <div class="map-location fake-button" (click)="locate(result)">
+        {{ result.name }}
+      </div>
       }
     </div>
   </div>
-  <div id="map-container" class="container"></div>
+  <div id="map-container" class="container">
+    <app-map-container id="map"></app-map-container>
+  </div>
   <div id="control-toggle" class="fake-button" (click)="toggleControlPanel()">
     <mat-icon>search_gear</mat-icon>
   </div>

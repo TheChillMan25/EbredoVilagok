@@ -283,6 +283,11 @@ app-actions-loot3 {
         border-radius: 0;
         background-color: #333;
 
+        &:hover {
+          background-color: #f2c480;
+          color: #333;
+        }
+
         mat-icon {
           cursor: pointer;
         }

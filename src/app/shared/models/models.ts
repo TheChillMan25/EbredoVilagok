@@ -4,6 +4,7 @@ export interface User {
   email: string | null | undefined;
   characters: string[];
   adventures: string[];
+  posts: string[];
 }
 
 export interface ForumUser {
@@ -56,24 +57,38 @@ export interface Character {
   };
 }
 
-export interface Adventure {
-  id: string;
-  name: string;
+export interface Forum {
+  adventureForum: SubForum;
+  characterForum: SubForum;
 }
 
-export enum PostType {
-  MAIN,
-  CHARACTER,
-  ADVENTURE,
-  FRIEND,
+export interface SubForum {
+  id: string;
+  topic: string;
+  posts: ForumPost[];
 }
 
 export interface ForumPost {
   id: string;
   title: string;
-  type: PostType;
+  sentDate: string;
   text: string;
   attachments: string[];
+}
+
+export interface Adventure {
+  id: string;
+  name: string;
+  events: AdventureEvent[];
+  players: Player[];
+  currentPlayer: string;
+}
+
+export interface Player {
+  id: string;
+  userID: string;
+  character: Character;
+  currentAction: string;
 }
 
 export interface AdventureEvent {
@@ -81,13 +96,13 @@ export interface AdventureEvent {
   name: string;
   desc: string;
   story: string;
-  NPCs: NPC[];
   location: string;
+  NPCs: NPC[];
 }
 
 export interface NPC {
   id: string;
-  name: string,
+  name: string;
   character: Character | null;
   attitude: 'neutral' | 'hostile';
   actions: boolean[];

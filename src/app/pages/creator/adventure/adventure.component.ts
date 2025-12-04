@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
-import {
-  createRandomCharacter,
-  setBackground,
-} from '../../../shared/functional/functions';
+import { setBackground } from '../../../shared/functional/functions';
 import { MatIcon } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -21,7 +18,6 @@ import { MatInputModule } from '@angular/material/input';
 import { AdventureEvent, Character, NPC } from '../../../shared/models/models';
 import { MatSelect, MatOption } from '@angular/material/select';
 import * as L from 'leaflet';
-import { species } from '../../world/species/species_desc_data';
 import { NationData } from '../../../shared/models/NationData';
 import {
   CharacterDisadvantages,
@@ -260,7 +256,7 @@ export class AdventureComponent {
   }
 
   setAttitude(which: string) {
-    switch (which){
+    switch (which) {
       case 'neutral':
         break;
       case 'hostile':
