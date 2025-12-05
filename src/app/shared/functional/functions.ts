@@ -23,7 +23,7 @@ let specialItems = medicalItems
 export function setBackground(path: string, color: boolean = false) {
   const pageElement = document.getElementById('page');
   if (pageElement && !color) {
-    pageElement.style.background = `url(/assets/img/backgrounds/${path})`;
+    pageElement.style.background = `url(/assets/img/backgrounds/${path}.webp)`;
   } else if (pageElement && color) {
     pageElement.style.background = path;
   }

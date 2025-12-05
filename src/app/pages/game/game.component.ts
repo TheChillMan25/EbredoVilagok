@@ -156,7 +156,7 @@ export class GameComponent {
   ];
 
   ngOnInit() {
-    setBackground('paper_bg.jpg');
+    setBackground('paper_bg');
   }
 
   getItem(which: string, index: number) {

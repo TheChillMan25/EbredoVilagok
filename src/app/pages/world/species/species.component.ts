@@ -17,39 +17,39 @@ export class SpeciesComponent {
     {
       id: 'folyokoz',
       name: 'Folyóköz',
-      img: '/assets/img/regions/folyokoz.jpg',
+      img: '/assets/img/regions/folyokoz.webp',
     },
     {
       id: 'toronyvarosok',
       name: 'Toronyvárosok',
-      img: '/assets/img/regions/nuygatitorony.png',
+      img: '/assets/img/regions/nuygatitorony.webp',
     },
     {
       id: 'kelet_nepe',
       name: 'Kelet népe',
-      img: '/assets/img/regions/keletnepe.png',
+      img: '/assets/img/regions/keletnepe.webp',
     },
     {
       id: 'novenyszerzetek',
       name: 'Növényszerzetek',
-      img: '/assets/img/regions/novenyszerzet.png',
+      img: '/assets/img/regions/novenyszerzet.webp',
     },
     {
       id: 'gepszulottek',
       name: 'Gépszülöttek',
-      img: '/assets/img/regions/gepszulottek.png',
+      img: '/assets/img/regions/gepszulottek.webp',
     },
     {
       id: 'atkozottak',
       name: 'Átkozottak',
-      img: '/assets/img/regions/atkozottak.png',
+      img: '/assets/img/regions/atkozottak.webp',
     },
   ];
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-    setBackground('paper_bg.jpg');
+    setBackground('paper_bg');
   }
 
   navigate(path: string) {

@@ -105,7 +105,7 @@ export class AdventureComponent {
   constructor(private fb: FormBuilder, private charService: CharacterService) {}
 
   ngOnInit() {
-    setBackground('paper_bg.jpg');
+    setBackground('paper_bg');
     this.initForms();
 
     this.myCharacters$ = this.charService.getAllCharacters();
