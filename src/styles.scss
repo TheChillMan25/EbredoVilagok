@@ -273,12 +273,30 @@ mat-card {
   margin-left: -13px;
 }
 
+.leaflet-control-attribution {
+  display: none;
+}
+
+.leaflet-control-zoom {
+  display: none;
+}
+
 .custom-popup .leaflet-popup-tip {
   display: none;
 }
 
-.custom-popup .leaflet-popup-close-button {
-  display: none;
+.custom-popup a.leaflet-popup-close-button {
+  background-color: #222;
+  color: #f2c480;
+  font-size: larger;
+  margin-top: 0.35rem;
+  margin-right: 0.35rem;
+  border-radius: 0.25rem;
+
+  &:hover {
+    color: #222;
+    background-color: #f2c480;
+  }
 }
 
 @media (max-height: 685px) and (orientation: landscape) {

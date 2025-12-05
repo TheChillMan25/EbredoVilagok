@@ -19,6 +19,7 @@
       flex-direction: column;
       width: 20rem;
       gap: 1rem;
+      overflow-y: auto;
 
       #marker-toggle-container {
         width: 100%;
@@ -28,15 +29,21 @@
         padding: 0.5rem;
         border-radius: 0.5rem;
         background-color: #444;
+
+        .fake-button.hide {
+          text-decoration: line-through;
+          color: #111;
+        }
       }
 
       #search-results {
         display: flex;
+        flex: 2;
         flex-direction: column;
         gap: 0.5rem;
         padding: 0.5rem;
         background-color: #444;
-        height: 100%;
+        min-height: 40%;
         width: 100%;
         border-radius: 0.5rem;
         overflow-y: auto;
@@ -74,13 +81,18 @@
     #control-toggle {
       z-index: 1000;
       position: absolute;
-      top: 1rem;
-      right: 1rem;
+      top: 0.2rem;
+      right: 0.2rem;
+      padding: 0.3rem;
       display: flex;
     }
     .container {
       &#control-panel {
         display: none;
+        position: absolute;
+        height: 95%;
+        width: 90%;
+        z-index: 1000;
 
         &.show {
           display: flex;
