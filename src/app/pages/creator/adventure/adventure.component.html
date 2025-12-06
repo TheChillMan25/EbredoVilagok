@@ -53,9 +53,10 @@
         @for (npc of selectedAdventureEvent?.NPCs; track $index) {
         <div class="npc">
           <span id="{{ npc.id }}" class="npc-name">{{ npc.name }}</span>
-          <mat-icon>
-            @if (npc.attitude === "neutral") { handshake }@else { close }
-          </mat-icon>
+          <mat-icon fontSet="material-symbols-outlined"
+            >@if (npc.attitude === "neutral") { handshake }@else { swords
+            }</mat-icon
+          >
           <div class="fake-button" (click)="edit($index, 'npcs')">
             <mat-icon>edit</mat-icon>
           </div>
@@ -82,7 +83,7 @@
       <form id="event-form" (ngSubmit)="addEvent()" [formGroup]="eventForm">
         <mat-form-field appearance="outline">
           <mat-label>Név</mat-label>
-          <input matInput type="text" formControlName="name" />
+          <input matInput type="text" formControlName="name" placeholder="Min. 3 karakter"/>
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Helyszín</mat-label>
@@ -112,6 +113,9 @@
             rows="10"
           ></textarea>
         </mat-form-field>
+        @if(eventError !== ''){
+        <div id="event-error" class="error-message">{{ eventError }}</div>
+        }
         <button class="fake-button" type="submit">
           {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
         </button>
@@ -146,7 +150,7 @@
             >Ellenséges</mat-radio-button
           >
         </mat-radio-group>
-        <div id="actions-container">
+        <div id="actions-container" formGroupName="actions">
           <div
             id="neutral-actions"
             class="checkbox-container"
@@ -198,7 +202,6 @@
           </mat-select>
         </mat-form-field>
         } @if(npcError !== ''){
-
         <div id="npc-error" class="error-message">{{ npcError }}</div>
         }
         <button class="fake-button" type="submit">

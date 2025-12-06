@@ -25,6 +25,7 @@
       @for (result of searchResults; track $index) {
       <div class="map-location fake-button" (click)="locate(result)">
         {{ result.name }}
+        <mat-icon>location_on</mat-icon>
       </div>
       }
     </div>

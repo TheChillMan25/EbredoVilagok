@@ -39,8 +39,11 @@ import { MapContainerComponent } from '../../../shared/functional/map-container/
 import {
   cityLocations,
   forestLocations,
+  hillLocations,
   Location,
+  mountainLocations,
   townLocations,
+  waterLocations,
 } from '../../../shared/models/map_locations';
 
 @Component({
@@ -84,6 +87,7 @@ export class AdventureComponent {
   events: AdventureEvent[] = [];
 
   eventForm!: FormGroup;
+  eventError: string = '';
   npcForm!: FormGroup;
   npcError: string = '';
 
@@ -109,13 +113,13 @@ export class AdventureComponent {
     this.initForms();
 
     this.myCharacters$ = this.charService.getAllCharacters();
-    this.myCharacters$.forEach((char) => {
-      console.log(char);
-    });
 
     this.locations = cityLocations
       .concat(townLocations)
-      .concat(forestLocations);
+      .concat(forestLocations)
+      .concat(mountainLocations)
+      .concat(hillLocations)
+      .concat(waterLocations);
     /*window.onbeforeunload = (e) => {
       e.preventDefault();
     };*/
@@ -130,6 +134,7 @@ export class AdventureComponent {
         break;
       case 'npcs':
         this.showNPCs = true;
+        this.resetForm(this.npcForm);
         break;
     }
     this.action = 'Hozzáad';
@@ -147,29 +152,23 @@ export class AdventureComponent {
   initForms() {
     this.eventForm = this.fb.group({
       location: ['', [Validators.required]],
-      name: ['', [Validators.required, Validators.minLength(5)]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
       desc: [''],
       story: [''],
     });
-    const actions = this.fb.array<FormControl<boolean | null>>(
-      [
-        new FormControl(false),
-        new FormControl(false),
-        new FormControl(false),
-        new FormControl(false),
-      ],
-      { validators: [this.checkActions()] }
-    );
 
     this.npcForm = this.fb.group({
       name: ['', [Validators.required]],
       attitude: ['neutral', [Validators.required]],
-      actions: this.fb.group({
-        talk: [false],
-        trade: [false],
-        fight: [false],
-        steal: [false],
-      }),
+      actions: this.fb.group(
+        {
+          talk: [false],
+          trade: [false],
+          fight: [false],
+          steal: [false],
+        },
+        { validators: [this.checkActions()] }
+      ),
       character: [''],
     });
 
@@ -201,7 +200,8 @@ export class AdventureComponent {
 
   addEvent() {
     if (!this.eventForm.valid) {
-      console.error('Hibás kitöltés');
+      this.eventError = 'Töltsd ki a kötelező mezőket!';
+      console.error('Hibás kitöltés', this.eventForm.value);
       return;
     }
     const eventValues = this.eventForm.value;
@@ -289,6 +289,7 @@ export class AdventureComponent {
 
   resetForm(resetable: FormGroup) {
     if (resetable === this.npcForm) {
+      this.npcError = '';
       resetable.reset({
         name: '',
         attitude: 'neutral',
@@ -305,19 +306,12 @@ export class AdventureComponent {
     } else {
       resetable.reset();
     }
-
-    Object.keys(resetable.controls).forEach((field) => {
-      const control = resetable.get(field);
-      if (control instanceof FormControl) {
-        control.setErrors(null);
-      }
-    });
   }
 
   addNPC() {
     if (!this.npcForm.valid) {
-      console.error('Hibás kitöltés');
-      this.npcError = 'Töltsd ki a kötelező mezőket';
+      console.error('Hibás kitöltés', this.npcForm.value);
+      this.npcError = 'Töltsd ki a kötelező mezőket!';
       return;
     }
     const npcValues = this.npcForm.value;
@@ -388,8 +382,11 @@ export class AdventureComponent {
 
   checkActions(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const arr = control.value as boolean[];
-      const hasTrue = Array.isArray(arr) && arr.some((v) => v === true);
+      const values = control.value;
+      if (!values) {
+        return null;
+      }
+      const hasTrue = Object.values(values).some((v) => v === true);
       return hasTrue ? null : { atLeastOne: true };
     };
   }
