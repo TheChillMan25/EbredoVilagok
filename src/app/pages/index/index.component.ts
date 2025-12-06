@@ -11,14 +11,17 @@ import { setBackground } from '../../shared/functional/functions';
   styleUrl: './index.component.scss',
 })
 export class IndexComponent {
-  background: string = 'bg.jpg';
   cards = [
-    { name: 'Világ', img: 'assets/img/fooldal/vilag.jpg', id: 'vilag' },
-    { name: 'Játék', img: 'assets/img/fooldal/jatek.jpg', id: 'jatek' },
-    { name: 'Rendszer', img: 'assets/img/fooldal/rendszer.jpg', id: 'rendszer' },
+    { name: 'Világ', img: 'assets/img/fooldal/vilag.webp', id: 'vilag' },
+    { name: 'Játék', img: 'assets/img/fooldal/jatek.webp', id: 'jatek' },
+    {
+      name: 'Rendszer',
+      img: 'assets/img/fooldal/rendszer.webp',
+      id: 'rendszer',
+    },
   ];
 
   ngOnInit() {
-    setBackground(this.background);
+    setBackground('bg');
   }
 }

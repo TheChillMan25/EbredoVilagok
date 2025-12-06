@@ -69,7 +69,6 @@ import { MatButton } from '@angular/material/button';
   styleUrl: './system.component.scss',
 })
 export class SystemComponent {
-  background: string = 'table.jpg';
   activeSegmentName: 'character' | 'adventure' | 'actions' = 'character';
   activePageIndex: number = 0;
   maxPageIndex: number = 9;
@@ -86,7 +85,7 @@ export class SystemComponent {
   };
 
   ngOnInit(): void {
-    setBackground(this.background);
+    setBackground('table');
     this.setActiveSegment('character');
     this.checkFirstVisit();
   }

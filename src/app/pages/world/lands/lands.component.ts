@@ -9,6 +9,6 @@ import { setBackground } from '../../../shared/functional/functions';
 })
 export class LandsComponent {
   ngOnInit() {
-    setBackground('paper_bg.jpg');
+    setBackground('paper_bg');
   }
 }

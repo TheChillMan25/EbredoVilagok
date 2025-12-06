@@ -11,6 +11,7 @@ import { Location } from '../../shared/models/map_locations';
 interface Marker {
   id: string;
   text: string;
+  show: boolean;
 }
 
 interface SearchResult {
@@ -38,22 +39,23 @@ export class MapComponent {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
   search: FormControl = new FormControl();
   controlVisible: boolean = false;
+  showAllMarkers: boolean = true;
 
   markerToggles: Marker[] = [
-    { id: 'cities', text: 'Városok  ' },
-    { id: 'towns', text: 'Falvak' },
-    { id: 'waters', text: 'Vízek' },
-    { id: 'hills', text: 'Dombok' },
-    { id: 'mountains', text: 'Hegyek' },
-    { id: 'forests', text: 'Erdők' },
-    { id: 'others', text: 'Egyéb' },
-    { id: 'all', text: 'Minden' },
+    { id: 'cities', text: 'Városok', show: true },
+    { id: 'towns', text: 'Falvak', show: true },
+    { id: 'waters', text: 'Vízek', show: true },
+    { id: 'hills', text: 'Dombok', show: true },
+    { id: 'mountains', text: 'Hegyek', show: true },
+    { id: 'forests', text: 'Erdők', show: true },
+    { id: 'others', text: 'Egyéb', show: true },
+    { id: 'all', text: 'Minden', show: true },
   ];
 
   searchResults: Location[] = [];
 
   ngOnInit() {
-    setBackground('table.jpg');
+    setBackground('table');
 
     this.search.valueChanges.subscribe((value) => {
       this.searchFor(value);
@@ -69,13 +71,25 @@ export class MapComponent {
   }
 
   toggleMarkers(which: string) {
-    if (which !== 'all') this.map.toggleMarkers(which);
-    else this.map.toggleAllMarkers();
+    if (which !== 'all') {
+      this.map.toggleMarkers(which);
+      let marker = this.markerToggles.find((e) => e.id === which);
+      if (marker) {
+        marker.show = !marker.show;
+      }
+    } else {
+      this.showAllMarkers = !this.showAllMarkers;
+      this.map.toggleAllMarkers(this.showAllMarkers);
+      this.markerToggles.forEach((marker) => {
+        marker.show = this.showAllMarkers;
+        console.log(marker);
+      });
+    }
   }
 
   searchFor(what: string) {
-    this.searchResults = [];
     if (what && what.length !== 0) {
+      this.searchResults = [];
       Object.values(this.map.locationsMap).forEach((l) => {
         for (let loc of l.values()) {
           if (
@@ -91,5 +105,10 @@ export class MapComponent {
 
   locate(location: Location) {
     this.map.locatePoint(location);
+    if (this.isMobileView()) this.hideControlPanel();
+  }
+
+  isMobileView(): boolean {
+    return window.innerWidth <= 768;
   }
 }

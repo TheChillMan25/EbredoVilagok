@@ -15,6 +15,7 @@
         id="{{ toggle.id }}-toggle"
         class="fake-button"
         (click)="toggleMarkers(toggle.id)"
+        [ngClass]="{ hide: !toggle.show }"
       >
         {{ toggle.text }}
       </div>
@@ -24,6 +25,7 @@
       @for (result of searchResults; track $index) {
       <div class="map-location fake-button" (click)="locate(result)">
         {{ result.name }}
+        <mat-icon>location_on</mat-icon>
       </div>
       }
     </div>
@@ -32,6 +34,6 @@
     <app-map-container id="map"></app-map-container>
   </div>
   <div id="control-toggle" class="fake-button" (click)="toggleControlPanel()">
-    <mat-icon>search_gear</mat-icon>
+    <mat-icon>settings</mat-icon>
   </div>
 </div>

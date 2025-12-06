@@ -119,7 +119,7 @@ export class KarakterComponent {
 
   ngOnInit() {
     console.log(this.medicalItems.length, this.specialDrinks.length);
-    setBackground('paper_bg.jpg');
+    setBackground('paper_bg');
     this.initForm();
     /* this.mainForm.patchValue({ name: 'Stefan' });
     this.mainForm.patchValue({ stats: { mental: { esz: 10 } } });

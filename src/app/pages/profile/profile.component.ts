@@ -25,7 +25,7 @@ export class ProfileComponent {
   constructor(private userService: UserService) {}
 
   ngOnInit() {
-    setBackground('bg.jpg');
+    setBackground('bg');
     this.loadUserProfile();
   }
 

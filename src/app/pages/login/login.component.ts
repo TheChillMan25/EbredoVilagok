@@ -38,7 +38,7 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(){
-    setBackground('bg.jpg')
+    setBackground('bg')
   }
 
   login() {
