@@ -304,6 +304,7 @@ export class AdventureComponent {
       this.attitude = 'neutral';
       this.toggleActions('neutral');
     } else {
+      this.eventError = '';
       resetable.reset();
     }
   }
