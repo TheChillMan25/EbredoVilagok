@@ -1,0 +1,213 @@
+$primary: #f2c480;
+$secondary: whitesmoke;
+
+#content {
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  #sub-forum-panel,
+  #user-panel {
+    width: 20rem;
+    height: 100%;
+    background-color: #333;
+    border-radius: 0.5rem;
+    overflow-y: auto;
+  }
+
+  #sub-forum-panel.open {
+    display: grid;
+  }
+
+  #sub-forum-panel {
+    display: grid;
+    padding: 1rem;
+    .main-sub-forum-container {
+      .sub-forum-title {
+        font-size: 2rem;
+        text-align: center;
+        color: $primary;
+      }
+      hr {
+        border: none;
+        height: 2px;
+        width: 100%;
+        background-color: $primary;
+      }
+      .sub-forum-container {
+        height: calc(100% - 3rem - 2px);
+        .subforum {
+          width: 100%;
+          padding: 1rem 0.5rem;
+          font-size: larger;
+          color: $secondary;
+          cursor: pointer;
+          transition: 0.3s ease;
+        }
+
+        .subforum:hover {
+          color: #333;
+          background-color: #f2c480;
+        }
+      }
+    }
+  }
+
+  #toggle-btns {
+    display: none;
+  }
+
+  #main-content {
+    width: 50%;
+    height: 100%;
+
+    .post-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: #333;
+      border-radius: 0.5rem;
+
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .post-body {
+        width: 100%;
+
+        .post-text {
+          display: block;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  #user-panel.open {
+    display: flex;
+  }
+
+  #user-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    #profile-data {
+      text-align: center;
+      #img-container {
+        width: 100%;
+        img {
+          width: 100%;
+          border-radius: 50%;
+        }
+      }
+      #username {
+        font-size: 2rem;
+      }
+    }
+    .fake-button {
+      padding: 0.5rem;
+      background-color: #222;
+      gap: 0;
+    }
+    .fake-button:hover {
+      background-color: #f2c480;
+      color: #222;
+    }
+    #myPosts {
+      width: 100%;
+      height: 100%;
+      padding: 0.5rem;
+
+      .my-post-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: #444;
+        border-radius: 0.5rem;
+        cursor: pointer;
+
+        .my-post-header {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .my-post-body {
+          width: 100%;
+
+          .my-post-text {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+    }
+    #toggle-btns {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #content {
+    flex-direction: column;
+    #sub-forum-panel {
+      left: 1rem;
+    }
+
+    #main-content {
+      width: 100%;
+    }
+    #user-panel,
+    #sub-forum-panel {
+      position: absolute;
+      top: 1rem;
+      z-index: 10;
+      height: calc(100% - 2rem);
+      display: none;
+    }
+
+    #user-panel {
+      right: 1rem;
+    }
+    #toggle-btns {
+      width: calc(100% - 2rem);
+      display: flex;
+      justify-content: space-around;
+
+      .toggle-button {
+        display: flex;
+        width: fit-content;
+        height: fit-content;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background-color: #333;
+        color: $primary;
+        border-radius: 0.5rem;
+      }
+
+      #close-ui.open {
+        display: block;
+      }
+
+      #close-ui {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+    }
+  }
+}

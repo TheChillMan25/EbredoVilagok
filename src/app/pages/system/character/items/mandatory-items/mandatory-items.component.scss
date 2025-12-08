@@ -6,6 +6,12 @@ td:first-child {
   display: block !important;
 }
 
-.scrollable-container {
+.table-container {
   padding: 0.5rem;
+}
+
+@media (max-width: 450px) {
+  .table-container {
+    overflow-x: auto;
+  }
 }

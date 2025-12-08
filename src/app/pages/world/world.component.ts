@@ -12,27 +12,26 @@ import { setBackground } from '../../shared/functional/functions';
   styleUrl: './world.component.scss',
 })
 export class WorldComponent {
-  background: string = 'vilag_bg.jpg';
   cards: Card[] = [
     {
       name: 'Tájak és Királyságok',
-      img: 'assets/img/vilag/city.jpg',
+      img: 'assets/img/vilag/city.webp',
       id: 'tajak',
     },
     {
       name: 'Fajok és Népek',
-      img: 'assets/img/vilag/market.jpg',
+      img: 'assets/img/vilag/market.webp',
       id: 'fajok',
     },
-    { name: 'Térkép', img: 'assets/img/vilag/terkep.jpg', id: 'map' },
+    { name: 'Térkép', img: 'assets/img/vilag/terkep.webp', id: 'terkep' },
     {
       name: 'Bestiárium',
-      img: 'assets/img/vilag/bestiarium.jpg',
+      img: 'assets/img/vilag/bestiarium.webp',
       id: 'bestiarium',
     },
   ];
 
   ngOnInit() {
-    setBackground(this.background);
+    setBackground('vilag_bg');
   }
 }

@@ -1,5 +1,5 @@
 <p class="sub-title">Szüretelési méret táblázat</p>
-<div class="scrollable-container">
+<div class="table-container">
   <mat-table [dataSource]="harvestingSizeDataSource">
     <ng-container matColumnDef="size">
       <mat-header-cell *matHeaderCellDef>Méret</mat-header-cell>
@@ -21,7 +21,7 @@
   </mat-table>
 </div>
 <p class="sub-title">Általános szüretelési listák</p>
-<div class="scrollable-container">
+<div class="table-container">
   @for (item of sourceDatas; track $index) {
   <app-table-template
     [creatureName]="item.name"

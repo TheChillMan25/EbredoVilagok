@@ -15,7 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '../../shared/services/auth/auth.service';
+import { setBackground } from '../../shared/functional/functions';
 
 @Component({
   selector: 'app-register',
@@ -49,6 +50,10 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  ngOnInit(){
+    setBackground('bg');
+  }
+
   register() {
     if (!this.registerForm.valid) {
       this.registerError = 'Hibás kitöltés!';
@@ -70,10 +75,17 @@ export class RegisterComponent {
     const email = this.registerForm.value.email || '';
     const psw = this.registerForm.value.psw || '';
 
+    if (username.length > 16) {
+      this.isLoading = false;
+      this.showForm = true;
+      this.registerError =
+        'Használj rövidebb felhasználó nevet. (max 16 karakter)';
+      return;
+    }
+
     this.authService
       .register(email, psw, username)
-      .then((userCredential) => {
-        console.log('Sikeres regisztráció: ', userCredential.user);
+      .then(() => {
         this.authService.updateLoginStatus(true);
         this.router.navigateByUrl('/index');
       })

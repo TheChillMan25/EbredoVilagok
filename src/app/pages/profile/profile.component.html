@@ -1,0 +1,37 @@
+<div id="content">
+  <div id="profile-panel">
+    <div id="img-container">
+      <img src="/assets/img/misc/blank.png" alt="Pfp" />
+    </div>
+    <div id="profile-data">
+      <span id="username">{{ username }}</span>
+      <span id="email"><span>Email:</span> {{ email }}</span>
+    </div>
+  </div>
+  <div id="main-container">
+    <div id="containers">
+      <div
+        id="character-container"
+        class="container"
+        [ngClass]="{ show: showCharacter }"
+      >
+        @for (character of characters; track $index) {
+        <app-karakter-template [character]="character"></app-karakter-template>
+        }
+      </div>
+      <div
+        id="adventure-container"
+        class="container"
+        [ngClass]="{ show: !showCharacter }"
+      >
+        asd
+      </div>
+    </div>
+    <div id="button-container">
+      <div class="fake-button" (click)="showContainer('character')">
+        Karakterek
+      </div>
+      <div class="fake-button" (click)="showContainer()">Kalandok</div>
+    </div>
+  </div>
+</div>

@@ -36,4 +36,39 @@ mat-sidenav {
   transform: translateX(-50%);
   color: $text-secondary;
   font-size: xx-large;
+  z-index: 200;
+}
+
+.menu-toggle-button {
+  display: none;
+  margin-left: auto;
+  text-align: center;
+  mat-icon {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 1250px) {
+  #author {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  #author {
+    display: block;
+  }
+  .menu-toggle-button {
+    display: flex;
+    margin-right: 0.5rem;
+  }
+  app-navbar {
+    display: none;
+  }
+}
+
+@media (max-width: 375px) {
+  #author {
+    font-size: x-large;
+  }
 }

@@ -1,5 +1,11 @@
 <mat-sidenav-container>
-  <mat-sidenav> </mat-sidenav>
+  <mat-sidenav #sidenav>
+    <app-mobile-navbar
+      [sidenav]="sidenav"
+      [isLoggedIn]="isLoggedIn"
+      (logOutEvent)="handleLogin(false)"
+    ></app-mobile-navbar>
+  </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar>
       <div id="logo" [routerLink]="['/index']">
@@ -10,6 +16,15 @@
       <div id="page">
         <div id="page-blur"></div>
       </div>
+      <button
+        mat-icon-button
+        class="menu-toggle-button"
+        (click)="onToggleSidenav(sidenav)"
+      >
+        <mat-icon
+          >menu</mat-icon
+        >
+      </button>
     </mat-toolbar>
     <router-outlet />
   </mat-sidenav-content>

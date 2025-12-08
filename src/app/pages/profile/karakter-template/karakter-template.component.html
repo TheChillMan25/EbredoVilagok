@@ -1,0 +1,48 @@
+<div class="character-container">
+  <div class="personal inner-char-container">
+    <span class="name">{{ character?.name }}</span>
+    <span class="species">{{ character?.species }}</span>
+    <span class="class">{{ character?.class }}</span>
+    <span class="level">{{ character?.level }}. szint</span>
+    <div class="character-buttons">
+      <div class="fake-button" (click)="showSpecielDescs('special')">
+        Népi tul.
+      </div>
+      <div class="fake-button" (click)="showSpecielDescs('home')">Otthon</div>
+    </div>
+    <div class="bonus-container">
+      <span>Bónusz ismeretek</span>
+      @for (bonus of home.bonus; track $index) {
+      <div class="bonus">
+        <span>{{ bonus.name }}</span>
+        <span>{{ bonus.mod }}</span>
+      </div>
+      }
+    </div>
+  </div>
+  <div class="stats inner-char-container">
+    <span>Tulajdonságok</span>
+    <div class="main-stats">
+      @for (stat of mainStats; track $index) {
+      <div class="stat">
+        <div class="stat-name">{{ stat.name }}:</div>
+        <div class="stat-value">{{ stat.value }}</div>
+      </div>
+      }
+    </div>
+    <div class="regular-stats">
+      @for (stat of stats; track $index) {
+      <div class="stat">
+        <span class="stat-name">{{ stat.name }}:</span>
+        <span class="stat-value">{{ stat.value }}</span>
+      </div>
+      }
+    </div>
+  </div>
+  <div class="spec-container" [ngClass]="{ show: showSpecDescs }">
+    <div [id]="character?.id" class="text-container"></div>
+    <div class="fake-button" (click)="hideSpecDescs()">
+      <mat-icon>close</mat-icon>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.dev/guide/theming
 @use "@angular/material" as mat;
-@import url(./app/themes/grey_theme-colors.scss);
+@import url(./app/themes/greytheme.css);
 
 @font-face {
   font-family: "Modern Antiqua";
@@ -38,7 +38,8 @@ body {
   color: $text-primary;
 }
 
-app-navbar {
+app-navbar,
+app-mobile-navbar {
   height: 100%;
   width: 100%;
   z-index: 10;
@@ -53,7 +54,7 @@ app-navbar {
   background-repeat: no-repeat !important;
   //background-attachment: fixed;
   background-size: cover !important;
-  background-color: #222 !important;
+  background-color: #222;
   z-index: 0;
 
   #page-blur {
@@ -77,6 +78,7 @@ app-navbar {
   flex-direction: column;
   align-items: center;
   z-index: 5;
+  justify-content: space-evenly;
 }
 
 .title,
@@ -86,19 +88,17 @@ app-navbar {
 }
 
 .title {
-  top: 8rem;
   font-size: 5rem;
 }
 
 .subtitle {
-  top: 10rem;
   font-size: 4rem;
 }
 
 button {
-  color: $text-secondary !important;
-  background-color: $primary-background !important;
-  border-radius: 0.5rem !important;
+  font-size: large;
+  font-family: "Modern Antiqua";
+  border: none;
 }
 
 button:hover {
@@ -106,16 +106,21 @@ button:hover {
   background-color: $text-secondary !important;
 }
 
-#title,
-#subtitle,
+.title,
+.subtitle,
 #forum-button,
-#bottom-text,
-app-card-container {
+#bottom-text {
   position: relative;
+  text-align: center;
 }
 
 app-card-container {
+  position: relative;
   display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .hoverable-card {
@@ -127,15 +132,17 @@ app-card-container {
 }
 
 .fake-button {
+  width: fit-content;
   padding: 1rem;
   color: $text-secondary;
   display: flex;
   gap: 1rem;
-  background-color: $primary-background;
+  background-color: #444;
   align-items: center;
   justify-content: center;
   border-radius: 0.5rem;
   cursor: pointer;
+  user-select: none;
 }
 
 .fake-button:hover {
@@ -189,5 +196,210 @@ mat-cell:nth-child(even) {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #f2c480;
-  //background: #555;
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: #444 !important;
+  border-radius: 0.5rem !important;
+}
+
+.error-message {
+  color: red;
+  font-size: large;
+  text-align: center;
+}
+
+mat-card {
+  min-width: 50%;
+  padding: 1rem;
+  border: 0.2rem solid #222;
+
+  mat-card-header {
+    justify-content: space-between;
+
+    mat-card-title,
+    mat-icon {
+      color: #f2c480;
+    }
+  }
+
+  mat-card-content {
+    text-align: justify;
+  }
+}
+
+.leaflet-popup {
+  top: 25px !important;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  font-family: "Modern Antiqua";
+  background: #333 !important;
+  border-radius: 0px;
+  border: 0.2rem solid#111;
+
+  .leaflet-popup-content {
+    width: 18rem !important;
+    margin: 1rem 0.5rem;
+
+    > div {
+      text-align: center;
+      width: 100%;
+    }
+    .popup-title {
+      font-size: large;
+      color: #f2c480;
+    }
+
+    hr {
+      border: none;
+      height: 0.2rem;
+      background-color: #222;
+    }
+
+    .popup-text {
+      font-size: larger;
+      color: #f5f5f5;
+    }
+  }
+}
+
+.leaflet-popup:before {
+  content: "";
+  position: absolute;
+  border: 13px solid transparent;
+  border-bottom-color: #222;
+  bottom: 0px;
+  margin-left: -13px;
+}
+
+.leaflet-control-attribution {
+  display: none;
+}
+
+.leaflet-control-zoom {
+  display: none;
+}
+
+.custom-popup .leaflet-popup-tip {
+  display: none;
+}
+
+.custom-popup a.leaflet-popup-close-button {
+  background-color: #222;
+  color: #f2c480;
+  font-size: larger;
+  margin-top: 0.35rem;
+  margin-right: 0.35rem;
+  border-radius: 0.25rem;
+
+  &:hover {
+    color: #222;
+    background-color: #f2c480;
+  }
+}
+
+/* styles.scss */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-height: 685px) and (orientation: landscape) {
+  #content {
+    overflow-y: auto;
+    .title {
+      font-size: 2rem;
+    }
+    .subtitle {
+      font-size: 2rem;
+    }
+    #bottom-text {
+      font-size: medium;
+    }
+
+    .fake-button {
+      padding: 0.5rem;
+    }
+
+    app-card-container {
+      height: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        width: 0;
+      }
+    }
+  }
+}
+
+@media (max-height: 670px) and (orientation: landscape) and (max-width: 900px) {
+  #content {
+    gap: 0.5rem;
+    app-card-container {
+      height: 70%;
+      flex-direction: row;
+      justify-content: space-around;
+      scroll-snap-type: x mandatory;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  app-card-container {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: none;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    justify-content: space-between;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
+  }
+  .title {
+    font-size: 3rem;
+  }
+  .subtitle {
+    font-size: 2rem;
+  }
+  #bottom-text {
+    font-size: large;
+  }
+}
+
+@media (max-width: 425px) {
+  .title {
+    font-size: 2.5rem;
+  }
+
+  mat-card {
+    mat-card-header {
+      mat-card-title {
+        font-size: x-large !important;
+      }
+      mat-card-subtitle {
+        font-size: large !important;
+      }
+    }
+  }
 }

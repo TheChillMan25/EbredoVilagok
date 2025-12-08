@@ -1,0 +1,84 @@
+<div id="content">
+  <div id="sub-forum-panel" [ngClass]="{ open: showForums }">
+    <div id="adventure-forums" class="main-sub-forum-container">
+      <span class="sub-forum-title">Kalandok</span>
+      <hr />
+      <div id="adventure-sub-forums" class="sub-forum-container">
+        @for (item of forumTemplates; track $index) {
+        <div class="subforum">{{ item.name }}</div>
+        }
+      </div>
+    </div>
+    <div id="character-forums" class="main-sub-forum-container">
+      <span class="sub-forum-title">Karakter</span>
+      <hr />
+      <div id="character-sub-forums" class="sub-forum-container">
+        @for (item of forumTemplates; track $index) {
+        <div class="subforum">{{ item.name }}</div>
+        }
+      </div>
+    </div>
+    <div id="friends-forums" class="main-sub-forum-container">
+      <span class="sub-forum-title">Barátok</span>
+      <hr />
+      <div id="friends-sub-forums" class="sub-forum-container">
+        @for (item of forumTemplates; track $index) {
+        <div class="subforum">{{ item.name }}</div>
+        }
+      </div>
+    </div>
+  </div>
+  <div id="toggle-btns">
+    <div id="sub-toggle" class="toggle-button" (click)="showUI('forum')">
+      Fórumok<mat-icon>hub</mat-icon>
+    </div>
+    <div id="user-toggle" class="toggle-button" (click)="showUI('user')">
+      Saját
+      <mat-icon>person</mat-icon>
+    </div>
+    <div
+      id="close-ui"
+      [ngClass]="{ open: showCloseUI }"
+      (click)="closeUI()"
+    ></div>
+  </div>
+  <div id="main-content">
+    @for (item of myPosts; track $index) {
+    <div class="post-container">
+      <div class="post-header">
+        <div class="post-title">{{ item.title }}</div>
+      </div>
+      <div class="post-body">
+        <span class="post-text">{{ item.text }}</span>
+      </div>
+    </div>
+    }
+  </div>
+  <div id="user-panel" [ngClass]="{ open: showUser }">
+    @if(isLoggedIn){
+    <div id="profile-data">
+      <div id="img-container">
+        <img src="assets/img/misc/blank.png" alt="{{ user?.username }}" />
+      </div>
+      <span id="username">{{ user?.username }}</span>
+    </div>
+    <div class="fake-button">Új poszt <mat-icon>add_2</mat-icon></div>
+    <div id="myPosts">
+      @for (item of myPosts; track $index) {
+      <div class="my-post-container">
+        <div class="my-post-header">
+          <div class="my-post-title">{{ item.title }}</div>
+        </div>
+        <div class="my-post-body">
+          <span class="my-post-text">{{ item.text }}</span>
+        </div>
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="fake-button" routerLink="/login">
+      Belépés<mat-icon>login</mat-icon>
+    </div>
+    }
+  </div>
+</div>

@@ -2,8 +2,7 @@ $text-primary: whitesmoke;
 $text-secondary: #f2c480;
 $primary-background: #444;
 
-.small-card,
-.large-card {
+.card {
   position: relative;
   display: grid;
   background-color: $primary-background;
@@ -11,14 +10,17 @@ $primary-background: #444;
   border-radius: 1rem;
   box-shadow: 0 0.5rem 0.5rem #333;
   cursor: pointer;
+  width: 17rem;
+  scroll-snap-align: center;
+  flex: 0 0 auto;
 
   .img-container {
-    width: 17rem;
+    max-width: 100%;
     overflow: hidden;
     object-fit: cover;
 
     img {
-      width: 100%;
+      max-width: 100%;
       border-radius: 1rem 1rem 1rem 100%/1rem 1rem 1rem 50%;
     }
   }
@@ -28,5 +30,33 @@ $primary-background: #444;
     font-size: x-large;
     color: $text-secondary;
     padding: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    .card-title {
+      font-size: larger;
+    }
+  }
+}
+
+@media (max-width: 425px) {
+  .card {
+    width: 100%;
+  }
+}
+
+@media (max-height: 685px) and (orientation: landscape) {
+  .card {
+    .card-title {
+      font-size: medium;
+    }
+  }
+}
+
+@media (max-height: 670px) and (orientation: landscape) and (max-width: 890px) {
+  .card{
+    width: 13rem;
   }
 }

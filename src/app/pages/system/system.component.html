@@ -58,41 +58,79 @@
           <app-actions-loot3></app-actions-loot3>
           } }
         </div>
-        <div id="markers">
-          <div
-            id="character"
-            class="marker"
-            (click)="setActiveSegment('character')"
-          >
-            Karakter
-          </div>
-          <div
-            id="adventure"
-            class="marker"
-            (click)="setActiveSegment('adventure')"
-          >
-            Kaland
-          </div>
-          <div
-            id="actions"
-            class="marker"
-            (click)="setActiveSegment('actions')"
-          >
-            Akciók
-          </div>
+      </div>
+      <div id="markers" [ngClass]="{ visibleMarker: visibleMarkers }">
+        <div
+          id="character"
+          class="marker"
+          (click)="setActiveSegment('character')"
+        >
+          Karakter
+        </div>
+        <div
+          id="adventure"
+          class="marker"
+          (click)="setActiveSegment('adventure')"
+        >
+          Kaland
+        </div>
+        <div id="actions" class="marker" (click)="setActiveSegment('actions')">
+          Akciók
         </div>
       </div>
     </div>
-    <div id="buttons">
-      @if(activePageIndex > 0){
-      <div id="prev" class="fake-button" (click)="prev()" title="Előző">
-        <mat-icon>arrow_back_ios_new</mat-icon>
-      </div>
-      } @if(activePageIndex < maxPageIndex){
-      <div id="next" class="fake-button" (click)="next()" title="Következő">
-        <mat-icon>arrow_forward_ios_new</mat-icon>
-      </div>
-      }
+  </div>
+  <div id="buttons">
+    <div
+      id="prev"
+      class="fake-button"
+      (click)="prev()"
+      title="Előző"
+      [ngClass]="{ hide: this.activePageIndex === 0 }"
+    >
+      <mat-icon>arrow_back_ios_new</mat-icon>
     </div>
+    <div id="marker-toggle" (click)="toggleMarkers()">
+      <mat-icon>article</mat-icon>
+    </div>
+    <div
+      id="next"
+      class="fake-button"
+      (click)="next()"
+      title="Következő"
+      [ngClass]="{ hide: this.activePageIndex === maxPageIndex }"
+    >
+      <mat-icon>arrow_forward_ios_new</mat-icon>
+    </div>
+  </div>
+  <div class="fake-button" (click)="openUseManual()">
+    <mat-icon>question_mark</mat-icon>
+  </div>
+  <div id="use-manual" [ngClass]="{ show: showUseManual }">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Használati útmutató</mat-card-title>
+        <mat-card-subtitle>Hogyan használd az enciklopédiát</mat-card-subtitle>
+        <mat-icon>info</mat-icon>
+      </mat-card-header>
+      <mat-card-content>
+        Az enciklopédia tartalmát oldalakra bontva tudod elérni. Ezeket az
+        oldalakat lapozással tudod megjeleníteni a könyv két oldalán található
+        <strong>következő</strong> és <strong>előző</strong> gombokkal.
+        Telefonos nézetben a gombok a képernyő alsó két sarkánál találhatóak.
+      </mat-card-content>
+      <mat-card-content>
+        A különböző fejezeteket a könyvjelzőkkel lehet gyosran elérni. Ezek
+        telefonos nézetben a kijelző aljának közepén elhelyezkedő
+        <mat-icon style="color: #f2c480">article</mat-icon> gombbal jeleníthetők
+        meg.
+      </mat-card-content>
+      <mat-card-content>
+        Az oldalak tartalma a legtöbb helyen görgethető.
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button (click)="hideUseManual()">Ok</button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>

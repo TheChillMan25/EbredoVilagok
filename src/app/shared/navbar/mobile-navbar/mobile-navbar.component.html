@@ -1,0 +1,118 @@
+<mat-nav-list>
+  <span id="mobile-title">Ébredő Világok</span>
+  <a
+    mat-list-item
+    class="mobile-nav-link"
+    routerLink="/index"
+    (click)="closeMenu()"
+    ><span class="mobile-nav-link-name">Főoldal</span></a
+  >
+  <a
+    mat-list-item
+    id="mobile-enciklopedia"
+    class="mobile-nav-link"
+    (click)="toggleOptions('enc')"
+  >
+    <span class="mobile-nav-link-text mobile-nav-link-name">Enciklopédia</span>
+    <div
+      id="enciklopedia-options"
+      class="mobile-nav-menu"
+      [ngClass]="{ open: isEncOpen }"
+    >
+      <a
+        mat-list-item
+        routerLink="/vilag"
+        (click)="closeMenu()"
+        class="mobile-nav-link-text"
+        >Világ</a
+      >
+      <a
+        mat-list-item
+        routerLink="/rendszer"
+        (click)="closeMenu()"
+        class="mobile-nav-link-text"
+        >Rendszer</a
+      >
+    </div>
+  </a>
+  <a
+    mat-list-item
+    id="mobile-jatek"
+    class="mobile-nav-link"
+    (click)="toggleOptions('game')"
+  >
+    <span class="mobile-nav-link-text mobile-nav-link-name">Próbáld ki</span>
+    <div
+      id="jatek-options"
+      class="mobile-nav-menu"
+      [ngClass]="{ open: isGameOpen }"
+    >
+      <a
+        mat-list-item
+        routerLink="/jatek"
+        (click)="closeMenu()"
+        class="mobile-nav-link-text"
+        >Játék</a
+      >
+      <a
+        mat-list-item
+        routerLink="/karakter-keszito"
+        (click)="closeMenu()"
+        class="mobile-nav-link-text"
+        >Karakter</a
+      >
+      <a
+        mat-list-item
+        routerLink="/kaland-keszito"
+        (click)="closeMenu()"
+        class="mobile-nav-link-text"
+        >Kaland</a
+      >
+    </div>
+  </a>
+  <a mat-list-item class="mobile-nav-link" routerLink="/forum"
+    ><span class="mobile-nav-link-name">Fórum</span></a
+  >
+  @if(isLoggedIn){
+  <a
+    mat-list-item
+    class="mobile-nav-link"
+    routerLink="/profil"
+    (click)="closeMenu()"
+    ><span class="mobile-nav-link-name"
+      >Profil <mat-icon>person</mat-icon></span
+    ></a
+  >
+  <a
+    mat-list-item
+    class="mobile-nav-link"
+    routerLink="/profil"
+    (click)="logout()"
+    ><span class="mobile-nav-link-name"
+      >Kilép <mat-icon>logout</mat-icon></span
+    ></a
+  >
+  }@else {
+  <div id="login-container">
+    <a
+      mat-list-item
+      class="mobile-nav-link"
+      routerLink="/login"
+      (click)="closeMenu()"
+      ><span class="mobile-nav-link-name"
+        >Belép<mat-icon>login</mat-icon></span
+      ></a
+    >
+    |
+    <a
+      mat-list-item
+      class="mobile-nav-link"
+      routerLink="/register"
+      (click)="closeMenu()"
+      ><span class="mobile-nav-link-name"
+        >Regisztrál<mat-icon>person_add</mat-icon></span
+      ></a
+    >
+  </div>
+  }
+</mat-nav-list>

@@ -3,7 +3,7 @@
   Karakteralkotáskor legfeljebb kettő fegyvert választhatsz. Ezeket később
   lecserélheted természetesen és nem kötelező két fegyver választása sem.
 </p>
-<div class="scrollable-container">
+<div id="weapons" class="table-container">
   <mat-table [dataSource]="weaponsDataSource">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Fegyver</mat-header-cell>
@@ -22,7 +22,7 @@
     <mat-row *matRowDef="let row; columns: displayedWeaponColumns"></mat-row>
   </mat-table>
 </div>
-<div class="scrollable-container" style="margin-top: 1rem">
+<div id="armours" class="table-container" style="margin-top: 1rem">
   <mat-table [dataSource]="armourDataSource">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Páncél</mat-header-cell>

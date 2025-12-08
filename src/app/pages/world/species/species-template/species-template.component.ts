@@ -16,20 +16,17 @@ import { MatIcon } from '@angular/material/icon';
   styleUrl: './species-template.component.scss',
 })
 export class SpeciesTemplateComponent {
-  background = 'paper_bg.jpg';
   id!: string | null;
   currentSpecies!: SpeciesInterface[];
 
   constructor(private route: ActivatedRoute, private title: Title) {}
   ngOnInit() {
-    setBackground(this.background);
+    setBackground('paper_bg');
     this.id = this.route.snapshot.paramMap.get('id');
     this.title.setTitle(`Fajok | ${getSpeciesName(this.id)}`);
     if (this.id) {
       this.currentSpecies = species[this.id];
     }
-    console.log(this.id);
-    console.log(this.currentSpecies)
   }
 
   showProperties(id: string) {

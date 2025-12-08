@@ -1,0 +1,6 @@
+@media (max-width: 450px) {
+  mat-cell:nth-child(even),
+  mat-header-cell:nth-child(even) {
+    flex: 2;
+  }
+}
