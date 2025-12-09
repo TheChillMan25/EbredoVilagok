@@ -9,6 +9,14 @@
       <input matInput type="text" [formControl]="search" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+    <div id="aradas-control">
+      <span>Normál</span>
+      <mat-slide-toggle
+        aria-label="aradas"
+        [formControl]="isAradas"
+      ></mat-slide-toggle>
+      <span>Áradás</span>
+    </div>
     <div id="marker-toggle-container">
       @for (toggle of markerToggles; track $index) {
       <div

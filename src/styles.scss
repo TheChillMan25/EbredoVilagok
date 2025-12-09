@@ -104,6 +104,10 @@ button {
 button:hover {
   color: $primary-background !important;
   background-color: $text-secondary !important;
+
+  &.mdc-switch {
+    background-color: transparent !important;
+  }
 }
 
 .title,
@@ -297,6 +301,10 @@ mat-card {
     color: #222;
     background-color: #f2c480;
   }
+}
+
+.hidden-marker {
+  display: none;
 }
 
 /* styles.scss */
