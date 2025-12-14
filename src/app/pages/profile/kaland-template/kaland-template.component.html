@@ -1,20 +1,22 @@
-<div class="adventure-container">
+<div
+  class="adventure-container"
+  style="cursor: pointer"
+  (click)="toggleAdventureDetails()"
+  [ngClass]="{ detailsShown: adventureDetails }"
+>
   <span class="adventure-name">{{ adventure.name }}</span>
-  <div class="adventure-events-container">
-    <span style="cursor: pointer" (click)="toggleEvents()">Események</span>
-    <div class="adventure-events" [ngClass]="{ show: showEvents }">
+  <span class="adventure-event-count"
+    >Események száma: {{ adventure.events.length }}</span
+  >
+  <div class="adventure-actions">
+    <div class="fake-button"><mat-icon>delete</mat-icon></div>
+  </div>
+</div>
+<div class="adventure-details" [ngClass]="{ show: adventureDetails }">
+  <div class="adventure-events">
+    <div class="adventure-events">
       @for (event of adventure.events; track $index) {
-      <span>{{ event.name }}</span>
-      <div class="event-details">
-        <span>{{ event.location }}</span>
-        <ul>
-          @for (npc of event.NPCs; track $index) {
-          <li>{{ npc.name }}</li>
-          }
-        </ul>
-        <span>{{ event.desc }}</span>
-        <span>{{ event.story }}</span>
-      </div>
+      <app-event-template [event]="event"></app-event-template>
       }
     </div>
   </div>

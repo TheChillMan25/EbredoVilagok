@@ -15,18 +15,21 @@
         class="container"
         [ngClass]="{ show: showCharacter }"
       >
-        @for (character of characters; track $index) {
+        @if(characters.length > 0){ @for (character of characters; track $index)
+        {
         <app-karakter-template [character]="character"></app-karakter-template>
-        }
+        }}@else {
+        <span class="warning">Nincsenek megjeleníthető karakterek</span> }
       </div>
       <div
         id="adventure-container"
         class="container"
         [ngClass]="{ show: !showCharacter }"
       >
-        @for (adventure of adventures; track $index) {
+        @if(adventures.length > 0){ @for (adventure of adventures; track $index)
+        {
         <app-kaland-template [adventure]="adventure"></app-kaland-template>
-        }
+        }}@else {<span class="warning">Nincsenek megjeleníthető kalandok</span>}
       </div>
     </div>
     <div id="button-container">

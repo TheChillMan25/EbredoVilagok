@@ -5,7 +5,7 @@ import { UserService } from '../../shared/services/user/user.service';
 import { setBackground } from '../../shared/functional/functions';
 import { KarakterTemplateComponent } from './karakter-template/karakter-template.component';
 import { NgClass } from '@angular/common';
-import { KalandTemplateComponent } from "./kaland-template/kaland-template.component";
+import { KalandTemplateComponent } from './kaland-template/kaland-template.component';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +14,7 @@ import { KalandTemplateComponent } from "./kaland-template/kaland-template.compo
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
-  showCharacter: boolean = true;
+  showCharacter!: boolean;
   user: User | null = null;
   characters: Character[] = [];
   adventures: Adventure[] = [];
@@ -29,6 +29,13 @@ export class ProfileComponent {
   ngOnInit() {
     setBackground('bg');
     this.loadUserProfile();
+    try {
+      this.showCharacter = localStorage.getItem('showCharacter') === 'true';
+    } catch (error) {
+      localStorage.setItem('showCharacter', 'true');
+      this.showCharacter = true;
+      console.error(error);
+    }
   }
 
   ngOnDestroy() {
@@ -57,5 +64,6 @@ export class ProfileComponent {
   showContainer(container: string = '') {
     if (container === 'character') this.showCharacter = true;
     else this.showCharacter = false;
+    localStorage.setItem('showCharacter', this.showCharacter.toString());
   }
 }
