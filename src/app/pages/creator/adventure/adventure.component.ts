@@ -18,7 +18,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { AdventureEvent, Character, NPC } from '../../../shared/models/models';
+import {
+  Adventure,
+  AdventureEvent,
+  Character,
+  NPC,
+} from '../../../shared/models/models';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { NationData } from '../../../shared/models/NationData';
 import {
@@ -45,6 +50,17 @@ import {
   townLocations,
   waterLocations,
 } from '../../../shared/models/map_locations';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+  MatCardFooter,
+} from '@angular/material/card';
+import { MatButton } from '@angular/material/button';
+import { AdventureService } from '../../../shared/services/adventure/adventure.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-adventure',
@@ -62,6 +78,13 @@ import {
     MatSelect,
     MatOption,
     MapContainerComponent,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardFooter,
+    MatButton,
   ],
   templateUrl: './adventure.component.html',
   styleUrl: './adventure.component.scss',
@@ -69,10 +92,15 @@ import {
 export class AdventureComponent {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
   showEvents: boolean = false;
-  showUIContainer: boolean = false;
   showNPCs: boolean = false;
+  showUseManual: boolean = false;
   modify: boolean = false;
   attitude: string = 'neutral';
+
+  adventureName = new FormControl('', [
+    Validators.required,
+    Validators.minLength(3),
+  ]);
 
   modifyingIndex: number | null = null;
 
@@ -106,7 +134,12 @@ export class AdventureComponent {
 
   myCharacters$!: Observable<Character[]>;
 
-  constructor(private fb: FormBuilder, private charService: CharacterService) {}
+  constructor(
+    private fb: FormBuilder,
+    private charService: CharacterService,
+    private advService: AdventureService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     setBackground('paper_bg');
@@ -126,7 +159,6 @@ export class AdventureComponent {
   }
 
   showUIs(which: 'events' | 'npcs') {
-    this.showUIContainer = true;
     switch (which) {
       case 'events':
         this.showEvents = true;
@@ -142,7 +174,6 @@ export class AdventureComponent {
   }
 
   hideUIs() {
-    this.showUIContainer = false;
     this.showEvents = false;
     this.showNPCs = false;
     this.modify = false;
@@ -333,7 +364,7 @@ export class AdventureComponent {
         return;
       }
       let npc: NPC = {
-        id: `${this.selectedAdventureEvent?.name}-${this.selectedAdventureEvent?.NPCs.length}`,
+        id: `${this.selectedAdventureEvent?.id}-${this.selectedAdventureEvent?.NPCs.length}`,
         name: npcValues.name,
         actions: npcValues.actions,
         attitude: npcValues.attitude,
@@ -390,5 +421,37 @@ export class AdventureComponent {
       const hasTrue = Object.values(values).some((v) => v === true);
       return hasTrue ? null : { atLeastOne: true };
     };
+  }
+
+  changeMap() {
+    this.map.changeMap(this.map.mapType === 'aradas' ? false : true);
+  }
+
+  userManual(show: boolean) {
+    this.showUseManual = show;
+  }
+
+  createAdventure() {
+    if (this.adventureName.valid) {
+      let adventure: Omit<Adventure, 'id'> = {
+        name: this.adventureName.value,
+        events: this.events,
+        players: [],
+        currentPlayer: '',
+      };
+      this.advService
+        .addAdventure(adventure)
+        .then(() => {
+          this.npcForm.reset();
+          this.eventForm.reset();
+        })
+        .catch((error) => {
+          console.error('Hiba a kaland hozzáadásakor: ', error);
+        })
+        .finally(() => {
+          console.log('Kaland létrehozva: ', adventure);
+          this.router.navigateByUrl('/profil');
+        });
+    } else console.error('Hibás kaland!');
   }
 }
