@@ -24,7 +24,9 @@
         class="container"
         [ngClass]="{ show: !showCharacter }"
       >
-        asd
+        @for (adventure of adventures; track $index) {
+        <app-kaland-template [adventure]="adventure"></app-kaland-template>
+        }
       </div>
     </div>
     <div id="button-container">

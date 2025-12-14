@@ -1,0 +1,21 @@
+<div class="adventure-container">
+  <span class="adventure-name">{{ adventure.name }}</span>
+  <div class="adventure-events-container">
+    <span style="cursor: pointer" (click)="toggleEvents()">Események</span>
+    <div class="adventure-events" [ngClass]="{ show: showEvents }">
+      @for (event of adventure.events; track $index) {
+      <span>{{ event.name }}</span>
+      <div class="event-details">
+        <span>{{ event.location }}</span>
+        <ul>
+          @for (npc of event.NPCs; track $index) {
+          <li>{{ npc.name }}</li>
+          }
+        </ul>
+        <span>{{ event.desc }}</span>
+        <span>{{ event.story }}</span>
+      </div>
+      }
+    </div>
+  </div>
+</div>

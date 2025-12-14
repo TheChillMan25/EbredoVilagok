@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
-import { Character, User } from '../../shared/models/models';
+import { Adventure, Character, User } from '../../shared/models/models';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../shared/services/user/user.service';
 import { setBackground } from '../../shared/functional/functions';
 import { KarakterTemplateComponent } from './karakter-template/karakter-template.component';
 import { NgClass } from '@angular/common';
+import { KalandTemplateComponent } from "./kaland-template/kaland-template.component";
 
 @Component({
   selector: 'app-profile',
-  imports: [KarakterTemplateComponent, NgClass],
+  imports: [KarakterTemplateComponent, NgClass, KalandTemplateComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -16,6 +17,7 @@ export class ProfileComponent {
   showCharacter: boolean = true;
   user: User | null = null;
   characters: Character[] = [];
+  adventures: Adventure[] = [];
   username: string = '';
   email: string = '';
 
@@ -31,7 +33,7 @@ export class ProfileComponent {
 
   ngOnDestroy() {
     if (this.profileSubscription) this.profileSubscription.unsubscribe();
-    console.log(this.characters)
+    console.log(this.characters);
   }
 
   loadUserProfile() {
@@ -40,6 +42,7 @@ export class ProfileComponent {
       next: (data) => {
         this.user = data.user;
         this.characters = data.characters;
+        this.adventures = data.adventures;
         this.username = data.username;
         this.email = data.email;
         this.isLoading = false;

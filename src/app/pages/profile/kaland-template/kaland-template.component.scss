@@ -1,0 +1,21 @@
+.show {
+  display: flex;
+}
+
+.adventure-container {
+  .adventure-events-container {
+    .adventure-events {
+      display: none;
+      flex-direction: column;
+
+      &.show {
+        display: flex;
+      }
+
+      .event-details {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+}
