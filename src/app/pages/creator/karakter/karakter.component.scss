@@ -35,15 +35,19 @@
         padding: 0.5rem;
       }
     }
-    #buttons {
+    #create {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       width: 100%;
-      margin: auto;
+      margin-top: auto;
       .fake-button {
-        font-size: larger;
+        font-size: x-large;
+        border: .2rem solid #f2c480;
+        &:hover{
+          border: .2rem solid #444;
+        }
       }
 
       #error {

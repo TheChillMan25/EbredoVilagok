@@ -39,10 +39,10 @@
       </div>
     </div>
     <div id="button-container">
-      <div class="fake-button" (click)="showContainer('character')">
+      <div class="fake-button" (click)="showContainer('character')" [ngClass]="{selected: showCharacter}">
         Karakterek
       </div>
-      <div class="fake-button" (click)="showContainer()">Kalandok</div>
+      <div class="fake-button" (click)="showContainer()" [ngClass]="{selected: !showCharacter}">Kalandok</div>
     </div>
   </div>
 </div>

@@ -34,6 +34,7 @@ import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { MatButton } from "@angular/material/button";
 
 @Component({
   selector: 'app-karakter',
@@ -45,7 +46,8 @@ import { NgClass } from '@angular/common';
     MatSelectModule,
     MatIcon,
     NgClass,
-  ],
+    MatButton
+],
   templateUrl: './karakter.component.html',
   styleUrl: './karakter.component.scss',
 })
@@ -138,35 +140,35 @@ export class KarakterComponent {
       stats: this.fb.group({
         physical: this.fb.group({
           ero: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           ugyesseg: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           kitartas: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         mental: this.fb.group({
           esz: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           fortely: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           akaratero: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         main: this.fb.group({
-          hp: [1, Validators.min(1)],
-          sp: [1, Validators.min(1)],
+          hp: ['', Validators.required, Validators.min(1)],
+          sp: ['', Validators.required, Validators.min(1)],
         }),
       }),
       equipment: this.fb.group({

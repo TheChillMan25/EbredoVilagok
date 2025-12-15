@@ -301,6 +301,13 @@ html {
   --mdc-outlined-text-field-focus-label-text-color: #f2c480;
   --mdc-filled-button-label-text-color: #333;
 
+  /*Mat-select*/
+  /*--mat-select-panel-background-color: #555;*/
+  --mdc-list-list-item-hover-label-text-color: #f2c480;
+  --mat-option-focus-state-layer-color: #444;
+  --mat-option-hover-state-layer-color: #444;
+  --mat-option-selected-state-layer-color: #f2c480;
+
   /*Mat-card*/
   --mdc-outlined-card-container-color: #333;
   --mat-card-title-text-size: xx-large;

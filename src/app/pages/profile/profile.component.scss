@@ -89,6 +89,10 @@
         font-size: x-large;
         color: whitesmoke;
         border-radius: 0.3rem;
+
+        &.selected{
+          border: .2rem solid #111;
+        }
       }
     }
   }
