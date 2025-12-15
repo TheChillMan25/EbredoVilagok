@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from '../auth/auth.service';
-import { Character, User } from '../../models/models';
+import { Adventure, User } from '../../models/models';
 import { firstValueFrom, map, Observable, switchMap, take } from 'rxjs';
 import {
   addDoc,
@@ -18,44 +18,43 @@ import {
 @Injectable({
   providedIn: 'root',
 })
-export class CharacterService {
+export class AdventureService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async addCharacter(character: Omit<Character, 'id'>): Promise<Character> {
+  async addAdventure(adventure: Omit<Adventure, 'id'>): Promise<Adventure> {
     try {
       const user = await firstValueFrom(
         this.authService.currentUser.pipe(take(1))
       );
       if (!user) throw new Error('Felhasználó nem található!');
 
-      const characterCollection = collection(this.firestore, 'Characters');
-      const docRef = await addDoc(characterCollection, character);
-      const charID = docRef.id;
+      const adventureCollection = collection(this.firestore, 'Adventures');
+      const docRef = await addDoc(adventureCollection, adventure);
+      const advID = docRef.id;
 
-      await updateDoc(docRef, { id: charID });
-      const newCharacter: Character = {
-        ...character,
-        id: charID,
-      } as Character;
+      await updateDoc(docRef, { id: advID });
+      const newAdventure: Adventure = {
+        ...adventure,
+        id: advID,
+      } as Adventure;
 
       const userDocRef = doc(this.firestore, 'Users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
         const userData = userDoc.data() as User;
-        const characters = userData.characters || [];
-        characters.push(charID);
-        await updateDoc(userDocRef, { characters });
+        const adventures = userData.adventures || [];
+        adventures.push(advID);
+        await updateDoc(userDocRef, { adventures });
       }
-
-      return newCharacter;
+      return newAdventure;
     } catch (error) {
-      console.error('Error adding character:', error);
+      console.error('Error adding adventure: ', error);
       throw error;
     }
   }
 
-  getAllCharacters(): Observable<Character[]> {
+  getAllAdventures(): Observable<Adventure[]> {
     return this.authService.currentUser.pipe(
       switchMap(async (user) => {
         if (!user) return [];
@@ -66,33 +65,33 @@ export class CharacterService {
           if (!userDoc.exists()) return [];
 
           const userData = userDoc.data() as User;
-          const charIDs = userData.characters || [];
+          const advIDs = userData.adventures || [];
 
-          if (charIDs.length === 0) return [];
+          if (advIDs.length === 0) return [];
 
-          const characterCollection = collection(this.firestore, 'Characters');
-          const characters: Character[] = [];
+          const adventureCollection = collection(this.firestore, 'Adventures');
+          const adventures: Adventure[] = [];
 
           const q = query(
-            characterCollection,
-            where('id', 'in', userData.characters)
+            adventureCollection,
+            where('id', 'in', userData.adventures)
           );
           const snapShot = await getDocs(q);
           snapShot.forEach((doc) => {
-            characters.push({ ...doc.data(), id: doc.id } as Character);
+            adventures.push({ ...doc.data(), id: doc.id } as Adventure);
           });
 
-          return characters;
+          return adventures;
         } catch (error) {
-          console.error('Error fetching characters:', error);
+          console.error('Error fetching adventures:', error);
           return [];
         }
       }),
-      map((characters) => characters as Character[])
+      map((adventures) => adventures as Adventure[])
     );
   }
 
-  async deleteCharacter(charId: string): Promise<void> {
+  async deleteAdventure(advId: string): Promise<void> {
     try {
       const user = await firstValueFrom(
         this.authService.currentUser.pipe(take(1))
@@ -106,18 +105,18 @@ export class CharacterService {
       if (!userDoc.exists()) throw new Error('A felhasználó nem létezik!');
 
       const userData = userDoc.data() as User;
-      if (!userData.characters || !userData.characters.includes(charId))
+      if (!userData.adventures || !userData.adventures.includes(advId))
         throw new Error('Nem társítható karakter a felhasználóhoz');
 
-      const charDocRef = doc(this.firestore, 'Characters', charId);
-      await deleteDoc(charDocRef);
+      const advDocRef = doc(this.firestore, 'Adventures', advId);
+      await deleteDoc(advDocRef);
 
-      const updatedCharacters = userData.characters.filter(
-        (id) => id !== charId
+      const updatedAdventures = userData.adventures.filter(
+        (id) => id !== advId
       );
-      return updateDoc(userDocRef, { characters: updatedCharacters });
+      return updateDoc(userDocRef, { adventures: updatedAdventures });
     } catch (error) {
-      console.error('Hiba a karakter törlésekor: ', error);
+      console.error('Hiba a kaland törlésekor: ', error);
       throw error;
     }
   }

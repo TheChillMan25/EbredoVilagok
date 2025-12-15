@@ -1,0 +1,44 @@
+.adventure-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #222;
+  padding: 0.5rem;
+  font-size: large;
+  user-select: none;
+  border-radius: 0.5rem;
+
+  &.detailsShown {
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  .adventure-actions {
+    margin-left: auto;
+  }
+}
+
+.adventure-details {
+  display: none;
+  background-color: #333;
+
+  .adventure-events {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem;
+    overflow-y: auto;
+  }
+}
+
+.show {
+  display: flex;
+}
+
+@media(max-width: 500px){
+  .adventure-details{
+    .adventure-events{
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}

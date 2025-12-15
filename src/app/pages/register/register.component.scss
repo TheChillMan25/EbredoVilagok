@@ -20,7 +20,7 @@
     form.register-form {
       display: flex;
       flex-direction: column;
-
+      gap: 2rem;
       .buttons {
         display: flex;
         flex-direction: column;
@@ -36,15 +36,15 @@
   }
 }
 
-@media (max-width: 768px){
-  #content{
+@media (max-width: 768px) {
+  #content {
     justify-content: space-evenly;
     flex-direction: column;
 
-    #panel{
+    #panel {
       width: fit-content;
       height: fit-content;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
     }
   }
 }
