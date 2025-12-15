@@ -292,6 +292,7 @@ export class KarakterComponent {
       return;
     }
     const random = createRandomCharacter(charName);
+    console.log(random)
 
     this.mainForm.get('species')?.setValue(random.species);
     this.setRelevantSpeciesData(random.species);
@@ -304,7 +305,10 @@ export class KarakterComponent {
       },
       stats: random.stats,
       equipment: random.equipment,
-      virtues: random.virtues,
+      virtues: {
+        virtues: random.virtues.virtues,
+        disadvantage: random.virtues.disadv
+      },
       items: random.items,
     });
 

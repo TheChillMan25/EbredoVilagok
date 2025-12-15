@@ -1,7 +1,8 @@
 article {
-  columns: 2;
+  display: flex;
+  gap: .5rem;
   height: 55%;
-  text-align: justify;
+  overflow-y: auto;
   .columns {
     display: flex;
     flex-direction: column;

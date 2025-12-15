@@ -2,7 +2,7 @@ import { species as Species } from '../../pages/world/species/species_desc_data'
 import { Character } from '../models/models';
 import { NationData } from '../models/NationData';
 import { classes } from '../models/classes';
-import { weapons, armours } from '../models/equipment';
+import { weapons, armours, getWeapon } from '../models/equipment';
 import {
   foodRations,
   items,
@@ -191,6 +191,24 @@ export function checkStatNumbers(numbers: number[]) {
   console.log('On edges: ' + onEdges);
 }
 
+function createRandomEquipment(){
+  while (true) {
+    const equipment = {
+      left: Math.floor(Math.random() * weapons.length),
+      right: Math.floor(Math.random() * weapons.length),
+      armour: Math.floor(Math.random() * armours.length),
+    };
+    if (checkEquipment(equipment.left, equipment.right)) return equipment;
+  }
+}
+
+function checkEquipment(left: number, right: number){
+  return !(
+    (getWeapon(left).handed === 2 && getWeapon(right).handed !== 0) ||
+    (getWeapon(left).handed !== 0 && getWeapon(right).handed === 2)
+  );
+}
+
 export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
@@ -226,18 +244,14 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
           Math.ceil(Math.random() * 4),
       },
     },
-    equipment: {
-      left: Math.floor(Math.random() * weapons.length),
-      right: Math.floor(Math.random() * weapons.length),
-      armour: Math.floor(Math.random() * armours.length),
-    },
+    equipment: createRandomEquipment(),
     virtues: {
       virtues: [
-        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
-        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
+        Math.floor(Math.random() * virtues.length),
+        Math.floor(Math.random() * virtues.length),
       ],
       disadv: [
-        Math.max(Math.floor(Math.random() * disadvantages.length - 1), 0),
+        Math.floor(Math.random() * disadvantages.length)
       ],
     },
     items: {
