@@ -1,10 +1,15 @@
 <form [formGroup]="mainForm" id="content">
   <div id="main" class="container">
     <span class="groupName">Egyéni tulajdonságok</span>
-    <mat-form-field appearance="outline">
+    <div style="display: flex; gap: 1rem;">
+    <mat-form-field appearance="outline" style="flex: 2;">
       <mat-label>Név</mat-label>
       <input matInput type="text" formControlName="name" />
     </mat-form-field>
+    <button class="fake-button" (click)="createCharacter(true)">
+        <mat-icon>shuffle</mat-icon>
+      </button>
+    </div>
     <mat-form-field appearance="outline">
       <mat-label>Faj</mat-label>
       <mat-select
@@ -59,14 +64,11 @@
         }
       </div>
     </div>
-    <div id="buttons">
-      <button class="fake-button" (click)="createCharacter()">
+    <div id="create">
+      <span id="error">{{ errorMessage }}</span>
+      <button id="createBtn" class="fake-button" (click)="createCharacter()">
         Létrehozás
       </button>
-      <button class="fake-button" (click)="createCharacter(true)">
-        Random
-      </button>
-      <span id="error">{{ errorMessage }}</span>
     </div>
   </div>
   <div id="stat-virtue-container">
