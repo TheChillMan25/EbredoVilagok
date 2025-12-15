@@ -9,7 +9,9 @@
     >Események száma: {{ adventure.events.length }}</span
   >
   <div class="adventure-actions">
-    <div class="fake-button"><mat-icon>delete</mat-icon></div>
+    <div class="fake-button" (click)="deleteAdventure($event)">
+      <mat-icon>delete</mat-icon>
+    </div>
   </div>
 </div>
 <div class="adventure-details" [ngClass]="{ show: adventureDetails }">

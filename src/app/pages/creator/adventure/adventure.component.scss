@@ -128,6 +128,7 @@
 
 #event-form {
   justify-content: space-between;
+  gap: 1rem;
 }
 
 #npcForm {
@@ -177,14 +178,12 @@
 }
 
 @media (max-width: 950px) {
-  #ui-container {
-    .ui-container {
-      width: 35%;
-    }
+  .ui-container {
+    width: 35%;
+  }
 
-    #add-npc-ui {
-      left: 65%;
-    }
+  #add-npc-ui {
+    left: 65%;
   }
 }
 
@@ -200,14 +199,13 @@
       width: 50%;
     }
   }
-  #ui-container {
-    .ui-container {
-      width: 50%;
-    }
 
-    #add-npc-ui {
-      left: 50%;
-    }
+  .ui-container {
+    width: 50%;
+  }
+
+  #add-npc-ui {
+    left: 50%;
   }
 }
 
@@ -219,17 +217,22 @@
       width: 100%;
       height: 100%;
     }
+
+    #events {
+      flex: 3;
+    }
+    #npcs {
+      flex: 2;
+    }
   }
 }
 
 @media (max-width: 500px) {
-  #ui-container {
-    .ui-container {
-      width: 100%;
-    }
+  .ui-container {
+    width: 100%;
+  }
 
-    #add-npc-ui {
-      left: 0;
-    }
+  #add-npc-ui {
+    left: 0;
   }
 }

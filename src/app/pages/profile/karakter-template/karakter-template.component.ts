@@ -1,11 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Character } from '../../../shared/models/models';
 import {
   getHome,
   getSpeciesSpecial,
 } from '../../../shared/functional/functions';
 import { NgClass } from '@angular/common';
-import { MatIcon } from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon';
+import { CharacterService } from '../../../shared/services/character/character.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-karakter-template',
@@ -14,7 +16,8 @@ import { MatIcon } from "@angular/material/icon";
   styleUrl: './karakter-template.component.scss',
 })
 export class KarakterTemplateComponent {
-  @Input() character?: Character;
+  @Input() character!: Character;
+  @Output() deletedCharacter = new EventEmitter<void>();
   showSpecDescs: boolean = false;
 
   speciesSpecial!: { desc: string };
@@ -22,6 +25,8 @@ export class KarakterTemplateComponent {
 
   stats: { name: string; value: string }[] = [];
   mainStats: { name: string; value: number }[] = [];
+
+  constructor(private charService: CharacterService, private router: Router) {}
 
   ngOnInit() {
     this.createStats();
@@ -98,5 +103,12 @@ export class KarakterTemplateComponent {
 
   hideSpecDescs() {
     this.showSpecDescs = false;
+  }
+
+  deleteCharacter() {
+    if (this.character?.id) {
+      this.charService.deleteCharacter(this.character.id);
+      this.deletedCharacter.emit();
+    }
   }
 }

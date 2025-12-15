@@ -17,7 +17,10 @@
       >
         @if(characters.length > 0){ @for (character of characters; track $index)
         {
-        <app-karakter-template [character]="character"></app-karakter-template>
+        <app-karakter-template
+          [character]="character"
+          (deletedCharacter)="loadCharAdvData()"
+        ></app-karakter-template>
         }}@else {
         <span class="warning">Nincsenek megjeleníthető karakterek</span> }
       </div>
@@ -28,7 +31,10 @@
       >
         @if(adventures.length > 0){ @for (adventure of adventures; track $index)
         {
-        <app-kaland-template [adventure]="adventure"></app-kaland-template>
+        <app-kaland-template
+          [adventure]="adventure"
+          (deletedAdventure)="loadCharAdvData()"
+        ></app-kaland-template>
         }}@else {<span class="warning">Nincsenek megjeleníthető kalandok</span>}
       </div>
     </div>
