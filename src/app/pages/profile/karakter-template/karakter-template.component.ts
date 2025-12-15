@@ -8,10 +8,11 @@ import { NgClass } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
+import { DeleteWarningComponent } from '../delete-warning/delete-warning.component';
 
 @Component({
   selector: 'app-karakter-template',
-  imports: [NgClass, MatIcon],
+  imports: [NgClass, MatIcon, DeleteWarningComponent],
   templateUrl: './karakter-template.component.html',
   styleUrl: './karakter-template.component.scss',
 })
@@ -19,6 +20,7 @@ export class KarakterTemplateComponent {
   @Input() character!: Character;
   @Output() deletedCharacter = new EventEmitter<void>();
   showSpecDescs: boolean = false;
+  showWarning: boolean = false;
 
   speciesSpecial!: { desc: string };
   home!: { desc: string; bonus: { name: string; mod: string }[] };
@@ -105,10 +107,20 @@ export class KarakterTemplateComponent {
     this.showSpecDescs = false;
   }
 
+  closeWarning() {
+    this.showWarning = false;
+  }
+
   deleteCharacter() {
-    if (this.character?.id) {
-      this.charService.deleteCharacter(this.character.id);
-      this.deletedCharacter.emit();
+    const doNotRemind = localStorage.getItem('deleteNoRemind') === 'true';
+
+    if (doNotRemind) {
+      if (this.character?.id) {
+        this.charService.deleteCharacter(this.character.id);
+        this.deletedCharacter.emit();
+      }
+    } else {
+      this.showWarning = true;
     }
   }
 }

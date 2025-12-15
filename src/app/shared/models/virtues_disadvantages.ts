@@ -103,3 +103,15 @@ export const CharacterDisadvantages = [
   { diceNum: 99, name: 'Törvényszegő' },
   { diceNum: 100, name: 'Udvariatlan' },
 ];
+
+export function getCharacterVirDisAdv(
+  type: 'virtue' | 'disadv',
+  index: number
+) {
+  switch (type) {
+    case 'virtue':
+      return CharacterVirtues[index];
+    case 'disadv':
+      return CharacterDisadvantages[index];
+  }
+}

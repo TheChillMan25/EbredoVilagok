@@ -48,4 +48,10 @@
   <div class="fake-button delete" (click)="deleteCharacter()">
     <mat-icon>delete</mat-icon>
   </div>
+  <div class="warning" [ngClass]="{ show: showWarning }">
+    <app-delete-warning
+      (deleteEvent)="deleteCharacter()"
+      (closeEvent)="closeWarning()"
+    ></app-delete-warning>
+  </div>
 </div>

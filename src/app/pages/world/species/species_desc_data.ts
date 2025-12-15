@@ -1223,3 +1223,5 @@ export const species: Record<string, SpeciesInterface[]> = {
   gepszulottek: gepszulottek,
   atkozottak: atkozottak,
 };
+
+

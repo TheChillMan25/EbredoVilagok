@@ -12,6 +12,7 @@ export interface Weapon {
   name: string;
   dice: string;
   price: number;
+  handed: 0 |1 | 2;
 }
 
 export interface Armour {

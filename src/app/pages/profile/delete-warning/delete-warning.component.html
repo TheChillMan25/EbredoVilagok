@@ -1,0 +1,11 @@
+<div class="warning-container">
+  <div class="warning-title">Törlés...</div>
+  <div class="warning-desc">Biztosan törölni szeretnéd?</div>
+  <div class="warning-actions">
+    <div class="fake-button" (click)="delete()">Igen</div>
+    <div class="fake-button" (click)="close()">Nem</div>
+    <mat-checkbox (change)="checkboxChange($event.checked)"
+      >Megjegyzés</mat-checkbox
+    >
+  </div>
+</div>
