@@ -194,7 +194,6 @@ export function checkStatNumbers(numbers: number[]) {
 export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
-  console.log(charName);
   let stats = createStats();
   let randomCharacter: Omit<Character, 'id'> = {
     currentAdventure: '',
@@ -202,7 +201,7 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
     species: NationData.map((nation) => nation.nationName)[
       Math.floor(Math.random() * 17)
     ],
-    class: classes[Math.max(Math.floor(Math.random() * classes.length - 1))],
+    class: classes[Math.floor(Math.random() * (classes.length - 1))],
     level: 1,
     specialProperties: {
       speciesProperty: Math.floor(Math.random() * 6),
@@ -228,9 +227,9 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
       },
     },
     equipment: {
-      left: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
-      right: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
-      armour: Math.max(Math.floor(Math.random() * armours.length - 1), 0),
+      left: Math.floor(Math.random() * weapons.length),
+      right: Math.floor(Math.random() * weapons.length),
+      armour: Math.floor(Math.random() * armours.length),
     },
     virtues: {
       virtues: [
@@ -265,14 +264,15 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   return randomCharacter;
 }
 
-export function getItem(type: string, index: number) {
+export function getItem(
+  type: 'food' | 'otherItems' | 'specialItems',
+  index: number
+) {
   const map: Record<string, any> = {
     food: foodRations,
     otherItems: items,
     specialItems: medicalItems.concat(specialDrinks),
   };
 
-  if (map[type][index]) {
-    return map[type][index];
-  }
+  return map[type][index];
 }

@@ -7,7 +7,6 @@ import {
   setDisplay,
 } from '../../../../shared/functional/functions';
 import { species, SpeciesInterface } from '../species_desc_data';
-import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-species-template',

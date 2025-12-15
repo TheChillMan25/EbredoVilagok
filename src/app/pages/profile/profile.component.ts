@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { Adventure, Character, User } from '../../shared/models/models';
 import {
   combineLatest,
-  combineLatestAll,
-  Observable,
   Subscription,
 } from 'rxjs';
 import { UserService } from '../../shared/services/user/user.service';
