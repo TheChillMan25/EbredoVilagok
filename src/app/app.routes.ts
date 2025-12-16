@@ -80,14 +80,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/map/map.component').then((m) => m.MapComponent),
     canActivate: [publicGuard],
-  },
+  },/*
   {
     path: 'forum',
     title: 'Ébredő Világok | Fórum',
     loadComponent: () =>
       import('./pages/forum/forum.component').then((m) => m.ForumComponent),
     canActivate: [publicGuard],
-  },
+  },*/
   {
     path: 'karakter-keszito',
     title: 'Karakter készítő',
