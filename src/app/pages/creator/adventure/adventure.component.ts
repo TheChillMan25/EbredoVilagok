@@ -92,9 +92,13 @@ import { CanComponentDeactivate } from '../karakter/karakter.component';
 })
 export class AdventureComponent implements CanComponentDeactivate {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
+
+  skipLeaveConfirm: boolean = false;
+
   showEvents: boolean = false;
   showNPCs: boolean = false;
   showUseManual: boolean = false;
+
   modify: boolean = false;
   attitude: string = 'neutral';
 
@@ -115,6 +119,7 @@ export class AdventureComponent implements CanComponentDeactivate {
   selectedAdventureEvent?: AdventureEvent;
   events: AdventureEvent[] = [];
 
+  advError: string = '';
   eventForm!: FormGroup;
   eventError: string = '';
   npcForm!: FormGroup;
@@ -143,6 +148,7 @@ export class AdventureComponent implements CanComponentDeactivate {
   ) {}
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.skipLeaveConfirm) return true;
     if (this.adventureName.dirty || this.events.length > 0)
       return confirm(
         'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
@@ -152,6 +158,7 @@ export class AdventureComponent implements CanComponentDeactivate {
 
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
+    if (this.skipLeaveConfirm) return;
     if (this.adventureName.dirty || this.events.length > 0) {
       $event.returnValue = true;
     }
@@ -446,6 +453,10 @@ export class AdventureComponent implements CanComponentDeactivate {
 
   createAdventure() {
     if (this.adventureName.valid) {
+      if (this.events.length === 0) {
+        this.advError = 'Adj legaglább egy eseményt a kalandhoz!';
+        return;
+      }
       let adventure: Omit<Adventure, 'id'> = {
         name: this.adventureName.value,
         events: this.events,
@@ -455,6 +466,11 @@ export class AdventureComponent implements CanComponentDeactivate {
       this.advService
         .addAdventure(adventure)
         .then(() => {
+          this.skipLeaveConfirm = true;
+          this.adventureName.reset('');
+          this.adventureName.markAsPristine();
+          this.events = [];
+          this.selectedAdventureEvent = undefined;
           this.npcForm.reset();
           this.eventForm.reset();
         })
@@ -465,6 +481,9 @@ export class AdventureComponent implements CanComponentDeactivate {
           console.log('Kaland létrehozva: ', adventure);
           this.router.navigateByUrl('/profil');
         });
-    } else console.error('Hibás kaland!');
+    } else {
+      this.advError = 'Adj nevet a kalandnak!';
+      console.error('Hibás kaland!');
+    }
   }
 }
