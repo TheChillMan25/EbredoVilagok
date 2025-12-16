@@ -69,12 +69,14 @@ export interface Forum {
 export interface SubForum {
   id: string;
   topic: string;
-  posts: ForumPost[];
+  posts: string[];
 }
 
 export interface ForumPost {
   id: string;
   title: string;
+  poster: string;
+  posterUID: string;
   sentDate: string;
   text: string;
   attachments: string[];
