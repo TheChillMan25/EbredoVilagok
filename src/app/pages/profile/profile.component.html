@@ -6,6 +6,13 @@
     <div id="profile-data">
       <span id="username">{{ username }}</span>
       <span id="email"><span>Email:</span> {{ email }}</span>
+      <div
+        matTooltip="Mentett válozók törlése"
+        class="fake-button"
+        (click)="resetSavedVariables()"
+      >
+        <mat-icon>delete</mat-icon>
+      </div>
     </div>
   </div>
   <div id="main-container">
@@ -39,10 +46,20 @@
       </div>
     </div>
     <div id="button-container">
-      <div class="fake-button" (click)="showContainer('character')" [ngClass]="{selected: showCharacter}">
+      <div
+        class="fake-button"
+        (click)="showContainer('character')"
+        [ngClass]="{ selected: showCharacter }"
+      >
         Karakterek
       </div>
-      <div class="fake-button" (click)="showContainer()" [ngClass]="{selected: !showCharacter}">Kalandok</div>
+      <div
+        class="fake-button"
+        (click)="showContainer()"
+        [ngClass]="{ selected: !showCharacter }"
+      >
+        Kalandok
+      </div>
     </div>
   </div>
 </div>

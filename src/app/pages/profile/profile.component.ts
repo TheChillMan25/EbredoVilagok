@@ -11,10 +11,12 @@ import { NgClass } from '@angular/common';
 import { KalandTemplateComponent } from './kaland-template/kaland-template.component';
 import { CharacterService } from '../../shared/services/character/character.service';
 import { AdventureService } from '../../shared/services/adventure/adventure.service';
+import { MatIcon } from "@angular/material/icon";
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-profile',
-  imports: [KarakterTemplateComponent, NgClass, KalandTemplateComponent],
+  imports: [KarakterTemplateComponent, NgClass, KalandTemplateComponent, MatIcon, MatTooltip],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -90,5 +92,9 @@ export class ProfileComponent {
     if (container === 'character') this.showCharacter = true;
     else this.showCharacter = false;
     localStorage.setItem('showCharacter', this.showCharacter.toString());
+  }
+
+  resetSavedVariables(){
+    localStorage.clear()
   }
 }

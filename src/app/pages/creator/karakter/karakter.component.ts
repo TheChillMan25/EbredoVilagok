@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import {
   convertSpeciesNameToKey,
   createRandomCharacter,
@@ -37,6 +37,11 @@ import { CharacterService } from '../../../shared/services/character/character.s
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Observable } from 'rxjs';
+
+export interface CanComponentDeactivate {
+  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
 
 @Component({
   selector: 'app-karakter',
@@ -53,7 +58,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './karakter.component.html',
   styleUrl: './karakter.component.scss',
 })
-export class KarakterComponent {
+export class KarakterComponent implements CanComponentDeactivate {
   errorMessage: string = '';
   mainForm!: FormGroup;
   speciesList = NationData.map((nation) => nation.nationName);
@@ -120,6 +125,22 @@ export class KarakterComponent {
     private charService: CharacterService,
     private router: Router
   ) {}
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.mainForm.dirty) {
+      return confirm(
+        'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
+      );
+    }
+    return true;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this.mainForm.dirty) {
+      $event.returnValue = true;
+    }
+  }
 
   ngOnInit() {
     console.log(this.medicalItems.length, this.specialDrinks.length);
@@ -292,7 +313,7 @@ export class KarakterComponent {
       return;
     }
     const random = createRandomCharacter(charName);
-    console.log(random)
+    console.log(random);
 
     this.mainForm.get('species')?.setValue(random.species);
     this.setRelevantSpeciesData(random.species);
@@ -307,7 +328,7 @@ export class KarakterComponent {
       equipment: random.equipment,
       virtues: {
         virtues: random.virtues.virtues,
-        disadvantage: random.virtues.disadv
+        disadvantage: random.virtues.disadv,
       },
       items: random.items,
     });
