@@ -60,6 +60,11 @@
         height: 100%;
         width: 100%;
         overflow-y: auto;
+
+        .emptyWarning {
+          margin: auto;
+          font-size: x-large;
+        }
       }
 
       #character-container {
@@ -90,8 +95,8 @@
         color: whitesmoke;
         border-radius: 0.3rem;
 
-        &.selected{
-          border: .2rem solid #111;
+        &.selected {
+          border: 0.2rem solid #111;
         }
       }
     }
@@ -114,7 +119,7 @@
   }
 }
 
-@media (max-width: 900px) { 
+@media (max-width: 900px) {
   #content {
     padding: 1rem;
     flex-direction: column;

@@ -51,5 +51,14 @@ $text-hover-color: #333;
   .navbar-link {
     gap: 0.2rem;
     cursor: pointer;
+
+    .navbar-hover-container {
+      padding: 1rem;
+      position: absolute;
+      right: 0;
+      width: fit-content;
+      color: #f2c480;
+      flex-direction: row !important;
+    }
   }
 }
