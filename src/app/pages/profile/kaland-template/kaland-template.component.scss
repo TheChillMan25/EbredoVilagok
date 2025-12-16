@@ -32,11 +32,12 @@
 
 .show {
   display: flex;
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
-@media(max-width: 500px){
-  .adventure-details{
-    .adventure-events{
+@media (max-width: 500px) {
+  .adventure-details {
+    .adventure-events {
       flex-direction: column;
       align-items: center;
     }
