@@ -112,15 +112,20 @@ export class KarakterTemplateComponent {
   }
 
   deleteCharacter() {
-    const doNotRemind = localStorage.getItem('deleteNoRemind') === 'true';
+    const doNotRemind = localStorage.getItem('deleteNoRemind');
 
-    if (doNotRemind) {
+    if (doNotRemind === null) {
+      this.showWarning = true;
+      localStorage.setItem('deleteNoRemind', 'false');
+    }
+    if (doNotRemind === 'true' || (this.showWarning && doNotRemind === 'false')) {
       if (this.character?.id) {
         this.charService.deleteCharacter(this.character.id);
         this.deletedCharacter.emit();
       }
-    } else {
+    } else if(!this.showWarning && doNotRemind === 'false') {
       this.showWarning = true;
+      localStorage.setItem('deleteNoRemind', 'false');
     }
   }
 }

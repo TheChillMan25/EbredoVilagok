@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { setBackground } from '../../../shared/functional/functions';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
@@ -61,6 +61,7 @@ import {
 import { MatButton } from '@angular/material/button';
 import { AdventureService } from '../../../shared/services/adventure/adventure.service';
 import { Router } from '@angular/router';
+import { CanComponentDeactivate } from '../karakter/karakter.component';
 
 @Component({
   selector: 'app-adventure',
@@ -89,7 +90,7 @@ import { Router } from '@angular/router';
   templateUrl: './adventure.component.html',
   styleUrl: './adventure.component.scss',
 })
-export class AdventureComponent {
+export class AdventureComponent implements CanComponentDeactivate {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
   showEvents: boolean = false;
   showNPCs: boolean = false;
@@ -141,6 +142,21 @@ export class AdventureComponent {
     private router: Router
   ) {}
 
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.adventureName.dirty || this.events.length > 0)
+      return confirm(
+        'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
+      );
+    return true;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this.adventureName.dirty || this.events.length > 0) {
+      $event.returnValue = true;
+    }
+  }
+
   ngOnInit() {
     setBackground('paper_bg');
     this.initForms();
@@ -153,9 +169,6 @@ export class AdventureComponent {
       .concat(mountainLocations)
       .concat(hillLocations)
       .concat(waterLocations);
-    /*window.onbeforeunload = (e) => {
-      e.preventDefault();
-    };*/
   }
 
   showUIs(which: 'events' | 'npcs') {
