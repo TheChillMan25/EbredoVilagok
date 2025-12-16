@@ -1,0 +1,30 @@
+.warning-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  border-radius: 0.5rem;
+
+  .warning-title {
+    color: #f2c480;
+    font-size: x-large;
+  }
+
+  .warning-desc,
+  .warning-title {
+    width: 100%;
+    text-align: left;
+  }
+
+  .warning-actions {
+    display: flex;
+    gap: 1rem;
+
+    .fake-button {
+      padding: 0.5rem;
+    }
+  }
+}

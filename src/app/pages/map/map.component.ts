@@ -7,6 +7,7 @@ import { setBackground } from '../../shared/functional/functions';
 import { NgClass } from '@angular/common';
 import { MapContainerComponent } from '../../shared/functional/map-container/map-container.component';
 import { Location } from '../../shared/models/map_locations';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 interface Marker {
   id: string;
@@ -31,6 +32,7 @@ interface SearchResult {
     MatIconModule,
     NgClass,
     MapContainerComponent,
+    MatSlideToggle,
   ],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
@@ -38,6 +40,7 @@ interface SearchResult {
 export class MapComponent {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
   search: FormControl = new FormControl();
+  isAradas: FormControl = new FormControl();
   controlVisible: boolean = false;
   showAllMarkers: boolean = true;
 
@@ -59,6 +62,15 @@ export class MapComponent {
 
     this.search.valueChanges.subscribe((value) => {
       this.searchFor(value);
+    });
+
+    try {
+      this.isAradas.setValue(localStorage.getItem('mapType') === 'aradas');
+    } catch (error) {
+      console.warn('valami');
+    }
+    this.isAradas.valueChanges.subscribe((value) => {
+      this.changeMap(value);
     });
   }
 
@@ -82,9 +94,9 @@ export class MapComponent {
       this.map.toggleAllMarkers(this.showAllMarkers);
       this.markerToggles.forEach((marker) => {
         marker.show = this.showAllMarkers;
-        console.log(marker);
       });
     }
+    this.searchFor(this.search.value);
   }
 
   searchFor(what: string) {
@@ -92,9 +104,13 @@ export class MapComponent {
       this.searchResults = [];
       Object.values(this.map.locationsMap).forEach((l) => {
         for (let loc of l.values()) {
+          const marker = this.map.markerReference.get(loc.id);
           if (
-            loc.name.toLocaleLowerCase().includes(what.toLowerCase()) ||
-            loc.desc.toLocaleLowerCase().includes(what.toLowerCase())
+            (loc.name.toLocaleLowerCase().includes(what.toLowerCase()) ||
+              loc.desc.toLocaleLowerCase().includes(what.toLowerCase())) &&
+            (this.map.mapType === loc.map || loc.map === 'both') &&
+            marker &&
+            this.map.map.hasLayer(marker)
           )
             this.searchResults.push(loc);
         }
@@ -108,6 +124,12 @@ export class MapComponent {
     if (this.isMobileView()) this.hideControlPanel();
   }
 
+  changeMap(isAradas: boolean) {
+    this.map.changeMap(isAradas);
+    if (this.search.value !== '' || this.search.value !== null) {
+      this.searchFor(this.search.value);
+    }
+  }
   isMobileView(): boolean {
     return window.innerWidth <= 768;
   }

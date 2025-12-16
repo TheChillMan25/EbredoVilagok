@@ -6,6 +6,13 @@
     <div id="profile-data">
       <span id="username">{{ username }}</span>
       <span id="email"><span>Email:</span> {{ email }}</span>
+      <div
+        matTooltip="Mentett válozók törlése"
+        class="fake-button"
+        (click)="resetSavedVariables()"
+      >
+        <mat-icon>delete</mat-icon>
+      </div>
     </div>
   </div>
   <div id="main-container">
@@ -15,23 +22,44 @@
         class="container"
         [ngClass]="{ show: showCharacter }"
       >
-        @for (character of characters; track $index) {
-        <app-karakter-template [character]="character"></app-karakter-template>
-        }
+        @if(characters.length > 0){ @for (character of characters; track $index)
+        {
+        <app-karakter-template
+          [character]="character"
+          (deletedCharacter)="loadCharAdvData()"
+        ></app-karakter-template>
+        }}@else {
+        <span class="emptyWarning">Nincsenek megjeleníthető karakterek</span> }
       </div>
       <div
         id="adventure-container"
         class="container"
         [ngClass]="{ show: !showCharacter }"
       >
-        asd
+        @if(adventures.length > 0){ @for (adventure of adventures; track $index)
+        {
+        <app-kaland-template
+          [adventure]="adventure"
+          (deletedAdventure)="loadCharAdvData()"
+        ></app-kaland-template>
+        }}@else {<span class="emptyWarning">Nincsenek megjeleníthető kalandok</span>}
       </div>
     </div>
     <div id="button-container">
-      <div class="fake-button" (click)="showContainer('character')">
+      <div
+        class="fake-button"
+        (click)="showContainer('character')"
+        [ngClass]="{ selected: showCharacter }"
+      >
         Karakterek
       </div>
-      <div class="fake-button" (click)="showContainer()">Kalandok</div>
+      <div
+        class="fake-button"
+        (click)="showContainer()"
+        [ngClass]="{ selected: !showCharacter }"
+      >
+        Kalandok
+      </div>
     </div>
   </div>
 </div>

@@ -159,7 +159,7 @@ export class GameComponent {
     setBackground('paper_bg');
   }
 
-  getItem(which: string, index: number) {
+  getItem(which: 'food' | 'specialItems' | 'otherItems', index: number) {
     return getItem(which, index);
   }
 }

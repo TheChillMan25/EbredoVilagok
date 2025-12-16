@@ -1,0 +1,25 @@
+<div
+  class="adventure-container"
+  style="cursor: pointer"
+  (click)="toggleAdventureDetails()"
+  [ngClass]="{ detailsShown: adventureDetails }"
+>
+  <span class="adventure-name">{{ adventure.name }}</span>
+  <span class="adventure-event-count"
+    >Események száma: {{ adventure.events.length }}</span
+  >
+  <div class="adventure-actions">
+    <div class="fake-button" (click)="deleteAdventure($event)">
+      <mat-icon>delete</mat-icon>
+    </div>
+  </div>
+</div>
+<div class="adventure-details" [ngClass]="{ show: adventureDetails }">
+  <div class="adventure-events">
+    <div class="adventure-events">
+      @for (event of adventure.events; track $index) {
+      <app-event-template [event]="event"></app-event-template>
+      }
+    </div>
+  </div>
+</div>

@@ -173,6 +173,11 @@
     transform: translateY(-50%);
     height: 6rem;
 
+    &.hide {
+        pointer-events: none;
+        opacity: 0;
+      }
+
     mat-icon {
       cursor: pointer;
     }
@@ -290,11 +295,6 @@ app-actions-loot3 {
 
         mat-icon {
           cursor: pointer;
-        }
-
-        &.hide {
-          pointer-events: none;
-          opacity: 0;
         }
       }
 

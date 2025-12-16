@@ -52,10 +52,10 @@ app-mobile-navbar {
   width: 100%;
   height: calc(100% - 4rem);
   background-repeat: no-repeat !important;
-  //background-attachment: fixed;
   background-size: cover !important;
   background-color: #222;
   z-index: 0;
+  pointer-events: none;
 
   #page-blur {
     position: relative;
@@ -104,6 +104,10 @@ button {
 button:hover {
   color: $primary-background !important;
   background-color: $text-secondary !important;
+
+  &.mdc-switch {
+    background-color: transparent !important;
+  }
 }
 
 .title,
@@ -209,10 +213,16 @@ mat-cell:nth-child(even) {
   text-align: center;
 }
 
+div.mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
 mat-card {
   min-width: 50%;
+  max-width: 75%;
   padding: 1rem;
   border: 0.2rem solid #222;
+  gap: 0.5rem;
 
   mat-card-header {
     justify-content: space-between;
@@ -297,6 +307,10 @@ mat-card {
     color: #222;
     background-color: #f2c480;
   }
+}
+
+.hidden-marker {
+  display: none;
 }
 
 /* styles.scss */

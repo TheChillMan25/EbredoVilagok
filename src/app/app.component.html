@@ -13,19 +13,18 @@
       </div>
       <app-navbar></app-navbar>
       <p id="author">Ágas és Bogas</p>
-      <div id="page">
-        <div id="page-blur"></div>
-      </div>
+
       <button
         mat-icon-button
         class="menu-toggle-button"
         (click)="onToggleSidenav(sidenav)"
       >
-        <mat-icon
-          >menu</mat-icon
-        >
+        <mat-icon>menu</mat-icon>
       </button>
     </mat-toolbar>
+    <div id="page">
+      <div id="page-blur"></div>
+    </div>
     <router-outlet />
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -28,10 +28,30 @@
         </div>
         }
       </div>
+      <div id="event-footer">
+        <mat-form-field
+          style="margin-left: auto; width: 100%"
+          appearance="outline"
+        >
+          <mat-label>Kalandnév (min. 3)</mat-label>
+          <input matInput type="text" [formControl]="adventureName" />
+        </mat-form-field>
+        <div id="footer-btns">
+          <div id="create-btn" class="fake-button" (click)="createAdventure()">
+            Létrehozás
+          </div>
+          <div id="help" class="fake-button" (click)="userManual(true)">
+            <mat-icon>question_mark</mat-icon>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="location" class="container">
       <div class="header">
         <span class="header-text">Térkép</span>
+        <div class="fake-button" (click)="changeMap()">
+          <mat-icon>water</mat-icon>
+        </div>
       </div>
       <div id="map-container">
         <app-map-container
@@ -68,146 +88,182 @@
       </div>
     </div>
   </form>
-  <div id="ui-container" [ngClass]="{ show: showUIContainer }">
-    <div
-      id="add-event-ui"
-      class="ui-container"
-      [ngClass]="{ show: showEvents }"
-    >
-      <div class="header">
-        <div class="header-text">Új esemény</div>
-        <div class="fake-button" (click)="hideUIs()">
-          <mat-icon>close</mat-icon>
+  <div id="add-event-ui" class="ui-container" [ngClass]="{ show: showEvents }">
+    <div class="header">
+      <div class="header-text">Új esemény</div>
+      <div class="fake-button" (click)="hideUIs()">
+        <mat-icon>close</mat-icon>
+      </div>
+    </div>
+    <form id="event-form" (ngSubmit)="addEvent()" [formGroup]="eventForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Név</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="name"
+          placeholder="Min. 3 karakter"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Helyszín</mat-label>
+        <mat-select formControlName="location">
+          @for (location of locations; track $index) {
+          <mat-option [value]="location.name">{{ location.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Leírás</mat-label>
+        <textarea
+          matInput
+          id="desc"
+          formControlName="desc"
+          cols="30"
+          rows="5"
+        ></textarea>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Történet</mat-label>
+        <textarea
+          matInput
+          id="story"
+          formControlName="story"
+          cols="30"
+          rows="10"
+        ></textarea>
+      </mat-form-field>
+      @if(eventError !== ''){
+      <div id="event-error" class="error-message">{{ eventError }}</div>
+      }
+      <button class="fake-button" type="submit">
+        {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
+      </button>
+    </form>
+  </div>
+  <div id="add-npc-ui" class="ui-container" [ngClass]="{ show: showNPCs }">
+    <div class="header">
+      <div class="header-text">Új NPC</div>
+      <div class="fake-button" (click)="hideUIs()">
+        <mat-icon>close</mat-icon>
+      </div>
+    </div>
+    <form id="npcForm" (ngSubmit)="addNPC()" [formGroup]="npcForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Név</mat-label>
+        <input matInput type="text" formControlName="name" />
+      </mat-form-field>
+      <span class="header-text">Hozzáállás</span>
+      <mat-radio-group id="attitude" formControlName="attitude">
+        <mat-radio-button
+          (click)="setAttitude('neutral')"
+          aria-labelledby="attitude"
+          value="neutral"
+          labelPosition="before"
+          >Semleges</mat-radio-button
+        >
+        <mat-radio-button
+          (click)="setAttitude('hostile')"
+          aria-labelledby="attitude"
+          value="hostile"
+          labelPosition="before"
+          >Ellenséges</mat-radio-button
+        >
+      </mat-radio-group>
+      <div id="actions-container" formGroupName="actions">
+        <div
+          id="neutral-actions"
+          class="checkbox-container"
+          [ngClass]="{ disabled: this.attitude !== 'neutral' }"
+        >
+          <span class="header-text">Semleges</span>
+          <mat-checkbox
+            class="example-margin"
+            [formControl]="getActions().controls.talk"
+            [disabled]="attitude !== 'neutral'"
+            >Beszéd</mat-checkbox
+          >
+          <mat-checkbox
+            class="example-margin"
+            [formControl]="getActions().controls.trade"
+            [disabled]="attitude !== 'neutral'"
+            >Kereskedés</mat-checkbox
+          >
+        </div>
+        <div
+          id="hostile-actions"
+          class="checkbox-container"
+          [ngClass]="{ disabled: this.attitude !== 'hostile' }"
+        >
+          <span class="header-text">Ellenséges</span>
+          <mat-checkbox
+            class="example-margin"
+            [formControl]="getActions().controls.fight"
+            [disabled]="attitude !== 'hostile'"
+            >Támadás</mat-checkbox
+          >
+          <mat-checkbox
+            class="example-margin"
+            [formControl]="getActions().controls.steal"
+            [disabled]="attitude !== 'hostile'"
+            >Lopás</mat-checkbox
+          >
         </div>
       </div>
-      <form id="event-form" (ngSubmit)="addEvent()" [formGroup]="eventForm">
-        <mat-form-field appearance="outline">
-          <mat-label>Név</mat-label>
-          <input matInput type="text" formControlName="name" placeholder="Min. 3 karakter"/>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Helyszín</mat-label>
-          <mat-select formControlName="location">
-            @for (location of locations; track $index) {
-            <mat-option [value]="location.name">{{ location.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Leírás</mat-label>
-          <textarea
-            matInput
-            id="desc"
-            formControlName="desc"
-            cols="30"
-            rows="5"
-          ></textarea>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Történet</mat-label>
-          <textarea
-            matInput
-            id="story"
-            formControlName="story"
-            cols="30"
-            rows="10"
-          ></textarea>
-        </mat-form-field>
-        @if(eventError !== ''){
-        <div id="event-error" class="error-message">{{ eventError }}</div>
-        }
-        <button class="fake-button" type="submit">
-          {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
+      @if(this.attitude === "hostile"){
+      <mat-form-field appearance="outline">
+        <mat-label>Karakter</mat-label>
+        <mat-select formControlName="character">
+          @for (character of (myCharacters$ | async); track $index) {
+          <mat-option value="{{ character.id }}">{{
+            character.name
+          }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      } @if(npcError !== ''){
+      <div id="npc-error" class="error-message">{{ npcError }}</div>
+      }
+      <button class="fake-button" type="submit">
+        {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
+      </button>
+    </form>
+  </div>
+  <div id="user-manual" [ngClass]="{ show: this.showUseManual }">
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>Használati útmutató</mat-card-title
+        ><mat-card-subtitle>Hogyan készíthetsz kalandot</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          Minden kaland eseményekből épül fel. Ezeket az eseményeket a bal
+          oldalon lévő esemény hozzáadás gombal (<mat-icon
+            style="color: #f2c480"
+            >add</mat-icon
+          >) vagy a térképen egy helyszínre kattintva hozhatod létre. Az
+          eseménynek meg kell adnod egy nevet és egy helyszínt (illetve
+          megadhatsz egyéb leírásokat is).
+        </p>
+        <p>
+          Miután létrehoztál egy eseményt, azt szerkesztheted, törölheted, vagy
+          kiválaszthatod (ezt egy fehér keret jelzi).
+        </p>
+        <p>Egy eseményhez hozzáadhatsz NPC-ket, ha kiválasztottál egyet.</p>
+        <p>
+          Az NPC-nek rendelkeznie kell egy névvel, hozzáálással a többi
+          karaktert tekintve, és a vele végezhető cselekvéseket is meg kell
+          adni. Ha egy NPC ellenséges, akkor egy karaktert lehet hozzá csatolni,
+          amely a harc során használatos (ennek a statjai, HP és Stressz pontjai
+          használatosak).
+        </p>
+        <p>Ezeket az NPC-ket is lehet szerkeszteni, mint az eseményeket.</p>
+      </mat-card-content>
+      <mat-card-footer>
+        <button mat-flat-button type="button" (click)="userManual(false)">
+          OK
         </button>
-      </form>
-    </div>
-    <div id="add-npc-ui" class="ui-container" [ngClass]="{ show: showNPCs }">
-      <div class="header">
-        <div class="header-text">Új NPC</div>
-        <div class="fake-button" (click)="hideUIs()">
-          <mat-icon>close</mat-icon>
-        </div>
-      </div>
-      <form id="npcForm" (ngSubmit)="addNPC()" [formGroup]="npcForm">
-        <mat-form-field appearance="outline">
-          <mat-label>Név</mat-label>
-          <input matInput type="text" formControlName="name" />
-        </mat-form-field>
-        <span class="header-text">Hozzáállás</span>
-        <mat-radio-group id="attitude" formControlName="attitude">
-          <mat-radio-button
-            (click)="setAttitude('neutral')"
-            aria-labelledby="attitude"
-            value="neutral"
-            labelPosition="before"
-            >Semleges</mat-radio-button
-          >
-          <mat-radio-button
-            (click)="setAttitude('hostile')"
-            aria-labelledby="attitude"
-            value="hostile"
-            labelPosition="before"
-            >Ellenséges</mat-radio-button
-          >
-        </mat-radio-group>
-        <div id="actions-container" formGroupName="actions">
-          <div
-            id="neutral-actions"
-            class="checkbox-container"
-            [ngClass]="{ disabled: this.attitude !== 'neutral' }"
-          >
-            <span class="header-text">Semleges</span>
-            <mat-checkbox
-              class="example-margin"
-              [formControl]="getActions().controls.talk"
-              [disabled]="attitude !== 'neutral'"
-              >Beszéd</mat-checkbox
-            >
-            <mat-checkbox
-              class="example-margin"
-              [formControl]="getActions().controls.trade"
-              [disabled]="attitude !== 'neutral'"
-              >Kereskedés</mat-checkbox
-            >
-          </div>
-          <div
-            id="hostile-actions"
-            class="checkbox-container"
-            [ngClass]="{ disabled: this.attitude !== 'hostile' }"
-          >
-            <span class="header-text">Ellenséges</span>
-            <mat-checkbox
-              class="example-margin"
-              [formControl]="getActions().controls.fight"
-              [disabled]="attitude !== 'hostile'"
-              >Támadás</mat-checkbox
-            >
-            <mat-checkbox
-              class="example-margin"
-              [formControl]="getActions().controls.steal"
-              [disabled]="attitude !== 'hostile'"
-              >Lopás</mat-checkbox
-            >
-          </div>
-        </div>
-        @if(this.attitude === "hostile"){
-        <mat-form-field appearance="outline">
-          <mat-label>Karakter</mat-label>
-          <mat-select formControlName="character">
-            @for (character of (myCharacters$ | async); track $index) {
-            <mat-option value="{{ character.id }}">{{
-              character.name
-            }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        } @if(npcError !== ''){
-        <div id="npc-error" class="error-message">{{ npcError }}</div>
-        }
-        <button class="fake-button" type="submit">
-          {{ action }}<mat-icon>{{ actionIcon }}</mat-icon>
-        </button>
-      </form>
-    </div>
+      </mat-card-footer>
+    </mat-card>
   </div>
 </div>

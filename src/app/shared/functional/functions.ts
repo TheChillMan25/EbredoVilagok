@@ -2,7 +2,7 @@ import { species as Species } from '../../pages/world/species/species_desc_data'
 import { Character } from '../models/models';
 import { NationData } from '../models/NationData';
 import { classes } from '../models/classes';
-import { weapons, armours } from '../models/equipment';
+import { weapons, armours, getWeapon } from '../models/equipment';
 import {
   foodRations,
   items,
@@ -191,10 +191,27 @@ export function checkStatNumbers(numbers: number[]) {
   console.log('On edges: ' + onEdges);
 }
 
+function createRandomEquipment(){
+  while (true) {
+    const equipment = {
+      left: Math.floor(Math.random() * weapons.length),
+      right: Math.floor(Math.random() * weapons.length),
+      armour: Math.floor(Math.random() * armours.length),
+    };
+    if (checkEquipment(equipment.left, equipment.right)) return equipment;
+  }
+}
+
+function checkEquipment(left: number, right: number){
+  return !(
+    (getWeapon(left).handed === 2 && getWeapon(right).handed !== 0) ||
+    (getWeapon(left).handed !== 0 && getWeapon(right).handed === 2)
+  );
+}
+
 export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
-  console.log(charName);
   let stats = createStats();
   let randomCharacter: Omit<Character, 'id'> = {
     currentAdventure: '',
@@ -202,7 +219,7 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
     species: NationData.map((nation) => nation.nationName)[
       Math.floor(Math.random() * 17)
     ],
-    class: classes[Math.max(Math.floor(Math.random() * classes.length - 1))],
+    class: classes[Math.floor(Math.random() * (classes.length - 1))],
     level: 1,
     specialProperties: {
       speciesProperty: Math.floor(Math.random() * 6),
@@ -227,18 +244,14 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
           Math.ceil(Math.random() * 4),
       },
     },
-    equipment: {
-      left: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
-      right: Math.max(Math.floor(Math.random() * weapons.length - 1), 0),
-      armour: Math.max(Math.floor(Math.random() * armours.length - 1), 0),
-    },
+    equipment: createRandomEquipment(),
     virtues: {
       virtues: [
-        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
-        Math.max(Math.floor(Math.random() * virtues.length - 1), 0),
+        Math.floor(Math.random() * virtues.length),
+        Math.floor(Math.random() * virtues.length),
       ],
       disadv: [
-        Math.max(Math.floor(Math.random() * disadvantages.length - 1), 0),
+        Math.floor(Math.random() * disadvantages.length)
       ],
     },
     items: {
@@ -265,14 +278,15 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
   return randomCharacter;
 }
 
-export function getItem(type: string, index: number) {
+export function getItem(
+  type: 'food' | 'otherItems' | 'specialItems',
+  index: number
+) {
   const map: Record<string, any> = {
     food: foodRations,
     otherItems: items,
     specialItems: medicalItems.concat(specialDrinks),
   };
 
-  if (map[type][index]) {
-    return map[type][index];
-  }
+  return map[type][index];
 }

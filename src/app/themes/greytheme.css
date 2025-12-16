@@ -301,10 +301,40 @@ html {
   --mdc-outlined-text-field-focus-label-text-color: #f2c480;
   --mdc-filled-button-label-text-color: #333;
 
+  /*Mat-select*/
+  /*--mat-select-panel-background-color: #555;*/
+  --mdc-list-list-item-hover-label-text-color: #f2c480;
+  --mat-option-focus-state-layer-color: #555;
+  --mat-option-hover-state-layer-color: #555;
+  --mat-option-selected-state-layer-color: #f2c480;
+
   /*Mat-card*/
   --mdc-outlined-card-container-color: #333;
   --mat-card-title-text-size: xx-large;
   --mat-card-subtitle-text-size: larger;
   --mdc-outlined-card-outline-width: 0.2rem;
   --mdc-outlined-card-outline-color: #222;
+
+  /*Mat-slide-toggle*/
+  --mdc-switch-unselected-track-color: #222;
+  --mdc-switch-unselected-hover-track-color: #444;
+  --mdc-switch-unselected-focus-track-color: 333;
+
+  --mdc-switch-unselected-handle-color: var(--mat-sys-primary);
+  --mdc-switch-unselected-hover-handle-color: whitesmoke;
+  --mdc-switch-unselected-focus-handle-color: whitesmoke;
+  --mdc-switch-unselected-pressed-track-color: #222;
+
+  --mdc-switch-selected-track-color: #222;
+  --mdc-switch-selected-hover-track-color: #444;
+  --mdc-switch-selected-focus-track-color: 333;
+  --mdc-switch-selected-handle-color: var(--mat-sys-primary);
+  --mdc-switch-selected-focus-handle-color: whitesmoke;
+  --mdc-switch-selected-pressed-track-color: #222;
+
+  --mat-switch-track-outline-color: #444;
+  --mat-switch-selected-track-outline-color: #444;
+
+  --mdc-switch-unselected-icon-color: #222;
+  --mdc-switch-selected-icon-color: #222;
 }

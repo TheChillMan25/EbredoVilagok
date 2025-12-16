@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import {
   convertSpeciesNameToKey,
   createRandomCharacter,
+  getItem,
   setBackground,
 } from '../../../shared/functional/functions';
 import {
@@ -18,11 +19,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { NationData } from '../../../shared/models/NationData';
 import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
-import { armours, weapons } from '../../../shared/models/equipment';
+import { armours, getWeapon, weapons } from '../../../shared/models/equipment';
 import { Armour } from '../../../shared/models/character_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,
+  getCharacterVirDisAdv,
 } from '../../../shared/models/virtues_disadvantages';
 import {
   foodRations,
@@ -34,10 +36,17 @@ import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Observable } from 'rxjs';
+
+export interface CanComponentDeactivate {
+  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
 
 @Component({
   selector: 'app-karakter',
   imports: [
+    MatTooltipModule,
     MatLabel,
     MatFormFieldModule,
     ReactiveFormsModule,
@@ -49,7 +58,7 @@ import { NgClass } from '@angular/common';
   templateUrl: './karakter.component.html',
   styleUrl: './karakter.component.scss',
 })
-export class KarakterComponent {
+export class KarakterComponent implements CanComponentDeactivate {
   errorMessage: string = '';
   mainForm!: FormGroup;
   speciesList = NationData.map((nation) => nation.nationName);
@@ -117,13 +126,26 @@ export class KarakterComponent {
     private router: Router
   ) {}
 
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.mainForm.dirty) {
+      return confirm(
+        'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
+      );
+    }
+    return true;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this.mainForm.dirty) {
+      $event.returnValue = true;
+    }
+  }
+
   ngOnInit() {
     console.log(this.medicalItems.length, this.specialDrinks.length);
     setBackground('paper_bg');
     this.initForm();
-    /* this.mainForm.patchValue({ name: 'Stefan' });
-    this.mainForm.patchValue({ stats: { mental: { esz: 10 } } });
-    console.log(this.mainForm.get('stats.mental.esz')?.value); */
   }
 
   initForm() {
@@ -138,35 +160,35 @@ export class KarakterComponent {
       stats: this.fb.group({
         physical: this.fb.group({
           ero: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           ugyesseg: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           kitartas: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         mental: this.fb.group({
           esz: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           fortely: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
           akaratero: [
-            0,
+            '',
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         main: this.fb.group({
-          hp: [1, Validators.min(1)],
-          sp: [1, Validators.min(1)],
+          hp: ['', [Validators.required, Validators.min(1)]],
+          sp: ['', [Validators.required, Validators.min(1)]],
         }),
       }),
       equipment: this.fb.group({
@@ -199,99 +221,122 @@ export class KarakterComponent {
     });
   }
 
-  /**
-   * Creates character with given form data. Not given data means empty character property.
-   * @param random If true, creates a random character.
-   */
-  createCharacter(random: boolean = false) {
-    if (!this.mainForm.valid && !random) {
+  createCharacter() {
+    if (!this.mainForm.valid) {
       this.errorMessage =
         'Karakter nem készíthető el, tölts ki minden kötelező mezőt!';
       return;
     }
     const formValue = this.mainForm.value;
-    if (random) {
-      if (formValue.name === '') {
-        this.errorMessage = 'Adj meg egy nevet!';
-        return;
-      }
-      console.log('Creating random character...');
-      let randomCharacter = createRandomCharacter(formValue.name);
-      console.log(randomCharacter);
-      this.charService
-        .addCharacter(randomCharacter)
-        .then(() => {
-          this.mainForm.reset();
-        })
-        .catch((error) => {
-          console.error('Hiba a karakter létrehozása során: ', error);
-        })
-        .finally(() => {
-          console.log('Karakter létrehozva: ', randomCharacter);
-          this.router.navigateByUrl('/profil');
-        });
-    } else {
-      console.log('Creating new character');
-      let newCharacter: Omit<Character, 'id'> = {
-        currentAdventure: '',
-        name: formValue.name || '',
-        species: formValue.species || '',
-        class: formValue.class || '',
-        level: 1,
-        specialProperties: formValue.specialProperties || {
-          speciesProperty: 0,
-          home: 0,
+
+    let newCharacter: Omit<Character, 'id'> = {
+      currentAdventure: '',
+      name: formValue.name || '',
+      species: formValue.species || '',
+      class: formValue.class || '',
+      level: 1,
+      specialProperties: formValue.specialProperties || {
+        speciesProperty: 0,
+        home: 0,
+      },
+      stats: formValue.stats || {
+        physical: {
+          ero: 1,
+          ugyesseg: 1,
+          kitartas: 1,
         },
-        stats: formValue.stats || {
-          physical: {
-            ero: 1,
-            ugyesseg: 1,
-            kitartas: 1,
-          },
-          mental: {
-            esz: 1,
-            fortely: 1,
-            akaratero: 1,
-          },
-          main: {
-            hp: 1,
-            sp: 1,
-          },
+        mental: {
+          esz: 1,
+          fortely: 1,
+          akaratero: 1,
         },
-        equipment: formValue.equipment || {
-          left: '',
-          right: '',
-          armour: '',
+        main: {
+          hp: 1,
+          sp: 1,
         },
-        virtues: formValue.virtues || {
-          virtues: [],
-          disadvantage: [],
-        },
-        items: formValue.items || {
-          food: [],
-          specialItems: [],
-          otherItems: [],
-          weaponItems: [],
-        },
-        wounds: {
-          small: 0,
-          large: 0,
-        },
-      };
-      console.log(newCharacter);
-      this.charService
-        .addCharacter(newCharacter)
-        .then(() => {
-          this.mainForm.reset();
-        })
-        .catch((error) => {
-          console.error('Hiba a karakter létrehozása során: ', error);
-        })
-        .finally(() => {
-          console.log('Karakter létrehozva: ', newCharacter);
-          this.router.navigateByUrl('/profil');
-        });
+      },
+      equipment: formValue.equipment || {
+        left: '',
+        right: '',
+        armour: '',
+      },
+      virtues: formValue.virtues || {
+        virtues: [],
+        disadvantage: [],
+      },
+      items: formValue.items || {
+        food: [],
+        specialItems: [],
+        otherItems: [],
+        weaponItems: [],
+      },
+      wounds: {
+        small: 0,
+        large: 0,
+      },
+    };
+
+    if (
+      getWeapon(newCharacter.equipment.left).handed === 2 &&
+      getWeapon(newCharacter.equipment.right).handed !== 0
+    ) {
+      this.errorMessage =
+        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
+      return;
+    } else if (
+      getWeapon(newCharacter.equipment.right).handed === 2 &&
+      getWeapon(newCharacter.equipment.left).handed !== 0
+    ) {
+      this.errorMessage =
+        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
+      return;
     }
+
+    this.charService
+      .addCharacter(newCharacter)
+      .then(() => {
+        this.mainForm.reset();
+      })
+      .catch((error) => {
+        console.error('Hiba a karakter létrehozása során: ', error);
+      })
+      .finally(() => {
+        console.log('Karakter létrehozva: ', newCharacter);
+        this.router.navigateByUrl('/profil');
+      });
+  }
+
+  createRandomCharacter() {
+    const charName = this.mainForm.get('name')?.value;
+    if (charName === '' || charName.length < 3) {
+      this.errorMessage = 'Töltsd ki a név mezőt!';
+      return;
+    }
+    const random = createRandomCharacter(charName);
+    console.log(random);
+
+    this.mainForm.get('species')?.setValue(random.species);
+    this.setRelevantSpeciesData(random.species);
+
+    this.mainForm.patchValue({
+      class: random.class,
+      level: random.level,
+      specialProperties: {
+        speciesProperty: random.specialProperties.speciesProperty,
+      },
+      stats: random.stats,
+      equipment: random.equipment,
+      virtues: {
+        virtues: random.virtues.virtues,
+        disadvantage: random.virtues.disadv,
+      },
+      items: random.items,
+    });
+
+    this.mainForm
+      .get('specialProperties.home')
+      ?.setValue(random.specialProperties.home);
+    this.selectHome(random.specialProperties.home);
   }
 
   selectHome(index: any) {

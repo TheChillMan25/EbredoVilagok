@@ -6,6 +6,7 @@ import { firstValueFrom, map, Observable, switchMap, take } from 'rxjs';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -89,5 +90,35 @@ export class CharacterService {
       }),
       map((characters) => characters as Character[])
     );
+  }
+
+  async deleteCharacter(charId: string): Promise<void> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+
+      if (!user) throw new Error('Nem található felhasználó!');
+
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) throw new Error('A felhasználó nem létezik!');
+
+      const userData = userDoc.data() as User;
+      if (!userData.characters || !userData.characters.includes(charId))
+        throw new Error('Nem társítható karakter a felhasználóhoz');
+
+      const charDocRef = doc(this.firestore, 'Characters', charId);
+      await deleteDoc(charDocRef);
+
+      const updatedCharacters = userData.characters.filter(
+        (id) => id !== charId
+      );
+      return updateDoc(userDocRef, { characters: updatedCharacters });
+    } catch (error) {
+      console.error('Hiba a karakter törlésekor: ', error);
+      throw error;
+    }
   }
 }

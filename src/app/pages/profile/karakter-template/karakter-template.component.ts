@@ -1,27 +1,34 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Character } from '../../../shared/models/models';
 import {
   getHome,
   getSpeciesSpecial,
 } from '../../../shared/functional/functions';
 import { NgClass } from '@angular/common';
-import { MatIcon } from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon';
+import { CharacterService } from '../../../shared/services/character/character.service';
+import { Router } from '@angular/router';
+import { DeleteWarningComponent } from '../delete-warning/delete-warning.component';
 
 @Component({
   selector: 'app-karakter-template',
-  imports: [NgClass, MatIcon],
+  imports: [NgClass, MatIcon, DeleteWarningComponent],
   templateUrl: './karakter-template.component.html',
   styleUrl: './karakter-template.component.scss',
 })
 export class KarakterTemplateComponent {
-  @Input() character?: Character;
+  @Input() character!: Character;
+  @Output() deletedCharacter = new EventEmitter<void>();
   showSpecDescs: boolean = false;
+  showWarning: boolean = false;
 
   speciesSpecial!: { desc: string };
   home!: { desc: string; bonus: { name: string; mod: string }[] };
 
   stats: { name: string; value: string }[] = [];
   mainStats: { name: string; value: number }[] = [];
+
+  constructor(private charService: CharacterService, private router: Router) {}
 
   ngOnInit() {
     this.createStats();
@@ -98,5 +105,27 @@ export class KarakterTemplateComponent {
 
   hideSpecDescs() {
     this.showSpecDescs = false;
+  }
+
+  closeWarning() {
+    this.showWarning = false;
+  }
+
+  deleteCharacter() {
+    const doNotRemind = localStorage.getItem('deleteNoRemind');
+
+    if (doNotRemind === null) {
+      this.showWarning = true;
+      localStorage.setItem('deleteNoRemind', 'false');
+    }
+    if (doNotRemind === 'true' || (this.showWarning && doNotRemind === 'false')) {
+      if (this.character?.id) {
+        this.charService.deleteCharacter(this.character.id);
+        this.deletedCharacter.emit();
+      }
+    } else if(!this.showWarning && doNotRemind === 'false') {
+      this.showWarning = true;
+      localStorage.setItem('deleteNoRemind', 'false');
+    }
   }
 }

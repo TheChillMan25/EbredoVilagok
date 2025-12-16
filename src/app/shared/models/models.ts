@@ -82,7 +82,7 @@ export interface ForumPost {
 
 export interface Adventure {
   id: string;
-  name: string;
+  name: string | null;
   events: AdventureEvent[];
   players: Player[];
   currentPlayer: string;

@@ -1,9 +1,9 @@
 <div class="character-container">
   <div class="personal inner-char-container">
-    <span class="name">{{ character?.name }}</span>
-    <span class="species">{{ character?.species }}</span>
-    <span class="class">{{ character?.class }}</span>
-    <span class="level">{{ character?.level }}. szint</span>
+    <span class="name">{{ character.name }}</span>
+    <span class="species">{{ character.species }}</span>
+    <span class="class">{{ character.class }}</span>
+    <span class="level">{{ character.level }}. szint</span>
     <div class="character-buttons">
       <div class="fake-button" (click)="showSpecielDescs('special')">
         Népi tul.
@@ -40,9 +40,18 @@
     </div>
   </div>
   <div class="spec-container" [ngClass]="{ show: showSpecDescs }">
-    <div [id]="character?.id" class="text-container"></div>
+    <div [id]="character.id" class="text-container"></div>
     <div class="fake-button" (click)="hideSpecDescs()">
       <mat-icon>close</mat-icon>
     </div>
+  </div>
+  <div class="fake-button delete" (click)="deleteCharacter()">
+    <mat-icon>delete</mat-icon>
+  </div>
+  <div class="warning" [ngClass]="{ show: showWarning }">
+    <app-delete-warning
+      (deleteEvent)="deleteCharacter()"
+      (closeEvent)="closeWarning()"
+    ></app-delete-warning>
   </div>
 </div>

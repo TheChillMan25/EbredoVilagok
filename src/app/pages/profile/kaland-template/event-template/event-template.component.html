@@ -1,0 +1,30 @@
+<div class="event">
+  <p class="event-name">{{ event.name }}</p>
+  <div class="event-details">
+    <p><span class="p-title">Helyszín:</span> {{ event.location }}</p>
+    <span class="fake-button" (click)="showNPCs()">NPC-k:</span>
+    <span class="p-title">Leírás:</span>
+    <p>{{ event.desc }}</p>
+    <span class="p-title">Történet:</span>
+    <p>{{ event.story }}</p>
+  </div>
+  <div class="npcs" [ngClass]="{ show: visibleNPCs }">
+    @for (npc of event.NPCs; track $index) {
+    <!-- <app-npc-template [npc]="npc"></app-npc-template> -->
+
+    <div class="npc">
+      <span>{{ npc.name }}</span>
+      <mat-icon fontSet="material-symbols-outlined"
+        >@if(npc.attitude === 'neutral'){handshake}@else{swords}</mat-icon
+      >
+    </div>
+    }
+  </div>
+  <div
+    class="fake-button close-npcs"
+    (click)="hideNPCs()"
+    [ngClass]="{ show: visibleNPCs }"
+  >
+    <mat-icon>close</mat-icon>
+  </div>
+</div>
