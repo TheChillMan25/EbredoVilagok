@@ -209,6 +209,8 @@ export class UserService {
         const post: ForumPost = {
           id: doc.id,
           title: postData?.['title'] ?? '',
+          poster: postData?.['poster'] ?? '',
+          posterUID: postData?.['posterUID'] ?? '',
           text: postData?.['text'] ?? '',
           attachments: postData?.['attachments'] ?? '',
           sentDate: postData?.['sentDate'] ?? '',

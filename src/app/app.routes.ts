@@ -80,8 +80,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/map/map.component').then((m) => m.MapComponent),
     canActivate: [publicGuard],
-  },
-  /*{
+  },/*
+  {
     path: 'forum',
     title: 'Ébredő Világok | Fórum',
     loadComponent: () =>

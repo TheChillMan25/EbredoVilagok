@@ -1,0 +1,16 @@
+<div class="post-container">
+  <div class="post-header">
+    <div class="post-title">{{ post.title }}</div>
+    <span class="post-poster"
+      >{{ post.poster }}<mat-icon>person</mat-icon></span
+    >
+  </div>
+  <div class="post-body">
+    <span class="post-text">{{ post.text }}</span>
+  </div>
+  <div class="post-attachments">
+    <div class="fake-button"><mat-icon>attachment</mat-icon></div>
+    <span>Csatolva: {{ post.attachments.length }} db karakter(ek)</span>
+    <span class="post-date">{{ post.sentDate }}</span>
+  </div>
+</div>

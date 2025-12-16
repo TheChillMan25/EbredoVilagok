@@ -92,6 +92,38 @@ export class CharacterService {
     );
   }
 
+  async getCharacterByID(charID: string): Promise<Character | null> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+      if (!user) {
+        return null;
+      }
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        return null;
+      }
+      const userData = userDoc.data() as User;
+      if (!userData.characters || !userData.characters.includes(charID)) {
+        return null;
+      }
+
+      const charDocRef = doc(this.firestore, 'Characters', charID);
+      const charSnapShot = await getDoc(charDocRef);
+      if (charSnapShot.exists()) {
+        return { ...charSnapShot.data(), id: charID } as Character;
+      }
+
+      console.error('Karakter nem található!');
+      return null;
+    } catch (error) {
+      console.error('Hiba a karakter lekérdezésekor: ', error);
+      return null;
+    }
+  }
+
   async deleteCharacter(charId: string): Promise<void> {
     try {
       const user = await firstValueFrom(

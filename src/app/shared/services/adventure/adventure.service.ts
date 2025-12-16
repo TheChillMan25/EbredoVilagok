@@ -91,6 +91,38 @@ export class AdventureService {
     );
   }
 
+  async getAdventureByID(advID: string): Promise<Adventure | null> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+      if (!user) {
+        return null;
+      }
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        return null;
+      }
+      const userData = userDoc.data() as User;
+      if (!userData.adventures || !userData.adventures.includes(advID)) {
+        return null;
+      }
+
+      const advDocRef = doc(this.firestore, 'Adventures', advID);
+      const advSnapShot = await getDoc(advDocRef);
+      if (advSnapShot.exists()) {
+        return { ...advSnapShot.data(), id: advID } as Adventure;
+      }
+
+      console.error('Karakter nem található!');
+      return null;
+    } catch (error) {
+      console.error('Hiba a karakter lekérdezésekor: ', error);
+      return null;
+    }
+  }
+
   async deleteAdventure(advId: string): Promise<void> {
     try {
       const user = await firstValueFrom(

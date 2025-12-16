@@ -36,6 +36,7 @@
           <mat-label>Kalandnév (min. 3)</mat-label>
           <input matInput type="text" [formControl]="adventureName" />
         </mat-form-field>
+        <div id="advError" class="error-message">{{ advError }}</div>
         <div id="footer-btns">
           <div id="create-btn" class="fake-button" (click)="createAdventure()">
             Létrehozás
