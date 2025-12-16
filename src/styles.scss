@@ -52,10 +52,10 @@ app-mobile-navbar {
   width: 100%;
   height: calc(100% - 4rem);
   background-repeat: no-repeat !important;
-  //background-attachment: fixed;
   background-size: cover !important;
   background-color: #222;
   z-index: 0;
+  pointer-events: none;
 
   #page-blur {
     position: relative;
