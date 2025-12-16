@@ -14,6 +14,8 @@ export class NavbarComponent {
   isLoggedIn: boolean = false;
   @Output() isLoggedOutEvent = new EventEmitter<boolean>();
 
+  showContact: boolean = false;
+
   private authSubscription?: Subscription;
 
   constructor(private authService: AuthService) {}
@@ -33,5 +35,9 @@ export class NavbarComponent {
 
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
+  }
+
+  toggleContact() {
+    this.showContact = !this.showContact;
   }
 }

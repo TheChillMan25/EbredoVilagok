@@ -29,7 +29,7 @@
           (deletedCharacter)="loadCharAdvData()"
         ></app-karakter-template>
         }}@else {
-        <span class="warning">Nincsenek megjeleníthető karakterek</span> }
+        <span class="emptyWarning">Nincsenek megjeleníthető karakterek</span> }
       </div>
       <div
         id="adventure-container"
@@ -42,7 +42,7 @@
           [adventure]="adventure"
           (deletedAdventure)="loadCharAdvData()"
         ></app-kaland-template>
-        }}@else {<span class="warning">Nincsenek megjeleníthető kalandok</span>}
+        }}@else {<span class="emptyWarning">Nincsenek megjeleníthető kalandok</span>}
       </div>
     </div>
     <div id="button-container">
