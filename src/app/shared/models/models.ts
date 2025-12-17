@@ -1,16 +1,22 @@
+import { FieldValue, Timestamp } from 'firebase/firestore';
+
 export interface User {
   id: string | null | undefined;
   username: string | null | undefined;
   email: string | null | undefined;
   characters: string[];
   adventures: string[];
-  posts: string[];
 }
 
 export interface ForumUser {
   id: string | null | undefined;
   username: string | null | undefined;
   posts: ForumPost[];
+}
+
+export enum ForumTopic {
+  CHARACTER,
+  ADVENTURE,
 }
 
 export interface Character {
@@ -74,10 +80,11 @@ export interface SubForum {
 
 export interface ForumPost {
   id: string;
+  forumID: ForumTopic;
   title: string;
-  poster: string;
-  posterUID: string;
-  sentDate: string;
+  poster: string | null | undefined;
+  posterUID: string | null | undefined;
+  createdAt: Timestamp | FieldValue;
   text: string;
   attachments: string[];
 }

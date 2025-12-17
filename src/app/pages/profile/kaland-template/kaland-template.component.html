@@ -8,11 +8,13 @@
   <span class="adventure-event-count"
     >Események száma: {{ adventure.events.length }}</span
   >
+  @if(!isPublic){
   <div class="adventure-actions">
     <div class="fake-button" (click)="deleteAdventure($event)">
       <mat-icon>delete</mat-icon>
     </div>
   </div>
+  }
 </div>
 <div class="adventure-details" [ngClass]="{ show: adventureDetails }">
   <div class="adventure-events">

@@ -18,6 +18,7 @@ import { DeleteWarningComponent } from '../delete-warning/delete-warning.compone
 })
 export class KarakterTemplateComponent {
   @Input() character!: Character;
+  @Input() isPublic: boolean = false;
   @Output() deletedCharacter = new EventEmitter<void>();
   showSpecDescs: boolean = false;
   showWarning: boolean = false;

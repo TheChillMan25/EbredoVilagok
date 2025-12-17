@@ -11,9 +11,11 @@ import {
 } from '../../models/models';
 import {
   collection,
+  collectionGroup,
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   where,
 } from 'firebase/firestore';
@@ -192,15 +194,13 @@ export class UserService {
       const userData = userSnapshot.data() as ForumUser;
       const user = { ...userData, id: userID };
 
-      if (!user.posts || user.posts.length === 0) {
-        return {
-          user,
-          posts: [] as ForumPost[],
-        };
-      }
+      const postCollection = collectionGroup(this.firestore, 'Posts');
+      const q = query(
+        postCollection,
+        where('posterUID', '==', user.id),
+        orderBy('createdAt', 'desc')
+      );
 
-      const postCollection = collection(this.firestore, 'ForumPosts');
-      const q = query(postCollection, where('id', 'in', user.posts));
       const postsSnapShot = await getDocs(q);
 
       const posts: ForumPost[] = [];
@@ -208,12 +208,13 @@ export class UserService {
         const postData = doc.data();
         const post: ForumPost = {
           id: doc.id,
+          forumID: postData?.['forumID'] ?? '',
           title: postData?.['title'] ?? '',
           poster: postData?.['poster'] ?? '',
           posterUID: postData?.['posterUID'] ?? '',
           text: postData?.['text'] ?? '',
-          attachments: postData?.['attachments'] ?? '',
-          createdAt: postData?.['createdAt'] ?? '',
+          attachments: postData?.['attachments'] ?? [],
+          createdAt: postData?.['createdAt'] ?? null,
         };
         posts.push(post);
       });

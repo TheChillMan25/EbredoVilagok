@@ -9,8 +9,49 @@
     <span class="post-text">{{ post.text }}</span>
   </div>
   <div class="post-attachments">
-    <div class="fake-button"><mat-icon>attachment</mat-icon></div>
+    <div class="fake-button" matTooltip="Hozzászólás">
+      <mat-icon>chat</mat-icon>
+    </div>
+    @if(post.attachments.length > 0){
+    <div
+      class="fake-button"
+      matTooltip="Csatolmány(ok)"
+      (click)="showAttached()"
+    >
+      <mat-icon>attachment</mat-icon>
+    </div>
     <span>Csatolva: {{ post.attachments.length }} db karakter(ek)</span>
-    <span class="post-date">{{ post.sentDate }}</span>
+    }
+    <span class="post-date">
+      {{ createdAtDate | date : "yyyy.MM.dd. HH:mm" }}
+    </span>
+  </div>
+</div>
+<!-- <div class="comments">
+  <div class="comment">
+    <div class="comment-header">
+      <div class="comment-sender">Levi</div>
+      <div class="comment-date">2025.12.08.</div>
+    </div>
+  </div>
+</div> -->
+<div id="attachment-ui" [ngClass]="{ show: showAttachments }">
+  <div class="attachment-container">
+    <div class="attachments">
+      @for (item of attachments; track $index) { @if(type === 'character'){
+      <app-karakter-template
+        [character]="$any(item)"
+        [isPublic]="true"
+      ></app-karakter-template>
+      }@else {
+      <app-kaland-template
+        [adventure]="$any(item)"
+        [isPublic]="true"
+      ></app-kaland-template>
+      } }
+    </div>
+    <div class="fake-button" (click)="closeAttached()">
+      <mat-icon>close</mat-icon>
+    </div>
   </div>
 </div>
