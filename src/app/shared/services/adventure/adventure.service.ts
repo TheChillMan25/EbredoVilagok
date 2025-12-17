@@ -4,7 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { Adventure, User } from '../../models/models';
 import { firstValueFrom, map, Observable, switchMap, take } from 'rxjs';
 import {
-  addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -13,6 +13,7 @@ import {
   query,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 
 @Injectable({
@@ -28,25 +29,26 @@ export class AdventureService {
       );
       if (!user) throw new Error('Felhasználó nem található!');
 
-      const adventureCollection = collection(this.firestore, 'Adventures');
-      const docRef = await addDoc(adventureCollection, adventure);
-      const advID = docRef.id;
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
 
-      await updateDoc(docRef, { id: advID });
+      const adventuresColRef = collection(this.firestore, 'Adventures');
+      const adventureDocRef = doc(adventuresColRef); // előre generált ID
+
       const newAdventure: Adventure = {
         ...adventure,
-        id: advID,
-      } as Adventure;
+        id: adventureDocRef.id,
+      };
 
-      const userDocRef = doc(this.firestore, 'Users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+      const batch = writeBatch(this.firestore);
+      batch.set(adventureDocRef, newAdventure);
+      batch.update(userDocRef, {
+        adventures: arrayUnion(adventureDocRef.id),
+      });
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as User;
-        const adventures = userData.adventures || [];
-        adventures.push(advID);
-        await updateDoc(userDocRef, { adventures });
-      }
+      await batch.commit();
+
       return newAdventure;
     } catch (error) {
       console.error('Error adding adventure: ', error);
@@ -119,6 +121,21 @@ export class AdventureService {
       return null;
     } catch (error) {
       console.error('Hiba a karakter lekérdezésekor: ', error);
+      return null;
+    }
+  }
+
+  async getPublicAdventureByID(advID: string): Promise<Adventure | null> {
+    try {
+      const advDocRef = doc(this.firestore, 'Adventures', advID);
+      const advSnapShot = await getDoc(advDocRef);
+
+      if (advSnapShot.exists()) {
+        return { ...advSnapShot.data(), id: advID } as Adventure;
+      }
+      return null;
+    } catch (error) {
+      console.error('Hiba a publikus kaland lekérésekor: ', error);
       return null;
     }
   }

@@ -4,7 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { Character, User } from '../../models/models';
 import { firstValueFrom, map, Observable, switchMap, take } from 'rxjs';
 import {
-  addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -13,6 +13,7 @@ import {
   query,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 
 @Injectable({
@@ -28,25 +29,25 @@ export class CharacterService {
       );
       if (!user) throw new Error('Felhasználó nem található!');
 
-      const characterCollection = collection(this.firestore, 'Characters');
-      const docRef = await addDoc(characterCollection, character);
-      const charID = docRef.id;
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
 
-      await updateDoc(docRef, { id: charID });
+      const charactersColRef = collection(this.firestore, 'Characters');
+      const characterDocRef = doc(charactersColRef);
+
       const newCharacter: Character = {
         ...character,
-        id: charID,
-      } as Character;
+        id: characterDocRef.id,
+      };
 
-      const userDocRef = doc(this.firestore, 'Users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+      const batch = writeBatch(this.firestore);
+      batch.set(characterDocRef, newCharacter);
+      batch.update(userDocRef, {
+        characters: arrayUnion(characterDocRef.id),
+      });
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as User;
-        const characters = userData.characters || [];
-        characters.push(charID);
-        await updateDoc(userDocRef, { characters });
-      }
+      await batch.commit();
 
       return newCharacter;
     } catch (error) {
@@ -120,6 +121,21 @@ export class CharacterService {
       return null;
     } catch (error) {
       console.error('Hiba a karakter lekérdezésekor: ', error);
+      return null;
+    }
+  }
+
+  async getPublicCharacterByID(charID: string): Promise<Character | null> {
+    try {
+      const charDocRef = doc(this.firestore, 'Characters', charID);
+      const charSnapShot = await getDoc(charDocRef);
+
+      if (charSnapShot.exists()) {
+        return { ...charSnapShot.data(), id: charID } as Character;
+      }
+      return null;
+    } catch (error) {
+      console.error('Hiba a publikus karakter lekérésekor: ', error);
       return null;
     }
   }

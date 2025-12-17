@@ -213,7 +213,7 @@ export class UserService {
           posterUID: postData?.['posterUID'] ?? '',
           text: postData?.['text'] ?? '',
           attachments: postData?.['attachments'] ?? '',
-          sentDate: postData?.['sentDate'] ?? '',
+          createdAt: postData?.['createdAt'] ?? '',
         };
         posts.push(post);
       });
