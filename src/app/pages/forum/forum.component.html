@@ -2,8 +2,20 @@
   <div id="sub-forum-panel" [ngClass]="{ open: showForums }">
     <span class="sub-forum-title">Fórumok</span>
     <hr />
-    <div class="subforum" (click)="changeForum('char')">Karakterek</div>
-    <div class="subforum" (click)="changeForum('adv')">Kalandok</div>
+    <div
+      class="subforum"
+      (click)="changeForum('char')"
+      [ngClass]="{ active: showCharForum }"
+    >
+      Karakterek
+    </div>
+    <div
+      class="subforum"
+      (click)="changeForum('adv')"
+      [ngClass]="{ active: !showCharForum }"
+    >
+      Kalandok
+    </div>
   </div>
   <div id="toggle-btns">
     <div id="sub-toggle" class="toggle-button" (click)="showUI('forum')">
@@ -20,11 +32,17 @@
     ></div>
   </div>
   <div id="main-content">
-    @if(showCharForum){ @for (post of characterPosts; track $index) {
-    <app-post-template [post]="post"></app-post-template>
-    } } @else { @for (post of adventurePosts; track $index) {
-    <app-post-template [post]="post"></app-post-template>
-    }}
+    <div class="main-header">
+      <div class="title">@if(showCharForum){Karakterek}@else{Kalandok }</div>
+      <hr />
+    </div>
+    <div class="posts-container">
+      @if(showCharForum){ @for (post of characterPosts; track post.id) {
+      <app-post-template [post]="post" type="character"></app-post-template>
+      } } @else { @for (post of adventurePosts; track post.id) {
+      <app-post-template [post]="post" type="adventure"></app-post-template>
+      }}
+    </div>
   </div>
   <div id="user-panel" [ngClass]="{ open: showUser }">
     @if(isLoggedIn){
@@ -34,15 +52,38 @@
       </div>
       <span id="username">{{ user?.username }}</span>
     </div>
-    <div class="fake-button">Új poszt <mat-icon>add_2</mat-icon></div>
+    <div id="newPostBtn" class="fake-button" (click)="showNewPostUI()">
+      Új poszt <mat-icon>add_2</mat-icon>
+    </div>
     <div id="myPosts">
       @for (item of myPosts; track $index) {
       <div class="my-post-container">
         <div class="my-post-header">
           <div class="my-post-title">{{ item.title }}</div>
+          <div class="my-post-topic">
+            @if(item.forumID ===
+            forumTopic.CHARACTER){Karakterek}@else{Kalandok}
+          </div>
         </div>
         <div class="my-post-body">
           <span class="my-post-text">{{ item.text }}</span>
+        </div>
+        <div class="my-post-attachments" style="display: flex">
+          @if(item.attachments.length > 0){
+          <span
+            ><span style="color: #f2c480">Csatolva:</span>
+            {{ item.attachments.length }}db</span
+          >
+          }
+          <span
+            class="my-post-date"
+            style="text-align: right; margin-left: auto"
+          >
+            {{ toDate(item.createdAt) | date : "yyyy.MM.dd. HH:mm" }}
+          </span>
+        </div>
+        <div class="fake-button" (click)="deletePost(item.id, item.forumID)">
+          <mat-icon>delete</mat-icon>
         </div>
       </div>
       }
@@ -52,5 +93,69 @@
       Belépés<mat-icon>login</mat-icon>
     </div>
     }
+  </div>
+  <div
+    id="addPostUI"
+    [ngClass]="{ show: newPostUIVisible }"
+    (click)="showNewPostUI(false, $event)"
+  >
+    <form (ngSubmit)="addPost()" [formGroup]="newPost">
+      @if(isLoading){
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      }@else { @if(!isMobileView()){
+      <div id="closePostUI" class="fake-button" (click)="showNewPostUI(false)">
+        <mat-icon>close</mat-icon>
+      </div>
+      }
+      <mat-form-field style="grid-area: forum" appearance="outline">
+        <mat-label>Fórum</mat-label>
+        <mat-select formControlName="forum">
+          <mat-option [value]="forumTopic.CHARACTER">Karakter</mat-option>
+          <mat-option [value]="forumTopic.ADVENTURE">Kalandok</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="grid-area: title" appearance="outline">
+        <mat-label>Cím (min.1 : max. 30)</mat-label>
+        <input matInput type="text" formControlName="title" />
+      </mat-form-field>
+      <mat-form-field style="grid-area: text" appearance="outline">
+        <mat-label
+          >Szöveg <span>{{ text.value?.length || 0 }}/{{ maxText }}</span>
+        </mat-label>
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="4"
+          cdkAutosizeMaxRows="30"
+          formControlName="text"
+        ></textarea>
+      </mat-form-field>
+      <mat-form-field style="grid-area: attachSelect" appearance="outline">
+        <mat-label>Csatol</mat-label>
+        <mat-select formControlName="attachSelect">
+          @for (item of (items | async); track $index) {
+          <mat-option [value]="{ id: item.id, name: item.name }">
+            {{ item.name }}
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <div class="attached-items" style="grid-area: attachedItems">
+        @for (id of attachments.controls; track $index) {
+        <div class="attached-item">
+          <span>{{ id.value?.name }}</span>
+          <div class="fake-button" (click)="removeAttachment($index)">
+            <mat-icon>delete</mat-icon>
+          </div>
+        </div>
+        }
+      </div>
+      <span class="error-message" style="grid-area: error">{{
+        postError
+      }}</span>
+      <button mat-flat-button type="submit">
+        Poszt<mat-icon>send</mat-icon></button
+      >}
+    </form>
   </div>
 </div>
