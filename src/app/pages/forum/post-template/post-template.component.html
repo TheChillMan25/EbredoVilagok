@@ -1,4 +1,4 @@
-<div class="post-container">
+<div class="post-container" [ngClass]="{ commentsVisible: showComments }">
   <div class="post-header">
     <div class="post-title">{{ post.title }}</div>
     <span class="post-poster"
@@ -6,10 +6,14 @@
     >
   </div>
   <div class="post-body">
-    <span class="post-text">{{ post.text }}</span>
+    <p class="post-text">{{ post.text }}</p>
   </div>
   <div class="post-attachments">
-    <div class="fake-button" matTooltip="Hozzászólás">
+    <div
+      class="fake-button"
+      matTooltip="Hozzászólás"
+      (click)="toggle('comments')"
+    >
       <mat-icon>chat</mat-icon>
     </div>
     @if(post.attachments.length > 0){
@@ -27,14 +31,79 @@
     </span>
   </div>
 </div>
-<!-- <div class="comments">
-  <div class="comment">
-    <div class="comment-header">
-      <div class="comment-sender">Levi</div>
-      <div class="comment-date">2025.12.08.</div>
-    </div>
+<div id="comments" [ngClass]="{ show: showComments }">
+  <div
+    id="new-comment-btn"
+    class="fake-button"
+    (click)="toggle('addCommentBar')"
+    [ngClass]="{ hide: addCommentVisible }"
+  >
+    <mat-label>Új komment</mat-label>
+    <mat-icon>add</mat-icon>
   </div>
-</div> -->
+  <form [formGroup]="commentForm" [ngClass]="{ show: addCommentVisible }">
+    <mat-error style="grid-area: error; text-align: center"
+      >@if(commentForm.get('text')?.hasError('whitespace') &&
+      commentForm.get('text')?.value.length > 0){A komment nem lehet
+      üres!}</mat-error
+    >
+    <div
+      class="fake-button"
+      (click)="toggle('addCommentBar')"
+      style="grid-area: close"
+    >
+      <mat-icon>close</mat-icon>
+    </div>
+    <mat-form-field
+      appearance="outline"
+      style="flex: 2"
+      style="grid-area: text"
+    >
+      <mat-label
+        >Szöveg
+        <span
+          >{{ commentForm.get("text")?.value.length || 0 }}/{{
+            maxCommentLen
+          }}</span
+        >
+      </mat-label>
+      <textarea
+        matInput
+        formControlName="text"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="1"
+        cdkAutosizeMaxRows="10"
+        style="resize: none"
+      ></textarea>
+    </mat-form-field>
+    <div
+      class="fake-button"
+      (click)="addComment()"
+      [class.disabled]="commentForm.invalid"
+      [class.disabled]="isLoading"
+      style="grid-area: send; justify-self: end"
+    >
+      <mat-icon>send</mat-icon>
+    </div>
+  </form>
+  <div id="comments-container">
+    @for (item of comments; track item.id) {
+    <div class="comment">
+      <div class="comment-header">
+        <span class="comment-sender">{{ item.authorName }}</span>
+      </div>
+      <div class="comment-body">
+        <p class="comment-text">{{ item.text }}</p>
+      </div>
+      <div class="comment-footer">
+        <span class="comment-date">
+          {{ toDate(item.createdAt) | date : "yyyy.MM.dd. HH:mm" }}
+        </span>
+      </div>
+    </div>
+    }
+  </div>
+</div>
 <div id="attachment-ui" [ngClass]="{ show: showAttachments }">
   <div class="attachment-container">
     <div class="attachments">

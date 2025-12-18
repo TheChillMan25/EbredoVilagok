@@ -90,7 +90,6 @@ $secondary: whitesmoke;
       textarea {
         resize: none;
         line-height: 1.2rem;
-        height: calc(1.2rem * 25);
       }
 
       button {
@@ -135,6 +134,8 @@ $secondary: whitesmoke;
   #main-content {
     width: 50%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .main-header {
       width: 100%;
@@ -235,7 +236,7 @@ $secondary: whitesmoke;
           position: absolute;
           top: -1rem;
           right: -1rem;
-          padding: .3rem;
+          padding: 0.3rem;
         }
       }
     }
@@ -254,6 +255,7 @@ $secondary: whitesmoke;
 
     #main-content {
       width: 100%;
+      overflow-y: auto;
     }
     #user-panel,
     #sub-forum-panel {
@@ -315,10 +317,6 @@ $secondary: whitesmoke;
           "error"
           "button";
         grid-template-columns: 1fr;
-
-        textarea {
-          height: calc(1.2rem * 15);
-        }
 
         button {
           width: fit-content;

@@ -31,7 +31,24 @@ import { AdventureService } from '../../shared/services/adventure/adventure.serv
 import { MatButton } from '@angular/material/button';
 import { serverTimestamp, Timestamp, FieldValue } from 'firebase/firestore';
 import { isMobileView } from '../map/map.component';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
+export function toDate(
+  value: Timestamp | Date | FieldValue | null | undefined
+): Date | null {
+  if (!value) return null;
+  const asTimestamp = value as Timestamp;
+  if (typeof asTimestamp.toDate === 'function') {
+    return asTimestamp.toDate();
+  }
+  if (value instanceof Date) return value;
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+}
 @Component({
   selector: 'app-forum',
   imports: [
@@ -49,6 +66,8 @@ import { isMobileView } from '../map/map.component';
     AsyncPipe,
     DatePipe,
     MatButton,
+    CdkTextareaAutosize,
+    MatProgressSpinner,
   ],
   templateUrl: './forum.component.html',
   styleUrl: './forum.component.scss',
@@ -69,6 +88,8 @@ export class ForumComponent {
   fb = new FormBuilder();
   maxText = 500;
   postError = '';
+
+  isLoading: boolean = false;
 
   showCharForum: boolean = true;
   characterPosts!: ForumPost[];
@@ -148,6 +169,10 @@ export class ForumComponent {
     }
   }
 
+  toDate(value: Timestamp | Date | FieldValue | null | undefined): Date | null {
+    return toDate(value);
+  }
+
   removeAttachment(index: number) {
     this.attachments.removeAt(index);
   }
@@ -222,34 +247,18 @@ export class ForumComponent {
     else this.showCharForum = false;
   }
 
-  toDate(value: Timestamp | Date | FieldValue | null | undefined): Date | null {
-    if (!value) return null;
-    const asTimestamp = value as Timestamp;
-    if (typeof asTimestamp.toDate === 'function') {
-      return asTimestamp.toDate();
-    }
-    if (value instanceof Date) return value;
-    if (typeof value === 'string' || typeof value === 'number') {
-      const parsed = new Date(value);
-      return isNaN(parsed.getTime()) ? null : parsed;
-    }
-    return null;
-  }
-
   addPost() {
     if (!this.newPost.valid) {
       this.postError = 'Töltsd ki a kötelező mezőket!';
       return;
     }
+    this.isLoading = true;
     const formValue = this.newPost.value;
 
-    let post: Omit<ForumPost, 'id'> = {
+    let post: Omit<ForumPost, 'id' | 'poster' | 'posterUID' | 'createdAt'> = {
       forumID: formValue.forum,
       title: formValue.title,
       text: formValue.text,
-      createdAt: serverTimestamp(),
-      poster: this.user?.username,
-      posterUID: this.user?.id,
       attachments: formValue.attachments.map((e: any) => e.id) || [],
     };
 
@@ -268,6 +277,9 @@ export class ForumComponent {
       .catch((error) => {
         console.error('Hiba a poszt létrehozásakor: ', error);
         throw error;
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
   }
 

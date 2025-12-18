@@ -11,13 +11,20 @@ import {
   switchMap,
   take,
 } from 'rxjs';
-import { ForumPost, ForumTopic, User } from '../../models/models';
 import {
-  arrayUnion,
+  ForumPostComment,
+  ForumPost,
+  ForumTopic,
+  User,
+} from '../../models/models';
+import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  limit,
   orderBy,
   query,
   serverTimestamp,
@@ -31,7 +38,9 @@ import {
 export class ForumService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async addPost(post: Omit<ForumPost, 'id'>): Promise<ForumPost> {
+  async addPost(
+    postData: Omit<ForumPost, 'id' | 'poster' | 'posterUID' | 'createdAt'>
+  ): Promise<ForumPost> {
     const user = await firstValueFrom(
       this.authService.currentUser.pipe(take(1))
     );
@@ -40,6 +49,14 @@ export class ForumService {
     const userDocRef = doc(this.firestore, 'Users', user.uid);
     const userSnap = await getDoc(userDocRef);
     if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+    const userData = userSnap.data() as User;
+
+    let post: Omit<ForumPost, 'id'> = {
+      ...postData,
+      poster: userData.username,
+      posterUID: user.uid,
+      createdAt: serverTimestamp(),
+    };
 
     const forumDocRef =
       post.forumID === ForumTopic.CHARACTER
@@ -47,15 +64,9 @@ export class ForumService {
         : doc(this.firestore, 'Forums', 'adventures');
     const postsColRef = collection(forumDocRef, 'Posts');
 
-    const postDocRef = doc(postsColRef);
+    const docRef = await addDoc(postsColRef, post);
 
-    const batch = writeBatch(this.firestore);
-    batch.set(postDocRef, post);
-    batch.update(userDocRef, { posts: arrayUnion(postDocRef.id) });
-
-    await batch.commit();
-
-    return { ...post, id: postDocRef.id } as ForumPost;
+    return { ...post, id: docRef.id } as ForumPost;
   }
 
   getAllPosts(): Observable<{ charPosts: ForumPost[]; advPosts: ForumPost[] }> {
@@ -156,10 +167,89 @@ export class ForumService {
         'Posts',
         postID
       );
-      await deleteDoc(postDocRef);
+
+      const commentsColRef = collection(
+        this.firestore,
+        'Forums',
+        subForum,
+        'Posts',
+        postID,
+        'Comments'
+      );
+
+      while (true) {
+        const snap = await getDocs(query(commentsColRef, limit(450)));
+        if (snap.empty) break;
+
+        const batch = writeBatch(this.firestore);
+        snap.forEach((doc) => batch.delete(doc.ref));
+        await batch.commit();
+      }
+
+      const finalBatch = writeBatch(this.firestore);
+      finalBatch.delete(postDocRef);
+      await finalBatch.commit();
     } catch (error) {
       console.error('Hiba a poszt törlésekor: ', error);
       throw error;
     }
+  }
+
+  getComments(
+    postID: string,
+    forumID: ForumTopic
+  ): Observable<ForumPostComment[]> {
+    const subForum =
+      forumID === ForumTopic.CHARACTER ? 'characters' : 'adventures';
+    const postCommentsRef = query(
+      collection(
+        this.firestore,
+        'Forums',
+        subForum,
+        'Posts',
+        postID,
+        'Comments'
+      ),
+      orderBy('createdAt', 'desc')
+    );
+
+    return collectionData(postCommentsRef, { idField: 'id' }) as Observable<
+      ForumPostComment[]
+    >;
+  }
+
+  async addComment(
+    text: string,
+    forumID: ForumTopic,
+    postID: string
+  ): Promise<ForumPostComment> {
+    const user = await firstValueFrom(
+      this.authService.currentUser.pipe(take(1))
+    );
+    if (!user) throw new Error('Felhasználó nem található!');
+
+    const userDocRef = doc(this.firestore, 'Users', user.uid);
+    const userSnap = await getDoc(userDocRef);
+    if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+    const userData = userSnap.data() as User;
+
+    const comment: Omit<ForumPostComment, 'id'> = {
+      text: text,
+      authorName: userData.username,
+      authorUID: user.uid,
+      createdAt: serverTimestamp(),
+    };
+
+    console.log(comment);
+
+    const forumDocRef =
+      forumID === ForumTopic.CHARACTER
+        ? doc(this.firestore, 'Forums', 'characters')
+        : doc(this.firestore, 'Forums', 'adventures');
+    const commentsColRef = collection(forumDocRef, 'Posts', postID, 'Comments');
+
+    const docRef = await addDoc(commentsColRef, comment);
+
+    return { ...comment, id: docRef.id } as ForumPostComment;
   }
 }

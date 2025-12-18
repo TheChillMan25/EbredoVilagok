@@ -37,9 +37,9 @@
       <hr />
     </div>
     <div class="posts-container">
-      @if(showCharForum){ @for (post of characterPosts; track $index) {
+      @if(showCharForum){ @for (post of characterPosts; track post.id) {
       <app-post-template [post]="post" type="character"></app-post-template>
-      } } @else { @for (post of adventurePosts; track $index) {
+      } } @else { @for (post of adventurePosts; track post.id) {
       <app-post-template [post]="post" type="adventure"></app-post-template>
       }}
     </div>
@@ -75,7 +75,10 @@
             {{ item.attachments.length }}db</span
           >
           }
-          <span class="my-post-date" style="text-align: right; margin-left: auto;">
+          <span
+            class="my-post-date"
+            style="text-align: right; margin-left: auto"
+          >
             {{ toDate(item.createdAt) | date : "yyyy.MM.dd. HH:mm" }}
           </span>
         </div>
@@ -97,7 +100,9 @@
     (click)="showNewPostUI(false, $event)"
   >
     <form (ngSubmit)="addPost()" [formGroup]="newPost">
-      @if(!isMobileView()){
+      @if(isLoading){
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      }@else { @if(!isMobileView()){
       <div id="closePostUI" class="fake-button" (click)="showNewPostUI(false)">
         <mat-icon>close</mat-icon>
       </div>
@@ -115,9 +120,15 @@
       </mat-form-field>
       <mat-form-field style="grid-area: text" appearance="outline">
         <mat-label
-          >Szöveg <span>{{ text.value.length }}/{{ maxText }}</span></mat-label
-        >
-        <textarea matInput formControlName="text"></textarea>
+          >Szöveg <span>{{ text.value?.length || 0 }}/{{ maxText }}</span>
+        </mat-label>
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="4"
+          cdkAutosizeMaxRows="30"
+          formControlName="text"
+        ></textarea>
       </mat-form-field>
       <mat-form-field style="grid-area: attachSelect" appearance="outline">
         <mat-label>Csatol</mat-label>
@@ -143,8 +154,8 @@
         postError
       }}</span>
       <button mat-flat-button type="submit">
-        Poszt<mat-icon>send</mat-icon>
-      </button>
+        Poszt<mat-icon>send</mat-icon></button
+      >}
     </form>
   </div>
 </div>

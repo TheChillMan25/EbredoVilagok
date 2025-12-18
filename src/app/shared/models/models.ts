@@ -89,6 +89,14 @@ export interface ForumPost {
   attachments: string[];
 }
 
+export interface ForumPostComment {
+  id?: string;
+  authorUID: string | null | undefined;
+  authorName: string | null | undefined;
+  text: string;
+  createdAt: Timestamp | FieldValue;
+}
+
 export interface Adventure {
   id: string;
   name: string | null;
