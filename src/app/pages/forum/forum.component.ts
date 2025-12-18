@@ -75,8 +75,11 @@ export function toDate(
 export class ForumComponent {
   user: ForumUser | null = null;
   myPosts: ForumPost[] = [];
+  /**Mobileview Forum panel visibility */
   showForums: boolean = false;
+  /**Mobileview User panel visibility */
   showUser: boolean = false;
+  /**Mobileview panel to hide User/Forum panel */
   showCloseUI: boolean = false;
 
   characters$!: Observable<Character[]>;
@@ -245,6 +248,7 @@ export class ForumComponent {
   changeForum(type: 'char' | 'adv') {
     if (type === 'char') this.showCharForum = true;
     else this.showCharForum = false;
+    if (isMobileView()) this.closeUI();
   }
 
   addPost() {

@@ -64,6 +64,7 @@ export class PostTemplateComponent {
   @Input() post!: ForumPost;
   @Input() type!: 'character' | 'adventure';
   isLoading: boolean = false;
+  isLoggedIn!: boolean;
 
   showAttachments: boolean = false;
   showComments: boolean = false;
@@ -88,6 +89,7 @@ export class PostTemplateComponent {
   ngOnInit() {
     this.initCommentForm();
     this.getComments();
+    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   }
 
   ngOnChanges() {

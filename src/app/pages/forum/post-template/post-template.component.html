@@ -32,6 +32,7 @@
   </div>
 </div>
 <div id="comments" [ngClass]="{ show: showComments }">
+  @if(isLoggedIn){
   <div
     id="new-comment-btn"
     class="fake-button"
@@ -86,6 +87,7 @@
       <mat-icon>send</mat-icon>
     </div>
   </form>
+  }
   <div id="comments-container">
     @for (item of comments; track item.id) {
     <div class="comment">
