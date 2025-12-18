@@ -93,8 +93,4 @@ export class ProfileComponent {
     else this.showCharacter = false;
     localStorage.setItem('showCharacter', this.showCharacter.toString());
   }
-
-  resetSavedVariables(){
-    localStorage.clear()
-  }
 }

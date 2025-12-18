@@ -30,7 +30,6 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { toDate } from '../forum.component';
 import { Subscription } from 'rxjs';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { error } from 'three';
 
 export function noWhitespaceValidator(
   control: AbstractControl
