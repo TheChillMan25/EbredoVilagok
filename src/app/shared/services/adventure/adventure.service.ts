@@ -8,6 +8,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  documentId,
   getDoc,
   getDocs,
   query,
@@ -32,6 +33,10 @@ export class AdventureService {
       const userDocRef = doc(this.firestore, 'Users', user.uid);
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+      const userData = userSnap.data() as User;
+      if (userData.adventures.length === 10) {
+        throw new Error('Maximum kalandszám elérve, nem készíthető több!');
+      }
 
       const adventuresColRef = collection(this.firestore, 'Adventures');
       const adventureDocRef = doc(adventuresColRef); // előre generált ID
@@ -76,7 +81,7 @@ export class AdventureService {
 
           const q = query(
             adventureCollection,
-            where('id', 'in', userData.adventures)
+            where(documentId(), 'in', userData.adventures)
           );
           const snapShot = await getDocs(q);
           snapShot.forEach((doc) => {

@@ -8,6 +8,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  documentId,
   getDoc,
   getDocs,
   query,
@@ -32,6 +33,11 @@ export class CharacterService {
       const userDocRef = doc(this.firestore, 'Users', user.uid);
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+      const userData = userSnap.data() as User;
+      
+      if(userData.characters.length === 10){
+        throw new Error('Maximum kaland szám elérve, nem készíthető több!')
+      }
 
       const charactersColRef = collection(this.firestore, 'Characters');
       const characterDocRef = doc(charactersColRef);
@@ -76,7 +82,7 @@ export class CharacterService {
 
           const q = query(
             characterCollection,
-            where('id', 'in', userData.characters)
+            where(documentId(), 'in', userData.characters)
           );
           const snapShot = await getDocs(q);
           snapShot.forEach((doc) => {

@@ -91,6 +91,7 @@ import { CanComponentDeactivate } from '../karakter/karakter.component';
 })
 export class AdventureComponent implements CanComponentDeactivate {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
+  isLoading: boolean = false;
 
   skipLeaveConfirm: boolean = false;
 
