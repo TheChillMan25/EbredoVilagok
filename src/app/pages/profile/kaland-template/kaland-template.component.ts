@@ -13,6 +13,7 @@ import { AdventureService } from '../../../shared/services/adventure/adventure.s
 })
 export class KalandTemplateComponent {
   @Input() adventure!: Adventure;
+  @Input() isPublic: boolean = false;
   @Output() deletedAdventure = new EventEmitter<void>();
 
   adventureDetails: boolean = false;

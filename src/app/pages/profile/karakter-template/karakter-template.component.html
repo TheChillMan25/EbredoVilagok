@@ -45,6 +45,7 @@
       <mat-icon>close</mat-icon>
     </div>
   </div>
+  @if(!isPublic){
   <div class="fake-button delete" (click)="deleteCharacter()">
     <mat-icon>delete</mat-icon>
   </div>
@@ -54,4 +55,5 @@
       (closeEvent)="closeWarning()"
     ></app-delete-warning>
   </div>
+  }
 </div>

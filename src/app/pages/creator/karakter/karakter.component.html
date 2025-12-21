@@ -71,7 +71,7 @@
     </div>
     <div id="create">
       <span id="error">{{ errorMessage }}</span>
-      <button id="createBtn" class="fake-button" (click)="createCharacter()">
+      <button id="createBtn" class="fake-button" (click)="createCharacter()" [ngClass]="{disabled: isLoading}">
         Létrehozás
       </button>
     </div>

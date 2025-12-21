@@ -44,9 +44,13 @@
       margin-top: auto;
       .fake-button {
         font-size: x-large;
-        border: .2rem solid #f2c480;
-        &:hover{
-          border: .2rem solid #444;
+        border: 0.2rem solid #f2c480;
+        &:hover {
+          border: 0.2rem solid #444;
+        }
+        &.disabled {
+          opacity: 0.75;
+          pointer-events: none;
         }
       }
 

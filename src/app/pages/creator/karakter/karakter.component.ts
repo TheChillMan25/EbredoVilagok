@@ -59,6 +59,8 @@ export interface CanComponentDeactivate {
   styleUrl: './karakter.component.scss',
 })
 export class KarakterComponent implements CanComponentDeactivate {
+  isLoading: boolean = false;
+
   errorMessage: string = '';
   mainForm!: FormGroup;
   speciesList = NationData.map((nation) => nation.nationName);

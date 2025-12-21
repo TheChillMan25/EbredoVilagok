@@ -38,7 +38,7 @@
         </mat-form-field>
         <div id="advError" class="error-message">{{ advError }}</div>
         <div id="footer-btns">
-          <div id="create-btn" class="fake-button" (click)="createAdventure()">
+          <div id="create-btn" class="fake-button" [ngClass]="{disabled: isLoading}" (click)="createAdventure()">
             Létrehozás
           </div>
           <div id="help" class="fake-button" (click)="userManual(true)">
