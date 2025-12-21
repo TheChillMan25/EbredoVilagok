@@ -6,13 +6,6 @@
     <div id="profile-data">
       <span id="username">{{ username }}</span>
       <span id="email"><span>Email:</span> {{ email }}</span>
-      <div
-        matTooltip="Mentett válozók törlése"
-        class="fake-button"
-        (click)="resetSavedVariables()"
-      >
-        <mat-icon>delete</mat-icon>
-      </div>
     </div>
   </div>
   <div id="main-container">
@@ -22,7 +15,7 @@
         class="container"
         [ngClass]="{ show: showCharacter }"
       >
-        @if(characters.length > 0){ @for (character of characters; track $index)
+        @if(characters.length > 0){ @for (character of characters; track character.id)
         {
         <app-karakter-template
           [character]="character"
@@ -36,7 +29,7 @@
         class="container"
         [ngClass]="{ show: !showCharacter }"
       >
-        @if(adventures.length > 0){ @for (adventure of adventures; track $index)
+        @if(adventures.length > 0){ @for (adventure of adventures; track adventure.id)
         {
         <app-kaland-template
           [adventure]="adventure"
