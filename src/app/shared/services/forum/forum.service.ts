@@ -252,4 +252,41 @@ export class ForumService {
 
     return { ...comment, id: docRef.id } as ForumPostComment;
   }
+
+  async deleteComment(
+    commentID: string,
+    forumID: ForumTopic,
+    postID: string
+  ): Promise<void> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+
+      if (!user) throw new Error('Nem található felhasználó!');
+
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) throw new Error('A felhasználó nem létezik!');
+
+      const subForum =
+        forumID === ForumTopic.CHARACTER ? 'characters' : 'adventures';
+
+      const commentRef = doc(
+        this.firestore,
+        'Forums',
+        subForum,
+        'Posts',
+        postID,
+        'Comments',
+        commentID
+      );
+
+      await deleteDoc(commentRef);
+    } catch (error) {
+      console.error("Hiba a komment törlésekor: ", error)
+      throw error
+    }
+  }
 }

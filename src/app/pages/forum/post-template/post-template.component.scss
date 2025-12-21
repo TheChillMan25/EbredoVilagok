@@ -144,8 +144,21 @@
       padding: 1rem;
       border-radius: 0.5rem;
       .comment-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         .comment-sender {
           color: #f2c480;
+        }
+        .comment-options.fake-button {
+          position: relative;
+          padding: 0.5rem;
+
+          .comment-options-container{
+            position: absolute;
+            top: 3rem;
+            right: 0;
+          }
         }
       }
       .comment-body {

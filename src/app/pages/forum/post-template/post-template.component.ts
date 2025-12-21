@@ -4,6 +4,7 @@ import {
   Character,
   ForumPost,
   ForumPostComment,
+  ForumTopic,
 } from '../../../shared/models/models';
 import { MatIcon } from '@angular/material/icon';
 import { KarakterTemplateComponent } from '../../profile/karakter-template/karakter-template.component';
@@ -30,7 +31,6 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { toDate } from '../forum.component';
 import { Subscription } from 'rxjs';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { error } from 'three';
 
 export function noWhitespaceValidator(
   control: AbstractControl
@@ -63,6 +63,7 @@ export function noWhitespaceValidator(
 export class PostTemplateComponent {
   @Input() post!: ForumPost;
   @Input() type!: 'character' | 'adventure';
+  @Input() userUID!: string | null | undefined;
   isLoading: boolean = false;
   isLoggedIn!: boolean;
 
@@ -163,6 +164,10 @@ export class PostTemplateComponent {
       .finally(() => {
         this.isLoading = false;
       });
+  }
+
+  deleteComment(commentID: string, topic: ForumTopic, postID: string){
+    this.forumService.deleteComment(commentID, topic, postID)
   }
 
   getComments() {

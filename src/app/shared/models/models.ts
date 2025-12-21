@@ -90,7 +90,7 @@ export interface ForumPost {
 }
 
 export interface ForumPostComment {
-  id?: string;
+  id: string;
   authorUID: string | null | undefined;
   authorName: string | null | undefined;
   text: string;

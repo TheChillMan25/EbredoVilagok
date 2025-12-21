@@ -93,6 +93,14 @@
     <div class="comment">
       <div class="comment-header">
         <span class="comment-sender">{{ item.authorName }}</span>
+        @if(isLoggedIn && item.authorUID === userUID){
+        <div
+          class="comment-options fake-button"
+          (click)="deleteComment(item.id, post.forumID, post.id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </div>
+        }
       </div>
       <div class="comment-body">
         <p class="comment-text">{{ item.text }}</p>
