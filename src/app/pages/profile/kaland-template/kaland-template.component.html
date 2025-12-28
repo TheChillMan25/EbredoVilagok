@@ -25,3 +25,11 @@
     </div>
   </div>
 </div>
+@if(!isPublic){
+<div class="warning" [ngClass]="{ show: showWarning }">
+  <app-delete-warning
+    (deleteEvent)="deleteAdventure()"
+    (closeEvent)="warningVisible(false)"
+  ></app-delete-warning>
+</div>
+}

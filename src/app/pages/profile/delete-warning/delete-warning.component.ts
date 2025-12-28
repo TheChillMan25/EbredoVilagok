@@ -16,7 +16,8 @@ export class DeleteWarningComponent {
   delete() {
     this.deleteEvent.emit();
   }
-  close() {
+  close(event: MouseEvent | null = null) {
+    if (event) event.stopPropagation();
     this.closeEvent.emit();
   }
 }

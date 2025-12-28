@@ -14,7 +14,7 @@ import { DeleteWarningComponent } from '../delete-warning/delete-warning.compone
   selector: 'app-karakter-template',
   imports: [NgClass, MatIcon, DeleteWarningComponent],
   templateUrl: './karakter-template.component.html',
-  styleUrl: './karakter-template.component.scss',
+  styleUrls: ['./karakter-template.component.scss', '../template-shared.scss']
 })
 export class KarakterTemplateComponent {
   @Input() character!: Character;
