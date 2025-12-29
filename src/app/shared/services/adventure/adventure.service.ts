@@ -23,7 +23,9 @@ import {
 export class AdventureService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async addAdventure(adventure: Omit<Adventure, 'id'>): Promise<Adventure> {
+  async addAdventure(
+    adventure: Omit<Adventure, 'id' | 'userId'>
+  ): Promise<Adventure> {
     try {
       const user = await firstValueFrom(
         this.authService.currentUser.pipe(take(1))
@@ -44,6 +46,7 @@ export class AdventureService {
       const newAdventure: Adventure = {
         ...adventure,
         id: adventureDocRef.id,
+        userId: user.uid,
       };
 
       const batch = writeBatch(this.firestore);
@@ -126,21 +129,6 @@ export class AdventureService {
       return null;
     } catch (error) {
       console.error('Hiba a karakter lekérdezésekor: ', error);
-      return null;
-    }
-  }
-
-  async getPublicAdventureByID(advID: string): Promise<Adventure | null> {
-    try {
-      const advDocRef = doc(this.firestore, 'Adventures', advID);
-      const advSnapShot = await getDoc(advDocRef);
-
-      if (advSnapShot.exists()) {
-        return { ...advSnapShot.data(), id: advID } as Adventure;
-      }
-      return null;
-    } catch (error) {
-      console.error('Hiba a publikus kaland lekérésekor: ', error);
       return null;
     }
   }

@@ -33,14 +33,14 @@ export class GameComponent {
   role: string = 'player';
 
   players: {
-    userID: string;
+    userId: string;
     username: string;
     character: Character;
     effect: string;
     turn: string;
   }[] = [
     {
-      userID: 'jatekos-1',
+      userId: 'jatekos-1',
       username: 'Játékos 1',
       effect: '',
       turn: 'Várakozás',

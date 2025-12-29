@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { Character } from '../../../shared/models/models';
 import {
   getHome,
@@ -14,9 +21,10 @@ import { DeleteWarningComponent } from '../delete-warning/delete-warning.compone
   selector: 'app-karakter-template',
   imports: [NgClass, MatIcon, DeleteWarningComponent],
   templateUrl: './karakter-template.component.html',
-  styleUrls: ['./karakter-template.component.scss', '../template-shared.scss']
+  styleUrls: ['./karakter-template.component.scss', '../template-shared.scss'],
 })
 export class KarakterTemplateComponent {
+  @ViewChild('specText') specText!: ElementRef<HTMLDivElement>;
   @Input() character!: Character;
   @Input() isPublic: boolean = false;
   @Output() deletedCharacter = new EventEmitter<void>();
@@ -29,7 +37,16 @@ export class KarakterTemplateComponent {
   stats: { name: string; value: string }[] = [];
   mainStats: { name: string; value: number }[] = [];
 
-  constructor(private charService: CharacterService, private router: Router) {}
+  constructor(private charService: CharacterService, private router: Router) {
+    this.speciesSpecial = { desc: '' };
+    this.home = {
+      desc: '',
+      bonus: [
+        { name: '', mod: '' },
+        { name: '', mod: '' },
+      ],
+    };
+  }
 
   ngOnInit() {
     this.createStats();
@@ -92,15 +109,10 @@ export class KarakterTemplateComponent {
 
   showSpecielDescs(which: 'home' | 'special') {
     this.showSpecDescs = true;
-    let container;
-    if (this.character?.id)
-      container = document.getElementById(this.character?.id);
-    if (container) {
-      if (which === 'home') {
-        container.textContent = this.home.desc;
-      } else {
-        container.textContent = this.speciesSpecial.desc;
-      }
+    if (which === 'home') {
+      this.specText.nativeElement.textContent = this.home.desc;
+    } else {
+      this.specText.nativeElement.textContent = this.speciesSpecial.desc;
     }
   }
 
@@ -119,12 +131,15 @@ export class KarakterTemplateComponent {
       this.showWarning = true;
       localStorage.setItem('deleteNoRemind', 'false');
     }
-    if (doNotRemind === 'true' || (this.showWarning && doNotRemind === 'false')) {
+    if (
+      doNotRemind === 'true' ||
+      (this.showWarning && doNotRemind === 'false')
+    ) {
       if (this.character?.id) {
         this.charService.deleteCharacter(this.character.id);
         this.deletedCharacter.emit();
       }
-    } else if(!this.showWarning && doNotRemind === 'false') {
+    } else if (!this.showWarning && doNotRemind === 'false') {
       this.showWarning = true;
       localStorage.setItem('deleteNoRemind', 'false');
     }

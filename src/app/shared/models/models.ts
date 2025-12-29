@@ -21,6 +21,7 @@ export enum ForumTopic {
 
 export interface Character {
   id: string;
+  userId: string;
   currentAdventure: string;
   name: string;
   species: string;
@@ -67,6 +68,11 @@ export interface Character {
   };
 }
 
+export type PublicCharacter = Omit<
+  Character,
+  'id' | 'currentAdventure' | 'userId'
+>;
+
 export interface Forum {
   adventureForum: SubForum;
   characterForum: SubForum;
@@ -86,7 +92,7 @@ export interface ForumPost {
   posterUID: string | null | undefined;
   createdAt: Timestamp | FieldValue;
   text: string;
-  attachments: string[];
+  attachments: PublicCharacter[] | PublicAdventure[];
 }
 
 export interface ForumPostComment {
@@ -99,15 +105,21 @@ export interface ForumPostComment {
 
 export interface Adventure {
   id: string;
+  userId: string;
   name: string | null;
   events: AdventureEvent[];
   players: Player[];
   currentPlayer: string;
 }
 
+export type PublicAdventure = Omit<
+  Adventure,
+  'id' | 'players' | 'currentPlayer' | 'userId'
+>;
+
 export interface Player {
   id: string;
-  userID: string;
+  userId: string;
   character: Character;
   currentAction: string;
 }

@@ -111,9 +111,9 @@ export function getHome(
   index: number | undefined
 ): { desc: string; bonus: { name: string; mod: string }[] } {
   let speciesObj = convertSpeciesNameToKey(species);
-  if (speciesObj && index)
+  if (speciesObj && index !== undefined) {
     return Species[speciesObj?.landID][speciesObj?.speciesID].homes[index];
-  else return { desc: '', bonus: [] };
+  } else return { desc: '', bonus: [] };
 }
 
 export function getSpeciesSpecial(
@@ -140,8 +140,6 @@ export function createStats() {
   stats.sort((a, b) => a - b);
   stats.shift();
   stats.shift();
-
-  //checkStatNumbers(stats);
 
   return convertNumbersToStats(stats);
 }
@@ -178,20 +176,7 @@ export function getStat(stats: number[]) {
   return stat;
 }
 
-const edges = [6, 8, 12, 14, 16];
-export function checkStatNumbers(numbers: number[]) {
-  let onEdges: number[] = [];
-  for (let number of numbers) {
-    for (let edge of edges) {
-      if (number === edge || number === edge - 1) {
-        onEdges.push(number);
-      }
-    }
-  }
-  console.log('On edges: ' + onEdges);
-}
-
-function createRandomEquipment(){
+function createRandomEquipment() {
   while (true) {
     const equipment = {
       left: Math.floor(Math.random() * weapons.length),
@@ -202,18 +187,20 @@ function createRandomEquipment(){
   }
 }
 
-function checkEquipment(left: number, right: number){
+function checkEquipment(left: number, right: number) {
   return !(
     (getWeapon(left).handed === 2 && getWeapon(right).handed !== 0) ||
     (getWeapon(left).handed !== 0 && getWeapon(right).handed === 2)
   );
 }
 
-export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
+export function createRandomCharacter(
+  charName: string
+): Omit<Character, 'id' | 'userId'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
   let stats = createStats();
-  let randomCharacter: Omit<Character, 'id'> = {
+  let randomCharacter: Omit<Character, 'id' | 'userId'> = {
     currentAdventure: '',
     name: charName || '',
     species: NationData.map((nation) => nation.nationName)[
@@ -250,9 +237,7 @@ export function createRandomCharacter(charName: string): Omit<Character, 'id'> {
         Math.floor(Math.random() * virtues.length),
         Math.floor(Math.random() * virtues.length),
       ],
-      disadv: [
-        Math.floor(Math.random() * disadvantages.length)
-      ],
+      disadv: [Math.floor(Math.random() * disadvantages.length)],
     },
     items: {
       food: [Math.max(Math.floor(Math.random() * foodRations.length - 1), 0)],

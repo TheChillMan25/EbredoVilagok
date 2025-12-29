@@ -154,7 +154,7 @@
           position: relative;
           padding: 0.5rem;
 
-          .comment-options-container{
+          .comment-options-container {
             position: absolute;
             top: 3rem;
             right: 0;
@@ -193,7 +193,7 @@
   }
   #attachment-ui {
     .attachment-container {
-      height: 70%;
+      max-height: 70%;
     }
   }
 }

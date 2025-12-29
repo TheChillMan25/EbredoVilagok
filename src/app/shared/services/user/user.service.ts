@@ -2,20 +2,12 @@ import { Injectable } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from '../auth/auth.service';
 import { from, Observable, of, switchMap } from 'rxjs';
-import {
-  Adventure,
-  Character,
-  ForumPost,
-  ForumUser,
-  User,
-} from '../../models/models';
+import { Adventure, Character, User } from '../../models/models';
 import {
   collection,
-  collectionGroup,
   doc,
   getDoc,
   getDocs,
-  orderBy,
   query,
   where,
 } from 'firebase/firestore';
@@ -52,27 +44,7 @@ export class UserService {
     );
   }
 
-  getForumUserProfile(): Observable<{
-    user: ForumUser | null;
-    posts: ForumPost[];
-  }> {
-    return (
-      this,
-      this.authService.currentUser.pipe(
-        switchMap((authUser) => {
-          if (!authUser) {
-            return of({
-              user: null,
-              posts: [],
-            });
-          }
-          return from(this.fetchUserWithForumData(authUser.uid));
-        })
-      )
-    );
-  }
-
-  private async fetchUserWidthData(userID: string): Promise<{
+  private async fetchUserWidthData(userId: string): Promise<{
     user: User | null;
     username: string;
     email: string;
@@ -80,7 +52,7 @@ export class UserService {
     adventures: Adventure[] | [];
   }> {
     try {
-      const userDocRef = doc(this.firestore, 'Users', userID);
+      const userDocRef = doc(this.firestore, 'Users', userId);
       const userSnapshot = await getDoc(userDocRef);
 
       if (!userSnapshot.exists()) {
@@ -95,7 +67,7 @@ export class UserService {
       }
 
       const userData = userSnapshot.data() as User;
-      const user = { ...userData, id: userID };
+      const user = { ...userData, id: userId };
 
       const characters: Character[] = [];
       if (user.characters && user.characters.length > 0) {
@@ -110,7 +82,8 @@ export class UserService {
           const characterData = doc.data();
           const character: Character = {
             id: doc.id,
-            currentAdventure: characterData?.['currentAdventure'],
+            userId: characterData?.['userId'] ?? '',
+            currentAdventure: characterData?.['currentAdventure'] ?? '',
             name: characterData?.['name'] ?? '',
             species: characterData?.['species'] ?? '',
             class: characterData?.['class'] ?? '',
@@ -147,6 +120,7 @@ export class UserService {
           const adventureData = doc.data();
           const adventure: Adventure = {
             id: doc.id,
+            userId: adventureData?.['userId'] ?? '',
             name: adventureData?.['name'] ?? '',
             events: adventureData?.['events'] ?? '',
             players: adventureData?.['players'] ?? '',
@@ -175,59 +149,5 @@ export class UserService {
     }
   }
 
-  private async fetchUserWithForumData(userID: string): Promise<{
-    user: ForumUser | null;
-    posts: ForumPost[];
-  }> {
-    try {
-      const userDocRef = doc(this.firestore, 'Users', userID);
-      const userSnapshot = await getDoc(userDocRef);
-
-      if (!userSnapshot.exists()) {
-        console.warn('Usersnapshot not found!');
-        return {
-          user: null,
-          posts: [],
-        };
-      }
-
-      const userData = userSnapshot.data() as ForumUser;
-      const user = { ...userData, id: userID };
-
-      const postCollection = collectionGroup(this.firestore, 'Posts');
-      const q = query(
-        postCollection,
-        where('posterUID', '==', user.id),
-        orderBy('createdAt', 'desc')
-      );
-
-      const postsSnapShot = await getDocs(q);
-
-      const posts: ForumPost[] = [];
-      postsSnapShot.forEach((doc) => {
-        const postData = doc.data();
-        const post: ForumPost = {
-          id: doc.id,
-          forumID: postData?.['forumID'] ?? '',
-          title: postData?.['title'] ?? '',
-          poster: postData?.['poster'] ?? '',
-          posterUID: postData?.['posterUID'] ?? '',
-          text: postData?.['text'] ?? '',
-          attachments: postData?.['attachments'] ?? [],
-          createdAt: postData?.['createdAt'] ?? null,
-        };
-        posts.push(post);
-      });
-      return {
-        user,
-        posts,
-      };
-    } catch (error) {
-      console.error('Hiba a forumfelhasználó betöltésekor: ' + error);
-      return {
-        user: null,
-        posts: [],
-      };
-    }
-  }
+  deleteUser() {}
 }

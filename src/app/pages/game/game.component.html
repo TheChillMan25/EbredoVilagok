@@ -2,7 +2,7 @@
   <div id="players">
     <span class="headerText">Játékosok</span>
     @for (player of players; track $index) {
-    <div id="{{ player.userID }}" class="player">
+    <div id="{{ player.userId }}" class="player">
       <div class="player-header">
         <span class="player-name">{{ player.username }}</span>
         <span
@@ -84,7 +84,8 @@
         <mat-card-subtitle>Túl kicsi képernyő</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        A kijelződ túl kicsi a játék megfelelő működéséhez. Válts nagyobb képernyőre a játék működése érdekében.
+        A kijelződ túl kicsi a játék megfelelő működéséhez. Válts nagyobb
+        képernyőre a játék működése érdekében.
       </mat-card-content>
       <mat-card-actions>
         <button mat-flat-button routerLink="/index">Vissza a főildalra</button>

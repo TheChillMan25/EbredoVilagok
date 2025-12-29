@@ -23,7 +23,9 @@ import {
 export class CharacterService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async addCharacter(character: Omit<Character, 'id'>): Promise<Character> {
+  async addCharacter(
+    character: Omit<Character, 'id' | 'userId'>
+  ): Promise<Character> {
     try {
       const user = await firstValueFrom(
         this.authService.currentUser.pipe(take(1))
@@ -34,9 +36,9 @@ export class CharacterService {
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
       const userData = userSnap.data() as User;
-      
-      if(userData.characters.length === 10){
-        throw new Error('Maximum kaland szám elérve, nem készíthető több!')
+
+      if (userData.characters.length === 10) {
+        throw new Error('Maximum kaland szám elérve, nem készíthető több!');
       }
 
       const charactersColRef = collection(this.firestore, 'Characters');
@@ -45,6 +47,7 @@ export class CharacterService {
       const newCharacter: Character = {
         ...character,
         id: characterDocRef.id,
+        userId: user.uid,
       };
 
       const batch = writeBatch(this.firestore);
@@ -127,21 +130,6 @@ export class CharacterService {
       return null;
     } catch (error) {
       console.error('Hiba a karakter lekérdezésekor: ', error);
-      return null;
-    }
-  }
-
-  async getPublicCharacterByID(charID: string): Promise<Character | null> {
-    try {
-      const charDocRef = doc(this.firestore, 'Characters', charID);
-      const charSnapShot = await getDoc(charDocRef);
-
-      if (charSnapShot.exists()) {
-        return { ...charSnapShot.data(), id: charID } as Character;
-      }
-      return null;
-    } catch (error) {
-      console.error('Hiba a publikus karakter lekérésekor: ', error);
       return null;
     }
   }
