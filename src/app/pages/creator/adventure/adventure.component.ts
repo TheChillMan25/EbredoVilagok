@@ -7,7 +7,6 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   AbstractControl,
-  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -92,6 +91,7 @@ import { CanComponentDeactivate } from '../karakter/karakter.component';
 })
 export class AdventureComponent implements CanComponentDeactivate {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
+  isLoading: boolean = false;
 
   skipLeaveConfirm: boolean = false;
 
@@ -274,7 +274,6 @@ export class AdventureComponent implements CanComponentDeactivate {
         NPCs: [],
       };
       this.events.push(event);
-      console.log(this.events);
     }
     this.hideUIs();
     this.resetForm(this.eventForm);
@@ -457,7 +456,7 @@ export class AdventureComponent implements CanComponentDeactivate {
         this.advError = 'Adj legaglább egy eseményt a kalandhoz!';
         return;
       }
-      let adventure: Omit<Adventure, 'id'> = {
+      let adventure: Omit<Adventure, 'id' | 'userId'> = {
         name: this.adventureName.value,
         events: this.events,
         players: [],

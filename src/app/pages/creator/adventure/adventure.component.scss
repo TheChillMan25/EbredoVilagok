@@ -64,6 +64,11 @@
     justify-content: space-between;
     #create-btn {
       font-size: x-large;
+
+      &.disabled {
+        opacity: 0.75;
+        pointer-events: none;
+      }
     }
   }
 }

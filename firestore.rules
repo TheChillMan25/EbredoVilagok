@@ -2,17 +2,148 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2025, 10, 12);
+    // --- SEGÉDFÜGGVÉNYEK ---
+
+    // 1. Be van jelentkezve?
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 2. Ő a dokumentum tulajdonosa?
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // 3. Bejövő adat validációja (Típus és kötelező mezők)
+    function isValidUserData() {
+      let incoming = request.resource.data;
+      return incoming.username is string && incoming.username.size() >= 3 && incoming.username.size() <= 20
+          && incoming.email is string
+          // Az ID mezőnek meg kell egyeznie a dokumentum kulcsával és az Auth UID-val
+          && incoming.id == request.auth.uid; 
+    }
+
+    // Ellenőrizzük, hogy a létrehozni kívánt dokumentum 'userId' mezője
+    // megegyezik-e a bejelentkezett felhasználóval.
+    function isResourceOwner() {
+      return request.resource.data.userId == request.auth.uid;
+    }
+
+    // Ellenőrizzük, hogy a már létező dokumentum tulajdonosa mi vagyunk-e
+    function isExistingResourceOwner() {
+      return resource.data.userId == request.auth.uid;
+    }
+
+    // Lekérdezzük a User dokumentumot, hogy ellenőrizzük a limiteket
+    function getUserData() {
+      return get(/databases/$(database)/documents/Users/$(request.auth.uid)).data;
+    }
+
+    match /Users/{userId} {
+      
+      // OLVASÁS:
+      // Megengedjük, ha be van jelentkezve (ha a játékban látniuk kell egymást)
+      allow get: if isSignedIn();
+      allow list: if isSignedIn(); 
+
+      // LÉTREHOZÁS (Regisztrációkor):
+      allow create: if isSignedIn() 
+                    && isOwner(userId)
+                    && isValidUserData();
+
+      // MÓDOSÍTÁS (Profil szerkesztés):
+      allow update: if isSignedIn() 
+                    && isOwner(userId)
+                    // FONTOS: Megtiltjuk az email cím módosítását a kliens oldalról!
+                    && request.resource.data.email == resource.data.email;
+
+      // TÖRLÉS:
+      // Egyelőre tiltsuk le, hogy véletlenül ne törölje magát senki
+      allow delete: if false;
+    }
+
+    // --- CHARACTERS SZABÁLYOK ---
+    match /Characters/{characterId} {
+      // Olvasás: Ha be van jelentkezve (játék miatt bárki láthatja?) 
+      // VAGY ha privát, akkor: if isExistingResourceOwner();
+      allow read: if isSignedIn();
+
+      // Létrehozás feltételei:
+      // 1. Be van jelentkezve
+      // 2. A dokumentumba beleírja a saját userId-ját (isResourceOwner)
+      // 3. A felhasználó karakter listája kisebb mint 10 (LIMIT ELLENŐRZÉS!)
+      allow create: if isSignedIn()
+                    && isResourceOwner()
+                    && getUserData().characters.size() < 10;
+
+      // Módosítás és Törlés: Csak a tulajdonosnak
+      allow update, delete: if isSignedIn() && isExistingResourceOwner();
+    }
+
+    // --- ADVENTURES SZABÁLYOK ---
+    match /Adventures/{adventureId} {
+      allow read: if isSignedIn();
+
+      // Ugyanaz a logika, mint a karaktereknél
+      allow create: if isSignedIn()
+                    && isResourceOwner()
+                    && getUserData().adventures.size() < 10;
+
+      allow update, delete: if isSignedIn() && isExistingResourceOwner();
+    }
+
+    // --- FÓRUM SZABÁLYOK ---
+
+    // Fórum Témák (pl. 'characters', 'adventures')
+    // A service kódja alapján ezek fix dokumentumok, kliens nem hozza létre őket.
+    match /Forums/{topic} {
+      // Bárki olvashatja (vendég is)
+      allow read: if true; 
+      // Írni ide nem szabad (a Posts collection-be írunk)
+      allow write: if false; 
+
+      // --- POSZTOK (Posts) ---
+      match /Posts/{postId} {
+        // Bárki olvashatja
+        allow read: if true;
+
+        // Létrehozás:
+        // 1. Be van jelentkezve
+        // 2. A 'posterUID' mező a saját ID-ja (a service így küldi)
+        allow create: if isSignedIn() 
+                      && request.resource.data.posterUID == request.auth.uid;
+
+        // Törlés: Csak a posztoló törölheti
+        allow delete: if isSignedIn() 
+                      && resource.data.posterUID == request.auth.uid;
+
+        // (Opcionális: update, ha később lesz szerkesztés funkció)
+        allow update: if isSignedIn() && resource.data.posterUID == request.auth.uid;
+
+        // --- KOMMENTEK (Comments) ---
+        match /Comments/{commentId} {
+          // Bárki olvashatja
+          allow read: if true;
+
+          // Létrehozás:
+          // 1. Be van jelentkezve
+          // 2. Az 'authorUID' mező a saját ID-ja
+          allow create: if isSignedIn() 
+                        && request.resource.data.authorUID == request.auth.uid;
+
+          // Törlés (Ez a trükkös rész!):
+          // Két esetben törölhető egy komment:
+          // A) Én írtam a kommentet (saját komment törlése)
+          // B) Én vagyok a POSZT tulajdonosa, ami alatt a komment van (mert a post törlésekor a kommenteket is törlöd batch-ben)
+          allow delete: if isSignedIn() && (
+            // A) Saját komment
+            resource.data.authorUID == request.auth.uid 
+            || 
+            // B) A szülő poszt tulajdonosa vagyok
+            get(/databases/$(database)/documents/Forums/$(topic)/Posts/$(postId)).data.posterUID == request.auth.uid
+          );
+        }
+      }
     }
   }
 }

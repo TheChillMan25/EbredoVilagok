@@ -10,9 +10,8 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
 } from '@angular/fire/auth';
-import { collection } from 'firebase/firestore';
-import { doc, Firestore, setDoc } from '@angular/fire/firestore';
-import { Adventure, Character, User } from '../../models/models';
+import { doc, Firestore, setDoc, collection } from '@angular/fire/firestore';
+import { User } from '../../models/models';
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +56,6 @@ export class AuthService {
         email: email,
         characters: [],
         adventures: [],
-        posts: [],
       });
       return userCredential;
     } catch (error) {

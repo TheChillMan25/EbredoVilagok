@@ -21,6 +21,10 @@ interface SearchResult {
   location: number;
 }
 
+export function isMobileView(): boolean {
+  return window.innerWidth <= 768;
+}
+
 @Component({
   selector: 'app-map',
   imports: [
@@ -121,7 +125,7 @@ export class MapComponent {
 
   locate(location: Location) {
     this.map.locatePoint(location);
-    if (this.isMobileView()) this.hideControlPanel();
+    if (isMobileView()) this.hideControlPanel();
   }
 
   changeMap(isAradas: boolean) {
@@ -129,8 +133,5 @@ export class MapComponent {
     if (this.search.value !== '' || this.search.value !== null) {
       this.searchFor(this.search.value);
     }
-  }
-  isMobileView(): boolean {
-    return window.innerWidth <= 768;
   }
 }

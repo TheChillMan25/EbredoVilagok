@@ -1,10 +1,11 @@
+import { FieldValue, Timestamp } from 'firebase/firestore';
+
 export interface User {
   id: string | null | undefined;
   username: string | null | undefined;
   email: string | null | undefined;
   characters: string[];
   adventures: string[];
-  posts: string[];
 }
 
 export interface ForumUser {
@@ -13,8 +14,14 @@ export interface ForumUser {
   posts: ForumPost[];
 }
 
+export enum ForumTopic {
+  CHARACTER,
+  ADVENTURE,
+}
+
 export interface Character {
   id: string;
+  userId: string;
   currentAdventure: string;
   name: string;
   species: string;
@@ -61,6 +68,11 @@ export interface Character {
   };
 }
 
+export type PublicCharacter = Omit<
+  Character,
+  'id' | 'currentAdventure' | 'userId'
+>;
+
 export interface Forum {
   adventureForum: SubForum;
   characterForum: SubForum;
@@ -74,25 +86,40 @@ export interface SubForum {
 
 export interface ForumPost {
   id: string;
+  forumID: ForumTopic;
   title: string;
-  poster: string;
-  posterUID: string;
-  sentDate: string;
+  poster: string | null | undefined;
+  posterUID: string | null | undefined;
+  createdAt: Timestamp | FieldValue;
   text: string;
-  attachments: string[];
+  attachments: PublicCharacter[] | PublicAdventure[];
+}
+
+export interface ForumPostComment {
+  id: string;
+  authorUID: string | null | undefined;
+  authorName: string | null | undefined;
+  text: string;
+  createdAt: Timestamp | FieldValue;
 }
 
 export interface Adventure {
   id: string;
+  userId: string;
   name: string | null;
   events: AdventureEvent[];
   players: Player[];
   currentPlayer: string;
 }
 
+export type PublicAdventure = Omit<
+  Adventure,
+  'id' | 'players' | 'currentPlayer' | 'userId'
+>;
+
 export interface Player {
   id: string;
-  userID: string;
+  userId: string;
   character: Character;
   currentAction: string;
 }

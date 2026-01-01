@@ -222,7 +222,6 @@ export class MapContainerComponent {
   locatePoint(location: Location) {
     this.map.flyTo([location.location.y, location.location.x], 1);
     let marker = this.markerReference.get(location.id);
-    console.log(marker);
     marker?.openPopup();
   }
 

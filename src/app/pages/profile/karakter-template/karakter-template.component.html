@@ -19,6 +19,17 @@
       </div>
       }
     </div>
+    @if(!isPublic){
+    <div class="fake-button delete" (click)="deleteCharacter()">
+      <mat-icon>delete</mat-icon>
+    </div>
+    <div class="warning" [ngClass]="{ show: showWarning }">
+      <app-delete-warning
+        (deleteEvent)="deleteCharacter()"
+        (closeEvent)="closeWarning()"
+      ></app-delete-warning>
+    </div>
+    }
   </div>
   <div class="stats inner-char-container">
     <span>Tulajdonságok</span>
@@ -40,18 +51,9 @@
     </div>
   </div>
   <div class="spec-container" [ngClass]="{ show: showSpecDescs }">
-    <div [id]="character.id" class="text-container"></div>
+    <div #specText class="text-container"></div>
     <div class="fake-button" (click)="hideSpecDescs()">
       <mat-icon>close</mat-icon>
     </div>
-  </div>
-  <div class="fake-button delete" (click)="deleteCharacter()">
-    <mat-icon>delete</mat-icon>
-  </div>
-  <div class="warning" [ngClass]="{ show: showWarning }">
-    <app-delete-warning
-      (deleteEvent)="deleteCharacter()"
-      (closeEvent)="closeWarning()"
-    ></app-delete-warning>
   </div>
 </div>

@@ -4,15 +4,17 @@ import { AuthService } from '../auth/auth.service';
 import { Adventure, User } from '../../models/models';
 import { firstValueFrom, map, Observable, switchMap, take } from 'rxjs';
 import {
-  addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
+  documentId,
   getDoc,
   getDocs,
   query,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 
 @Injectable({
@@ -21,32 +23,40 @@ import {
 export class AdventureService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  async addAdventure(adventure: Omit<Adventure, 'id'>): Promise<Adventure> {
+  async addAdventure(
+    adventure: Omit<Adventure, 'id' | 'userId'>
+  ): Promise<Adventure> {
     try {
       const user = await firstValueFrom(
         this.authService.currentUser.pipe(take(1))
       );
       if (!user) throw new Error('Felhasználó nem található!');
 
-      const adventureCollection = collection(this.firestore, 'Adventures');
-      const docRef = await addDoc(adventureCollection, adventure);
-      const advID = docRef.id;
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+      const userData = userSnap.data() as User;
+      if (userData.adventures.length === 10) {
+        throw new Error('Maximum kalandszám elérve, nem készíthető több!');
+      }
 
-      await updateDoc(docRef, { id: advID });
+      const adventuresColRef = collection(this.firestore, 'Adventures');
+      const adventureDocRef = doc(adventuresColRef); // előre generált ID
+
       const newAdventure: Adventure = {
         ...adventure,
-        id: advID,
-      } as Adventure;
+        id: adventureDocRef.id,
+        userId: user.uid,
+      };
 
-      const userDocRef = doc(this.firestore, 'Users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+      const batch = writeBatch(this.firestore);
+      batch.set(adventureDocRef, newAdventure);
+      batch.update(userDocRef, {
+        adventures: arrayUnion(adventureDocRef.id),
+      });
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as User;
-        const adventures = userData.adventures || [];
-        adventures.push(advID);
-        await updateDoc(userDocRef, { adventures });
-      }
+      await batch.commit();
+
       return newAdventure;
     } catch (error) {
       console.error('Error adding adventure: ', error);
@@ -74,7 +84,7 @@ export class AdventureService {
 
           const q = query(
             adventureCollection,
-            where('id', 'in', userData.adventures)
+            where(documentId(), 'in', userData.adventures)
           );
           const snapShot = await getDocs(q);
           snapShot.forEach((doc) => {
