@@ -145,7 +145,6 @@ export class KarakterComponent implements CanComponentDeactivate {
   }
 
   ngOnInit() {
-    console.log(this.medicalItems.length, this.specialDrinks.length);
     setBackground('paper_bg');
     this.initForm();
   }
@@ -231,7 +230,7 @@ export class KarakterComponent implements CanComponentDeactivate {
     }
     const formValue = this.mainForm.value;
 
-    let newCharacter: Omit<Character, 'id'> = {
+    let newCharacter: Omit<Character, 'id' | 'userId'> = {
       currentAdventure: '',
       name: formValue.name || '',
       species: formValue.species || '',
@@ -315,7 +314,6 @@ export class KarakterComponent implements CanComponentDeactivate {
       return;
     }
     const random = createRandomCharacter(charName);
-    console.log(random);
 
     this.mainForm.get('species')?.setValue(random.species);
     this.setRelevantSpeciesData(random.species);

@@ -6,14 +6,18 @@ import {
   Character,
   ForumPost,
   ForumTopic,
-  ForumUser,
+  PublicAdventure,
+  User,
 } from '../../shared/models/models';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { NgClass, AsyncPipe, DatePipe } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { ForumService } from '../../shared/services/forum/forum.service';
-import { PostTemplateComponent } from './post-template/post-template.component';
+import {
+  noWhitespaceValidator,
+  PostTemplateComponent,
+} from './post-template/post-template.component';
 import {
   FormControl,
   FormsModule,
@@ -23,13 +27,11 @@ import {
   FormBuilder,
   FormArray,
 } from '@angular/forms';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { CharacterService } from '../../shared/services/character/character.service';
-import { AdventureService } from '../../shared/services/adventure/adventure.service';
 import { MatButton } from '@angular/material/button';
-import { serverTimestamp, Timestamp, FieldValue } from 'firebase/firestore';
+import { Timestamp, FieldValue } from 'firebase/firestore';
 import { isMobileView } from '../map/map.component';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -59,11 +61,11 @@ export function toDate(
     FormsModule,
     ReactiveFormsModule,
     MatFormField,
+    MatError,
     MatLabel,
     MatInput,
     MatSelect,
     MatOption,
-    AsyncPipe,
     DatePipe,
     MatButton,
     CdkTextareaAutosize,
@@ -73,7 +75,7 @@ export function toDate(
   styleUrl: './forum.component.scss',
 })
 export class ForumComponent {
-  user: ForumUser | null = null;
+  user: User | null = null;
   myPosts: ForumPost[] = [];
   /**Mobileview Forum panel visibility */
   showForums: boolean = false;
@@ -82,9 +84,9 @@ export class ForumComponent {
   /**Mobileview panel to hide User/Forum panel */
   showCloseUI: boolean = false;
 
-  characters$!: Observable<Character[]>;
-  adventures$!: Observable<Adventure[]>;
-  items!: Observable<Character[] | Adventure[]>;
+  characters: Character[] = [];
+  adventures: Adventure[] = [];
+  items: Character[] | Adventure[] = [];
 
   newPostUIVisible: boolean = false;
   newPost!: FormGroup;
@@ -108,9 +110,7 @@ export class ForumComponent {
   private forumProfileSubscription: Subscription | null = null;
   constructor(
     private userService: UserService,
-    private forumService: ForumService,
-    private charService: CharacterService,
-    private advService: AdventureService
+    private forumService: ForumService
   ) {
     this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   }
@@ -119,8 +119,6 @@ export class ForumComponent {
     setBackground('#222', true);
     this.loadForumUserData();
     this.loadPosts();
-    this.characters$ = this.charService.getAllCharacters();
-    this.adventures$ = this.advService.getAllAdventures();
     this.initForm();
   }
 
@@ -143,6 +141,7 @@ export class ForumComponent {
         Validators.required,
         Validators.minLength(1),
         Validators.maxLength(500),
+        noWhitespaceValidator,
       ]),
       attachSelect: new FormControl(),
       attachments: this.fb.array([]),
@@ -162,12 +161,20 @@ export class ForumComponent {
     return this.newPost.get('text') as FormControl;
   }
 
-  addAttachment(item: string) {
+  addAttachment(item: Character | Adventure) {
+    if (!item) return;
+    if (this.attachments.length >= 3) {
+      this.postError = 'Nem lehet több csatolmányt hozzáadni! (max. 3)';
+      return;
+    }
     const alreadyExists = this.attachments.value.includes(item);
 
     if (!alreadyExists) {
+      this.postError = '';
       this.attachments.push(new FormControl(item));
+      this.newPost.get('attachSelect')?.reset();
     } else {
+      this.postError = 'Ez az elem már csatolva van.';
       console.warn('Ez az elem már csatolva van.');
     }
   }
@@ -185,10 +192,12 @@ export class ForumComponent {
       this.forumProfileSubscription.unsubscribe();
     }
     this.forumProfileSubscription = this.userService
-      .getForumUserProfile()
+      .getUserProfile()
       .subscribe({
         next: (data) => {
           this.user = data.user;
+          this.characters = data.characters;
+          this.adventures = data.adventures;
         },
         error(err) {
           console.error('Hiba a forumprofil betöltésekor: ' + err);
@@ -204,10 +213,10 @@ export class ForumComponent {
   selectForum(value: ForumTopic) {
     switch (value) {
       case ForumTopic.CHARACTER:
-        this.items = this.characters$;
+        this.items = this.characters;
         break;
       case ForumTopic.ADVENTURE:
-        this.items = this.adventures$;
+        this.items = this.adventures;
         break;
     }
     this.attachments.clear();
@@ -263,7 +272,15 @@ export class ForumComponent {
       forumID: formValue.forum,
       title: formValue.title,
       text: formValue.text,
-      attachments: formValue.attachments.map((e: any) => e.id) || [],
+      attachments:
+        formValue.attachments.map((a: Character | Adventure) => {
+          if ('events' in a)
+            return { events: a.events, name: a.name } as PublicAdventure;
+          else {
+            let { id, currentAdventure, ...rest } = a;
+            return rest;
+          }
+        }) || [],
     };
 
     this.forumService

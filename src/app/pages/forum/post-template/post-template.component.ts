@@ -10,9 +10,6 @@ import { MatIcon } from '@angular/material/icon';
 import { KarakterTemplateComponent } from '../../profile/karakter-template/karakter-template.component';
 import { KalandTemplateComponent } from '../../profile/kaland-template/kaland-template.component';
 import { NgClass } from '@angular/common';
-import { CharacterService } from '../../../shared/services/character/character.service';
-import { AdventureService } from '../../../shared/services/adventure/adventure.service';
-import { MatTooltip } from '@angular/material/tooltip';
 import { DatePipe } from '@angular/common';
 import { FieldValue, Timestamp } from 'firebase/firestore';
 import { ForumService } from '../../../shared/services/forum/forum.service';
@@ -46,7 +43,6 @@ export function noWhitespaceValidator(
     KarakterTemplateComponent,
     KalandTemplateComponent,
     NgClass,
-    MatTooltip,
     DatePipe,
     MatFormField,
     MatLabel,
@@ -75,15 +71,11 @@ export class PostTemplateComponent {
   commentForm!: FormGroup;
   fb = new FormBuilder();
 
-  attachments: (Character | Adventure)[] = [];
-
   comments: ForumPostComment[] = [];
 
   private commentsSub: Subscription | null = null;
 
   constructor(
-    private charService: CharacterService,
-    private advService: AdventureService,
     private forumService: ForumService
   ) {}
 
@@ -127,22 +119,6 @@ export class PostTemplateComponent {
     return toDate(value);
   }
 
-  async getAttachments() {
-    for (let id of this.post.attachments) {
-      if (this.type === 'character') {
-        const character = await this.charService.getPublicCharacterByID(id);
-        if (character) {
-          this.attachments.push(character);
-        }
-      } else if (this.type === 'adventure') {
-        const adventure = await this.advService.getPublicAdventureByID(id);
-        if (adventure) {
-          this.attachments.push(adventure);
-        }
-      }
-    }
-  }
-
   addComment() {
     if (!this.commentForm.valid) {
       return;
@@ -166,8 +142,8 @@ export class PostTemplateComponent {
       });
   }
 
-  deleteComment(commentID: string, topic: ForumTopic, postID: string){
-    this.forumService.deleteComment(commentID, topic, postID)
+  deleteComment(commentID: string, topic: ForumTopic, postID: string) {
+    this.forumService.deleteComment(commentID, topic, postID);
   }
 
   getComments() {
@@ -179,7 +155,6 @@ export class PostTemplateComponent {
   }
 
   showAttached() {
-    if (this.attachments.length === 0) this.getAttachments();
     this.showAttachments = true;
   }
 

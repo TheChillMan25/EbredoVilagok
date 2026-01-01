@@ -240,8 +240,6 @@ export class ForumService {
       createdAt: serverTimestamp(),
     };
 
-    console.log(comment);
-
     const forumDocRef =
       forumID === ForumTopic.CHARACTER
         ? doc(this.firestore, 'Forums', 'characters')

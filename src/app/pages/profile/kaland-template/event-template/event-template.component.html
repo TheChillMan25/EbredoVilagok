@@ -2,12 +2,17 @@
   <p class="event-name">{{ event.name }}</p>
   <div class="event-details">
     <p><span class="p-title">Helyszín:</span> {{ event.location }}</p>
-    <span class="fake-button" (click)="showNPCs()">NPC-k:</span>
+    @if(event.NPCs.length > 0){
+    <div class="fake-button" (click)="showNPCs()">NPC-k:</div>
+    }@else {
+    <span>Nincsenek NPC-k</span>
+    }
     <span class="p-title">Leírás:</span>
     <p>{{ event.desc }}</p>
     <span class="p-title">Történet:</span>
     <p>{{ event.story }}</p>
   </div>
+  @if(event.NPCs.length > 0){
   <div class="npcs" [ngClass]="{ show: visibleNPCs }">
     @for (npc of event.NPCs; track $index) {
     <!-- <app-npc-template [npc]="npc"></app-npc-template> -->
@@ -20,6 +25,7 @@
     </div>
     }
   </div>
+  }
   <div
     class="fake-button close-npcs"
     (click)="hideNPCs()"

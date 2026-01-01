@@ -274,7 +274,6 @@ export class AdventureComponent implements CanComponentDeactivate {
         NPCs: [],
       };
       this.events.push(event);
-      console.log(this.events);
     }
     this.hideUIs();
     this.resetForm(this.eventForm);
@@ -457,7 +456,7 @@ export class AdventureComponent implements CanComponentDeactivate {
         this.advError = 'Adj legaglább egy eseményt a kalandhoz!';
         return;
       }
-      let adventure: Omit<Adventure, 'id'> = {
+      let adventure: Omit<Adventure, 'id' | 'userId'> = {
         name: this.adventureName.value,
         events: this.events,
         players: [],
