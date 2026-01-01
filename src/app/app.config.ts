@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
         projectId: 'ebredo-vilagok',
         appId: '1:966343917836:web:b6058487c232219ff44929',
         storageBucket: 'ebredo-vilagok.firebasestorage.app',
-        apiKey: 'AIzaSyBbryq9GKDAhDcXPOxtGxN_20nOOhNkWkY',
+        apiKey: 'AIzaSyD3HJNXFpZVBo53OQc_GhMYg618-RwrbAo',
         authDomain: 'ebredo-vilagok.firebaseapp.com',
         messagingSenderId: '966343917836',
       })
@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
       // Ha localhost-on vagyunk, csatlakozunk a 9099-es porthoz
       if (
         location.hostname === 'localhost' ||
-        location.hostname.includes('192.168.1.240') ||
+        location.hostname.startsWith('192.168.1.') ||
         location.hostname === '127.0.0.1'
       ) {
         connectAuthEmulator(auth, `http://${location.hostname}:9099`, {
@@ -46,7 +46,7 @@ export const appConfig: ApplicationConfig = {
       // Ha localhost-on vagyunk, csatlakozunk a 8080-as porthoz
       if (
         location.hostname === 'localhost' ||
-        location.hostname.includes('192.168.1.240') ||
+        location.hostname.startsWith('192.168.1.') ||
         location.hostname === '127.0.0.1'
       ) {
         // Itt is a location.hostname-t használjuk
