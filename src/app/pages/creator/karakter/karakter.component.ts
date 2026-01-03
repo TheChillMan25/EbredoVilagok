@@ -2,7 +2,6 @@ import { Component, HostListener } from '@angular/core';
 import {
   convertSpeciesNameToKey,
   createRandomCharacter,
-  getItem,
   setBackground,
 } from '../../../shared/functional/functions';
 import {
@@ -24,7 +23,6 @@ import { Armour } from '../../../shared/models/character_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,
-  getCharacterVirDisAdv,
 } from '../../../shared/models/virtues_disadvantages';
 import {
   foodRations,
@@ -118,7 +116,7 @@ export class KarakterComponent implements CanComponentDeactivate {
 
   medicalItems = medicalItems.map((item) => item.name);
   specialDrinks = specialDrinks.map((drink) => drink.name);
-  otherItems = items.map((item) => item.name);
+  generalItems = items.map((item) => item.name);
 
   showDiceMenu: boolean = false;
 
@@ -211,7 +209,7 @@ export class KarakterComponent implements CanComponentDeactivate {
           new FormControl(),
           new FormControl(),
         ]),
-        otherItems: this.fb.array<FormControl<number>>([
+        generalItems: this.fb.array<FormControl<number>>([
           new FormControl(),
           new FormControl(),
           new FormControl(),
@@ -268,7 +266,7 @@ export class KarakterComponent implements CanComponentDeactivate {
       items: formValue.items || {
         food: [],
         specialItems: [],
-        otherItems: [],
+        generalItems: [],
         weaponItems: [],
       },
       wounds: {

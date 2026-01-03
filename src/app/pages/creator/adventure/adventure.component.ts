@@ -37,8 +37,7 @@ import {
   specialDrinks,
 } from '../../../shared/models/items';
 import { CharacterService } from '../../../shared/services/character/character.service';
-import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { Observable, Subscription, take } from 'rxjs';
 import { MapContainerComponent } from '../../../shared/functional/map-container/map-container.component';
 import {
   cityLocations,
@@ -65,7 +64,6 @@ import { CanComponentDeactivate } from '../karakter/karakter.component';
 @Component({
   selector: 'app-adventure',
   imports: [
-    AsyncPipe,
     MatIconModule,
     MatCheckboxModule,
     MatRadioModule,
@@ -135,10 +133,12 @@ export class AdventureComponent implements CanComponentDeactivate {
     specialItems: medicalItems
       .map((item) => item.name)
       .concat(specialDrinks.map((item) => item.name)),
-    otherItems: items.map((item) => item.name),
+    generalItems: items.map((item) => item.name),
   };
 
-  myCharacters$!: Observable<Character[]>;
+  myCharacters!: Character[];
+
+  myCharSub?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -168,7 +168,12 @@ export class AdventureComponent implements CanComponentDeactivate {
     setBackground('paper_bg');
     this.initForms();
 
-    this.myCharacters$ = this.charService.getAllCharacters();
+    this.myCharSub = this.charService
+      .getAllCharacters()
+      .pipe(take(1))
+      .subscribe((value) => {
+        this.myCharacters = value;
+      });
 
     this.locations = cityLocations
       .concat(townLocations)
@@ -182,20 +187,23 @@ export class AdventureComponent implements CanComponentDeactivate {
     switch (which) {
       case 'events':
         this.showEvents = true;
-        this.resetForm(this.eventForm);
         break;
       case 'npcs':
         this.showNPCs = true;
-        this.resetForm(this.npcForm);
         break;
     }
     this.action = 'Hozzáad';
     this.actionIcon = 'add';
   }
 
-  hideUIs() {
-    this.showEvents = false;
-    this.showNPCs = false;
+  hideUIs(which: 'events' | 'npcs') {
+    if (which === 'events') {
+      this.showEvents = false;
+      this.resetForm(this.eventForm);
+    } else {
+      this.showNPCs = false;
+      this.resetForm(this.npcForm);
+    }
     this.modify = false;
     this.modifyingIndex = null;
   }
@@ -272,10 +280,11 @@ export class AdventureComponent implements CanComponentDeactivate {
         desc: eventValues.desc,
         story: eventValues.story,
         NPCs: [],
+        completed: false,
       };
       this.events.push(event);
     }
-    this.hideUIs();
+    this.hideUIs('events');
     this.resetForm(this.eventForm);
   }
 
@@ -387,11 +396,13 @@ export class AdventureComponent implements CanComponentDeactivate {
         name: npcValues.name,
         actions: npcValues.actions,
         attitude: npcValues.attitude,
-        character: npcValues.character,
+        character: this.myCharacters.find(
+          (char) => char.id === npcValues.character
+        ),
       };
       this.selectedAdventureEvent?.NPCs.push(npc);
     }
-    this.hideUIs();
+    this.hideUIs('npcs');
     this.resetForm(this.npcForm);
   }
 
@@ -420,13 +431,11 @@ export class AdventureComponent implements CanComponentDeactivate {
   }
 
   getCharacterName(id: string): string {
-    this.myCharacters$.forEach((char) => {
-      char.forEach((character) => {
-        if (character.id === id) {
-          return character.name;
-        }
-        return '';
-      });
+    this.myCharacters.forEach((char) => {
+      if (char.id === id) {
+        return char.name;
+      }
+      return '';
     });
     return '';
   }
@@ -459,8 +468,6 @@ export class AdventureComponent implements CanComponentDeactivate {
       let adventure: Omit<Adventure, 'id' | 'userId'> = {
         name: this.adventureName.value,
         events: this.events,
-        players: [],
-        currentPlayer: '',
       };
       this.advService
         .addAdventure(adventure)

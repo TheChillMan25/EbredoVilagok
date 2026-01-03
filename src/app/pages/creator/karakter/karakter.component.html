@@ -71,7 +71,12 @@
     </div>
     <div id="create">
       <span id="error">{{ errorMessage }}</span>
-      <button id="createBtn" class="fake-button" (click)="createCharacter()" [ngClass]="{disabled: isLoading}">
+      <button
+        id="createBtn"
+        class="fake-button"
+        (click)="createCharacter()"
+        [ngClass]="{ disabled: isLoading }"
+      >
         Létrehozás
       </button>
     </div>
@@ -226,44 +231,44 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div id="otherItems" class="container" formGroupName="otherItems">
+    <div id="generalItems" class="container" formGroupName="generalItems">
       <span class="groupName">Egyéb tárgyak</span>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
-        <mat-select [formControl]="getInputs('items.otherItems').at(0)">
-          @for (item of otherItems; track $index) {
+        <mat-select [formControl]="getInputs('items.generalItems').at(0)">
+          @for (item of generalItems; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
-        <mat-select [formControl]="getInputs('items.otherItems').at(1)">
-          @for (item of otherItems; track $index) {
+        <mat-select [formControl]="getInputs('items.generalItems').at(1)">
+          @for (item of generalItems; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
-        <mat-select [formControl]="getInputs('items.otherItems').at(2)">
-          @for (item of otherItems; track $index) {
+        <mat-select [formControl]="getInputs('items.generalItems').at(2)">
+          @for (item of generalItems; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
-        <mat-select [formControl]="getInputs('items.otherItems').at(3)">
-          @for (item of otherItems; track $index) {
+        <mat-select [formControl]="getInputs('items.generalItems').at(3)">
+          @for (item of generalItems; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Tárgy</mat-label>
-        <mat-select [formControl]="getInputs('items.otherItems').at(4)">
-          @for (item of otherItems; track $index) {
+        <mat-select [formControl]="getInputs('items.generalItems').at(4)">
+          @for (item of generalItems; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>

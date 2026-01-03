@@ -301,6 +301,9 @@ html {
   --mdc-outlined-text-field-focus-label-text-color: #f2c480;
   --mdc-filled-button-label-text-color: #333;
 
+  /* MatTooltip*/
+  --mdc-plain-tooltip-supporting-text-size: medium;
+  --mdc-plain-tooltip-container-color: #222;
   /*Mat-select*/
   /*--mat-select-panel-background-color: #555;*/
   --mdc-list-list-item-hover-label-text-color: #f2c480;

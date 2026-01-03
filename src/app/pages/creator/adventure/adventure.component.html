@@ -38,7 +38,12 @@
         </mat-form-field>
         <div id="advError" class="error-message">{{ advError }}</div>
         <div id="footer-btns">
-          <div id="create-btn" class="fake-button" [ngClass]="{disabled: isLoading}" (click)="createAdventure()">
+          <div
+            id="create-btn"
+            class="fake-button"
+            [ngClass]="{ disabled: isLoading }"
+            (click)="createAdventure()"
+          >
             Létrehozás
           </div>
           <div id="help" class="fake-button" (click)="userManual(true)">
@@ -92,7 +97,7 @@
   <div id="add-event-ui" class="ui-container" [ngClass]="{ show: showEvents }">
     <div class="header">
       <div class="header-text">Új esemény</div>
-      <div class="fake-button" (click)="hideUIs()">
+      <div class="fake-button" (click)="hideUIs('events')">
         <mat-icon>close</mat-icon>
       </div>
     </div>
@@ -145,7 +150,7 @@
   <div id="add-npc-ui" class="ui-container" [ngClass]="{ show: showNPCs }">
     <div class="header">
       <div class="header-text">Új NPC</div>
-      <div class="fake-button" (click)="hideUIs()">
+      <div class="fake-button" (click)="hideUIs('npcs')">
         <mat-icon>close</mat-icon>
       </div>
     </div>
@@ -211,18 +216,17 @@
           >
         </div>
       </div>
-      @if(this.attitude === "hostile"){
       <mat-form-field appearance="outline">
         <mat-label>Karakter</mat-label>
         <mat-select formControlName="character">
-          @for (character of (myCharacters$ | async); track $index) {
+          @for (character of myCharacters; track $index) {
           <mat-option value="{{ character.id }}">{{
             character.name
           }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
-      } @if(npcError !== ''){
+      @if(npcError !== ''){
       <div id="npc-error" class="error-message">{{ npcError }}</div>
       }
       <button class="fake-button" type="submit">
