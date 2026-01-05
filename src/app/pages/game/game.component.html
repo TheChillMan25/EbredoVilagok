@@ -1,95 +1,95 @@
 <div id="content">
-  <div id="players">
-    <span class="headerText">Játékosok</span>
-    @for (player of players; track $index) {
-    <div id="{{ player.userId }}" class="player">
-      <div class="player-header">
-        <span class="player-name">{{ player.username }}</span>
-        <span
-          >HP: {{ player.character.stats.main.hp }} SP:
-          {{ player.character.stats.main.sp }}</span
+  @if(!isLoading){
+  <div id="host-area">
+    <div id="create-game" class="menus">
+      <span class="menu-name">Játék létrehozása</span>
+      <form [formGroup]="newGameForm" (ngSubmit)="createGame()">
+        <mat-form-field appearance="outline">
+          <mat-label
+            >Játék neve
+            {{ newGameForm.get("name")?.value.length }}/20</mat-label
+          >
+          <input matInput type="text" formControlName="name" maxlength="20" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Kaland</mat-label>
+          <mat-select formControlName="adventure">
+            @for (item of myAdventures; track item.id) {
+            <mat-option [value]="item.id">{{ item.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Max játékos (db)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="maxPlayers"
+            min="1"
+            max="6"
+          />
+        </mat-form-field>
+        <mat-checkbox formControlName="isPublic">Publikus</mat-checkbox>
+        <mat-error class="error-message"
+          >@if(newGameForm.get('name')?.hasError('whitespace') &&
+          newGameForm.get('name')?.value.length > 0){ Nem lehet üres a név!
+          }@else{ {{ createError }} }</mat-error
         >
-      </div>
-      <span class="effect">Hatás: {{ player.effect }}</span>
-      <div class="player-action">
-        Kör: <span>{{ player.turn }}</span>
-      </div>
+        <button mat-flat-button type="submit">Létrehozás</button>
+      </form>
     </div>
-    }
-  </div>
-  <div id="backpack">
-    <span class="headerText">Hátizsák</span>
-    <div id="food-container" class="item-container">
-      <span class="headerText">Élelem</span>
-      @for (item of players[0].character.items.food; track $index) {
-      <div class="item">
-        {{ getItem("food", item).name }}
-      </div>
-      }
-    </div>
-    <div id="special-item-container" class="item-container">
-      <span class="headerText">Különleges tárgyak</span>
-      @for (item of players[0].character.items.specialItems; track $index) {
-      <div class="item">
-        {{ getItem("specialItems", item).name }}
-      </div>
-      }
-    </div>
-    <div id="item-container" class="item-container">
-      <span class="headerText">Tárgyak</span>
-      @for (item of players[0].character.items.otherItems; track $index) {
-      <div class="item">
-        {{ getItem("otherItems", item).name }}
-      </div>
-      }
-    </div>
-  </div>
-  <div id="actions">
-    <span class="headerText">Akciók</span>
-    <div id="action-container">
-      <div class="fake-button">
-        <mat-icon>close</mat-icon>
-        <div class="tooltip">Támadás az elsődleges fegyverrel</div>
-      </div>
-      <div class="fake-button">
-        <mat-icon>electric_bolt</mat-icon>
-        <div class="tooltip">Elektromos csapás.</div>
+    <div id="continue-game" class="menus">
+      <span class="menu-name">Játékaim</span>
+      <div id="myGames" class="games-container">
+        @if(myGames.length > 0){ @for (item of myGames; track item.id) {
+        <app-game-template
+          [game]="item"
+          type="myGame"
+          (gameEvent)="controlGameEvent($event)"
+        ></app-game-template>
+        } }@else {Nincsenek játékok}
       </div>
     </div>
   </div>
-  <div id="npcs">
-    <span class="headerText">NPC-k és ellenfelek</span>
-    @for (npc of npcs; track $index) {
-    <div id="{{ npc.npc.character?.id }}" class="npc">
-      <div class="npc-header">
-        <span class="npc-name">{{ npc.npc.name }}</span>
-        <span
-          >HP: {{ npc.npc.character?.stats?.main?.hp }} SP:
-          {{ npc.npc.character?.stats?.main?.sp }}</span
+  <div id="join-game" class="menus">
+    <div id="join-form-container">
+      <span class="menu-name">Csatlakozás játékhoz</span>
+      <form [formGroup]="joinGameForm" (ngSubmit)="joinGame()">
+        <mat-form-field appearance="outline">
+          <mat-label>Csatlakozási kód</mat-label>
+          <input matInput type="text" formControlName="joinID" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Karakter</mat-label>
+          <mat-select formControlName="character">
+            @for (item of myCharacters; track item.id) {
+            <mat-option [value]="item.id">{{ item.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-error
+          >@if(joinGameForm.get('joinID')?.hasError('whitespace') &&
+          joinGameForm.get('joinID')?.value.length > 0){ Nem lehet üres a kód!
+          }@else{{{ joinError}}}</mat-error
         >
-      </div>
-      <span class="effect">Hatás: {{ npc.effect }}</span>
-      <div class="npc-action">
-        Kör: <span>{{ npc.turn }}</span>
+        <button mat-flat-button type="submit">Csatlakozás</button>
+      </form>
+    </div>
+    <div class="open-games">
+      <span class="menu-name">Publikus játékok</span>
+      <div id="public-games" class="games-container">
+        @if(openGames.length > 0){ @for (item of openGames; track item.id) {
+        <app-game-template
+          [game]="item"
+          type="general"
+          (gameEvent)="controlGameEvent($event)"
+        ></app-game-template>
+        } }@else { Nincsenek játékok }
       </div>
     </div>
-    }
   </div>
-  <div id="map"></div>
-  <div id="warning">
-    <mat-card appearance="outlined">
-      <mat-card-header>
-        <mat-icon>warning</mat-icon>
-        <mat-card-title>Figyelmeztetés</mat-card-title>
-        <mat-card-subtitle>Túl kicsi képernyő</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        A kijelződ túl kicsi a játék megfelelő működéséhez. Válts nagyobb
-        képernyőre a játék működése érdekében.
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-flat-button routerLink="/index">Vissza a főildalra</button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+  } @if(isLoading){
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  }
 </div>
+<router-outlet></router-outlet>

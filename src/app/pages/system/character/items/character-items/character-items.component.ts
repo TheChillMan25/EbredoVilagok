@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Item } from '../../../../../shared/models/character_interfaces';
+import { Item } from '../../../../../shared/models/game_interfaces';
 import { items } from '../../../../../shared/models/items';
 
 @Component({

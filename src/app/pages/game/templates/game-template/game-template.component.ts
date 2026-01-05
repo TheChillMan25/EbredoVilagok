@@ -1,0 +1,22 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Game } from '../../../../shared/models/models';
+import { MatIcon } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-game-template',
+  imports: [MatIcon],
+  templateUrl: './game-template.component.html',
+  styleUrl: './game-template.component.scss',
+})
+export class GameTemplateComponent {
+  @Input() game!: Game;
+  @Input() type!: 'myGame' | 'general';
+  @Output() gameEvent = new EventEmitter<{
+    type: 'myGame' | 'general';
+    gameId: string;
+  }>();
+
+  buttonClicked() {
+    this.gameEvent.emit({ type: this.type, gameId: this.game.id });
+  }
+}

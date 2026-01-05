@@ -1,4 +1,5 @@
 import { FieldValue, Timestamp } from 'firebase/firestore';
+import { Food, Item, SpecialItem } from './game_interfaces';
 
 export interface User {
   id: string | null | undefined;
@@ -6,6 +7,7 @@ export interface User {
   email: string | null | undefined;
   characters: string[];
   adventures: string[];
+  games: string[];
 }
 
 export interface ForumUser {
@@ -59,7 +61,7 @@ export interface Character {
   items: {
     food: number[];
     specialItems: number[];
-    otherItems: number[];
+    generalItems: number[];
     weaponItems: string[];
   };
   wounds: {
@@ -108,8 +110,6 @@ export interface Adventure {
   userId: string;
   name: string | null;
   events: AdventureEvent[];
-  players: Player[];
-  currentPlayer: string;
 }
 
 export type PublicAdventure = Omit<
@@ -117,11 +117,20 @@ export type PublicAdventure = Omit<
   'id' | 'players' | 'currentPlayer' | 'userId'
 >;
 
+export enum PlayerStatus {
+  READY,
+  NOTREADY,
+}
+
 export interface Player {
-  id: string;
   userId: string;
-  character: Character;
+  username: string;
+  status: PlayerStatus;
+  character?: Character;
+  canDoPrimary: boolean;
   currentAction: string;
+  initiative: number | null;
+  inCombat: boolean;
 }
 
 export interface AdventureEvent {
@@ -131,12 +140,47 @@ export interface AdventureEvent {
   story: string;
   location: string;
   NPCs: NPC[];
+  completed: boolean;
 }
 
 export interface NPC {
   id: string;
   name: string;
-  character: Character | null;
+  character: Character | null | undefined;
   attitude: 'neutral' | 'hostile';
   actions: boolean[];
+}
+
+export interface Game {
+  id: string;
+  ownerName: string;
+  ownerId: string;
+  name: string;
+  maxPlayers: number;
+  players: Player[];
+  currentPlayer: string;
+  currentAction: GameAction | null;
+  currentEvent: number;
+  adventure?: Adventure;
+  isOpen: boolean;
+  isPublic: boolean;
+  started: boolean;
+  isCamping: boolean;
+}
+
+export enum ActionType {
+  USEITEM,
+  CAMP,
+  TALK,
+  TRADE,
+  FIGHT,
+  STEAL,
+}
+
+export interface GameAction {
+  type: ActionType;
+  isPrimary: boolean;
+  isPartyWide: boolean;
+  targetId?: string;
+  item?: Food | SpecialItem | Item;
 }

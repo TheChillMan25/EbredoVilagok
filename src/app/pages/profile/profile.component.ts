@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 import { Adventure, Character, User } from '../../shared/models/models';
-import {
-  combineLatest,
-  Subscription,
-} from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { UserService } from '../../shared/services/user/user.service';
 import { setBackground } from '../../shared/functional/functions';
 import { KarakterTemplateComponent } from './karakter-template/karakter-template.component';

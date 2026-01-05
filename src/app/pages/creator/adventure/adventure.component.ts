@@ -228,7 +228,7 @@ export class AdventureComponent implements CanComponentDeactivate {
         },
         { validators: [this.checkActions()] }
       ),
-      character: [''],
+      character: ['', [Validators.required]],
     });
 
     this.toggleActions('neutral');

@@ -1,0 +1,267 @@
+<div id="content">
+  <div id="players" class="container" style="grid-area: players">
+    <div class="header" style="grid-area: header">Csapat</div>
+    <div class="body" style="grid-area: body">
+      @for (player of game?.players; track player?.userId) {
+      <div
+        class="player"
+        [ngClass]="{ current: player?.userId === game?.currentPlayer }"
+      >
+        <span class="player-name" style="grid-area: name">{{
+          player?.username
+        }}</span
+        ><span class="player-character" style="grid-area: char">{{
+          player?.character?.name
+        }}</span
+        ><span class="player-stats" style="grid-area: hp"
+          >{{ player?.character?.stats?.main?.hp
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Hárítási pont"
+            >health_metrics</mat-icon
+          ></span
+        >
+        <span class="player-stats" style="grid-area: sp"
+          >{{ player?.character?.stats?.main?.sp
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Stressz pont"
+            >mindfulness</mat-icon
+          ></span
+        >
+        <span class="player-stats" style="grid-area: sW"
+          >{{ player?.character?.wounds?.small
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Kis seb(ek)"
+            >healing</mat-icon
+          ></span
+        ><span class="player-stats" style="grid-area: lW"
+          >{{ player?.character?.wounds?.large
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Nagy seb(ek)"
+            >femur</mat-icon
+          ></span
+        >
+      </div>
+      }
+    </div>
+  </div>
+  <div id="inventory" class="container" style="grid-area: inventory">
+    <div class="header" style="grid-area: header">
+      Hátizsák:
+      <div id="inventory-pages">
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'g' }"
+          (click)="selectInventory('g')"
+        >
+          Általános
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 's' }"
+          (click)="selectInventory('s')"
+        >
+          Különleges
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'f' }"
+          (click)="selectInventory('f')"
+        >
+          Étel
+        </div>
+      </div>
+    </div>
+    <div class="body" style="grid-area: body">
+      @for (item of currentInventory; track $index) {
+      <app-item
+        [item]="item"
+        (selectItemEvent)="selectItem($index)"
+        [canUse]="myTurn"
+      ></app-item>
+      }
+    </div>
+  </div>
+  <div id="actions" class="container" style="grid-area: actions">
+    <div class="header" style="grid-area: header">Akciók</div>
+    <div class="body" style="grid-area: body">
+      <div
+        class="fake-button"
+        matTooltip="Tárgy használat"
+        style="grid-area: useItem"
+      >
+        <mat-icon fontSet="material-symbols-outlined">grocery</mat-icon>
+      </div>
+      <div class="fake-button" matTooltip="Táborozás" style="grid-area: camp">
+        <mat-icon fontSet="material-symbols-outlined">camping</mat-icon>
+      </div>
+      <div class="fake-button" matTooltip="Beszéd" style="grid-area: talk">
+        <mat-icon fontSet="material-symbols-outlined">voice_selection</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        matTooltip="Kereskedés"
+        [ngClass]="{ disabled: hasHostileNPC }"
+        style="grid-area: trade"
+      >
+        <mat-icon fontSet="material-symbols-outlined">handshake</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        matTooltip="Támadás"
+        [ngClass]="{ disabled: !hasHostileNPC }"
+        style="grid-area: attack"
+      >
+        <mat-icon fontSet="material-symbols-outlined">swords</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        matTooltip="Lopás"
+        [ngClass]="{ disabled: !hasHostileNPC }"
+        style="grid-area: steal"
+      >
+        <mat-icon fontSet="material-symbols-outlined">back_hand</mat-icon>
+      </div>
+    </div>
+  </div>
+  @if(role === PlayerRole.HOST){
+  <div class="class-container" style="grid-area: info">
+    <div class="header" style="grid-area: header">Valami</div>
+    <div class="body" style="grid-area: body"></div>
+  </div>
+  }@else if (role === PlayerRole.PLAYER) {
+  <div id="character" class="container" style="grid-area: info">
+    <div class="header" style="grid-area: header">Karakter</div>
+    <div class="body" style="grid-area: body">
+      <span id="character-name" style="grid-area: name">{{
+        player?.character?.name
+      }}</span>
+      <span id="character-class" style="grid-area: class">{{
+        player?.character?.class
+      }}</span>
+      <span id="speciesSpecial" style="grid-area: sSpec">{{
+        myCharacterSpecs?.speciesSpecial?.desc
+      }}</span>
+      <div id="home-bonuses" style="grid-area: home">
+        <span id="bonus-title">Bónusz ismeretek:</span>
+        @for (item of myCharacterSpecs?.home?.bonus; track $index) {
+        <span class="bonus">{{ item.name }}: {{ item.mod }}</span
+        >}
+      </div>
+      <div id="equipment" style="grid-area: eq">
+        <span
+          style="grid-area: left"
+          [matTooltip]="'Sebzés: ' + myCharacterSpecs?.equipment?.left?.dice"
+          >{{ myCharacterSpecs?.equipment?.left?.name }}</span
+        ><mat-icon fontSet="material-symbols-outlined" style="grid-area: wIcon"
+          >swords</mat-icon
+        ><span
+          style="grid-area: right"
+          [matTooltip]="
+            myCharacterSpecs?.equipment?.right?.name !== 'Üres'
+              ? 'Sebzés: ' + myCharacterSpecs?.equipment?.right?.dice
+              : ''
+          "
+          >{{ myCharacterSpecs?.equipment?.right?.name }}</span
+        ><span
+          style="grid-area: armour"
+          [matTooltip]="
+            'Védelem: ' + myCharacterSpecs?.equipment?.armour?.defValue
+          "
+          >{{ myCharacterSpecs?.equipment?.armour?.name
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            style="grid-area: aIcon"
+            >shield</mat-icon
+          ></span
+        >
+      </div>
+    </div>
+  </div>
+  }
+  <div id="current-event" class="container" style="grid-area: current-event">
+    <div class="header" style="grid-area: header">Esemény</div>
+    <div class="body" style="grid-area: body">
+      <div id="event-name" style="grid-area: name">
+        <span class="text-name">
+          @if(game?.isCamping){Táborozás}@else{{{ currentEvent?.name }}}</span
+        >
+      </div>
+      <div id="event-desc" style="grid-area: desc">
+        <span
+          ><span class="text-name">Leirás:</span> {{ currentEvent?.desc }}</span
+        >
+      </div>
+      <div id="event-story" style="grid-area: story">
+        <span
+          ><span class="text-name">Történet:</span>
+          {{ currentEvent?.story }}</span
+        >
+      </div>
+      <div id="event-location" style="grid-area: loc">
+        <span
+          ><span class="text-name">Helyszín: </span>
+          <span
+            id="event-location-link"
+            (click)="locateCurrentEventLocation()"
+            >{{ currentEvent?.location }}</span
+          ></span
+        >
+      </div>
+      <div id="map-container" class="container" style="grid-area: map">
+        <app-map-container #map></app-map-container>
+      </div>
+    </div>
+  </div>
+  <div id="npcs" class="container" style="grid-area: npcs">
+    <div class="header" style="grid-area: header">NPC</div>
+    <div class="body" style="grid-area: body">
+      @for (npc of currentEvent?.NPCs; track $index) {
+      <div class="player">
+        <span class="player-name" style="grid-area: name">{{ npc?.name }}</span
+        ><span class="player-character" style="grid-area: char">{{
+          npc?.character?.name
+        }}</span
+        ><span class="player-stats" style="grid-area: hp"
+          >{{ npc?.character?.stats?.main?.hp
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Hárítási pont"
+            >health_metrics</mat-icon
+          ></span
+        >
+        <span class="player-stats" style="grid-area: sp"
+          >{{ npc?.character?.stats?.main?.sp
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Stressz pont"
+            >mindfulness</mat-icon
+          ></span
+        >
+        <span class="player-stats" style="grid-area: sW"
+          >{{ npc?.character?.wounds?.small
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Kis seb(ek)"
+            >healing</mat-icon
+          ></span
+        ><span class="player-stats" style="grid-area: lW"
+          >{{ npc?.character?.wounds?.large
+          }}<mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Nagy seb(ek)"
+            >femur</mat-icon
+          ></span
+        >
+      </div>
+      }
+    </div>
+  </div>
+  <div id="control" class="container" style="grid-area: control">
+    <div class="header" style="grid-area: header">Vezérlés</div>
+    <div class="body" style="grid-area: body"></div>
+  </div>
+</div>

@@ -2,17 +2,20 @@ import { species as Species } from '../../pages/world/species/species_desc_data'
 import { Character } from '../models/models';
 import { NationData } from '../models/NationData';
 import { classes } from '../models/classes';
-import { weapons, armours, getWeapon } from '../models/equipment';
 import {
+  armours,
   foodRations,
+  getWeapon,
   items,
   medicalItems,
   specialDrinks,
+  weapons,
 } from '../models/items';
 import {
   CharacterVirtues,
   CharacterDisadvantages,
 } from '../models/virtues_disadvantages';
+import { Item, SpecialItem, Food } from '../models/game_interfaces';
 
 let virtues = CharacterVirtues.map((virtue) => virtue.name);
 let disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
@@ -121,7 +124,7 @@ export function getSpeciesSpecial(
   index: number | undefined
 ): { desc: string } {
   let speciesObj = convertSpeciesNameToKey(species);
-  if (speciesObj && index)
+  if (speciesObj && index !== undefined)
     return Species[speciesObj?.landID][speciesObj?.speciesID].speciesSpecial[
       index
     ];
@@ -246,7 +249,7 @@ export function createRandomCharacter(
         Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
         Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
       ],
-      otherItems: [
+      generalItems: [
         Math.floor(Math.random() * 99),
         Math.floor(Math.random() * 99),
         Math.floor(Math.random() * 99),
@@ -264,14 +267,14 @@ export function createRandomCharacter(
 }
 
 export function getItem(
-  type: 'food' | 'otherItems' | 'specialItems',
+  type: 'food' | 'generalItems' | 'specialItems',
   index: number
-) {
+): Food | SpecialItem | Item | null {
   const map: Record<string, any> = {
     food: foodRations,
-    otherItems: items,
+    generalItems: items,
     specialItems: medicalItems.concat(specialDrinks),
   };
 
-  return map[type][index];
+  return map[type][index] ? map[type][index] : null;
 }

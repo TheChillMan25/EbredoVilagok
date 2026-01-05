@@ -94,7 +94,7 @@ export class CharacterService {
 
           return characters;
         } catch (error) {
-          console.error('Error fetching characters:', error);
+          console.error('Error fetching characters: ', error);
           return [];
         }
       }),

@@ -1,0 +1,40 @@
+.player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: #333;
+  border-radius: 0.5rem;
+  font-size: large;
+  gap: .5rem;
+
+  .player-header{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    mat-icon{
+      color: #f2c480;
+    }
+  }
+
+  &.showCharacter {
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  :nth-child(2){
+    margin-left: auto;
+  }
+
+  .fake-button{
+    padding: .5rem;
+  }
+}
+.character-container {
+  display: none;
+  padding: 0.5rem;
+  background-color: #2a2a2a;
+  border-radius: 0 0 0.5rem 0.5rem;
+  &.show {
+    display: block;
+  }
+}

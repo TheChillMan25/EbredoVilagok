@@ -487,3 +487,21 @@ export const trackPath: L.PointTuple[] = [
   [1845, 2013.0003203661327],
   [1824, 2042.9939130434782],
 ];
+
+export const locationsMap: Record<string, Location[]> = {
+  cities: cityLocations,
+  towns: townLocations,
+  waters: waterLocations,
+  hills: hillLocations,
+  mountains: mountainLocations,
+  forests: forestLocations,
+  others: otherLocations,
+};
+
+export function getLocationByName(locationName: string): Location | null {
+  const allLocations = Object.values(locationsMap).flat();
+  if (allLocations.find((loc) => loc.name === locationName)) {
+    return allLocations.find((loc) => loc.name === locationName)!;
+  }
+  return null;
+}
