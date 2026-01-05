@@ -269,12 +269,12 @@ export function createRandomCharacter(
 export function getItem(
   type: 'food' | 'generalItems' | 'specialItems',
   index: number
-): Food | SpecialItem | GeneralItem {
+): Food | SpecialItem | GeneralItem | null {
   const map: Record<string, any> = {
     food: foodRations,
     generalItems: items,
     specialItems: medicalItems.concat(specialDrinks),
   };
 
-  return map[type][index];
+  return map[type][index] ? map[type][index] : null;
 }

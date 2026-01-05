@@ -158,6 +158,7 @@ export class GameComponent {
         isOpen: false,
         started: false,
         isCamping: false,
+        currentAction: null,
       };
       await this.gameService.createGame(newGame);
 
@@ -232,7 +233,9 @@ export class GameComponent {
         character: selectedCharacter,
         currentAction: '',
         status: PlayerStatus.NOTREADY,
-        initiative: null
+        initiative: null,
+        canDoPrimary: true,
+        inCombat: false,
       };
 
       let g = await this.gameService.joinGame(game, player);

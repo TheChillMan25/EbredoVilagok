@@ -1,4 +1,5 @@
 import { FieldValue, Timestamp } from 'firebase/firestore';
+import { Food, Item, SpecialItem } from './character_interfaces';
 
 export interface User {
   id: string | null | undefined;
@@ -126,8 +127,10 @@ export interface Player {
   username: string;
   status: PlayerStatus;
   character?: Character;
+  canDoPrimary: boolean;
   currentAction: string;
   initiative: number | null;
+  inCombat: boolean;
 }
 
 export interface AdventureEvent {
@@ -156,10 +159,28 @@ export interface Game {
   maxPlayers: number;
   players: Player[];
   currentPlayer: string;
+  currentAction: GameAction | null;
   currentEvent: number;
   adventure?: Adventure;
   isOpen: boolean;
   isPublic: boolean;
   started: boolean;
   isCamping: boolean;
+}
+
+export enum ActionType {
+  USEITEM,
+  CAMP,
+  TALK,
+  TRADE,
+  FIGHT,
+  STEAL,
+}
+
+export interface GameAction {
+  type: ActionType;
+  isPrimary: boolean;
+  isPartyWide: boolean;
+  targetId?: string;
+  item?: Food | SpecialItem | Item;
 }

@@ -107,7 +107,7 @@ export class KarakterComponent implements CanComponentDeactivate {
 
   foods = foodRations.map((food) => ({
     name: food.name,
-    portion: food.portion,
+    uses: food.uses,
   }));
   specialIndex = 0;
   specialItems = medicalItems

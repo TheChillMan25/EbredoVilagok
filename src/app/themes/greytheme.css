@@ -300,6 +300,7 @@ html {
   --mat-list-active-indicator-shape: 0;
   --mdc-outlined-text-field-focus-label-text-color: #f2c480;
   --mdc-filled-button-label-text-color: #333;
+  --mat-snack-bar-button-color: #f2c480;
 
   /* MatTooltip*/
   --mdc-plain-tooltip-supporting-text-size: medium;

@@ -188,7 +188,7 @@
       <mat-select [formControl]="getInputs('items.food').at(0)">
         @for (item of foods; track $index) {
         <mat-option [value]="$index"
-          >{{ item.name }} - {{ item.portion }} fejadag</mat-option
+          >{{ item.name }} - {{ item.uses }} fejadag</mat-option
         >
         }
       </mat-select>
