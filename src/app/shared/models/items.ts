@@ -1,11 +1,13 @@
 import {
+  Armour,
   Food,
   Inventory,
   Item,
   ItemCategory,
   ItemType,
   SpecialItem,
-} from './character_interfaces';
+  Weapon,
+} from './game_interfaces';
 
 export const foodRations: Food[] = [
   {
@@ -208,6 +210,7 @@ export const inventories: Inventory[] = [
     category: ItemCategory.INVENTORY,
     space: 4,
     canStore: [ItemType.SPICE],
+    storage: [],
   },
 
   {
@@ -217,6 +220,7 @@ export const inventories: Inventory[] = [
     category: ItemCategory.INVENTORY,
     space: 15,
     canStore: [ItemType.AMMO],
+    storage: [],
   },
 
   {
@@ -226,6 +230,7 @@ export const inventories: Inventory[] = [
     category: ItemCategory.INVENTORY,
     space: 10,
     canStore: [ItemType.AMMO],
+    storage: [],
   },
 
   {
@@ -235,6 +240,7 @@ export const inventories: Inventory[] = [
     category: ItemCategory.INVENTORY,
     space: 25,
     canStore: [ItemType.AMMO],
+    storage: [],
   },
 
   {
@@ -244,6 +250,7 @@ export const inventories: Inventory[] = [
     category: ItemCategory.INVENTORY,
     space: 20,
     canStore: [ItemType.AMMO],
+    storage: [],
   },
 
   {
@@ -261,6 +268,7 @@ export const inventories: Inventory[] = [
       ItemType.AMMO,
       ItemType.SPICE,
     ],
+      storage: [],
   },
 ];
 
@@ -1078,3 +1086,4 @@ export const items: (Item | Inventory)[] = [
     category: ItemCategory.GENERAL,
   },
 ];
+

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Armour, Weapon } from '../../../../shared/models/character_interfaces';
+import { Armour, Weapon } from '../../../../shared/models/game_interfaces';
 import { armours, weapons } from '../../../../shared/models/equipment';
 
 @Component({

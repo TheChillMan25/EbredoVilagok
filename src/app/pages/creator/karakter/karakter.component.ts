@@ -19,7 +19,7 @@ import { NationData } from '../../../shared/models/NationData';
 import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
 import { armours, getWeapon, weapons } from '../../../shared/models/equipment';
-import { Armour } from '../../../shared/models/character_interfaces';
+import { Armour } from '../../../shared/models/game_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,

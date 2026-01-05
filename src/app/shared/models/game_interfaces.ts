@@ -21,7 +21,7 @@ export interface Armour extends Item {
 }
 
 export interface Item {
-  id: number;
+  id?: number;
   name: string;
   desc?: string;
   type: ItemType;

@@ -30,7 +30,7 @@ import { ItemComponent } from '../templates/item/item.component';
 import { Food, GeneralItem, SpecialItem } from '../../../shared/models/items';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { Armour, Weapon } from '../../../shared/models/character_interfaces';
+import { Armour, Weapon } from '../../../shared/models/game_interfaces';
 import { getArmour, getWeapon } from '../../../shared/models/equipment';
 
 @Component({

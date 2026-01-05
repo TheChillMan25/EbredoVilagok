@@ -1,5 +1,5 @@
 import { FieldValue, Timestamp } from 'firebase/firestore';
-import { Food, Item, SpecialItem } from './character_interfaces';
+import { Food, Item, SpecialItem } from './game_interfaces';
 
 export interface User {
   id: string | null | undefined;
