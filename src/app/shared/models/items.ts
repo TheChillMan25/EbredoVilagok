@@ -1,3 +1,19 @@
+export interface Food {
+  name: string;
+  portion: number;
+  desc: string;
+  heal: number;
+}
+export interface SpecialItem {
+  name: string;
+  desc: string;
+  effect: string;
+}
+export interface GeneralItem {
+  name: string;
+  desc: string;
+}
+
 export const foodRations = [
   {
     name: 'Silány',
@@ -117,6 +133,8 @@ export const specialDrinks = [
     effect: 'A táborozásnál felér egy elégséges étkezéssel.',
   },
 ];
+
+export const specialItems = medicalItems.concat(specialDrinks);
 
 export const items = [
   { name: 'Fa kereplő', desc: 'Egy fa kereplő' },

@@ -145,5 +145,11 @@ service cloud.firestore {
         }
       }
     }
+
+    match /Games/{ownerId} {
+      allow read, update, delete: if true
+      allow create: if isSignedIn() 
+                    && request.resource.data.ownerId == request.auth.uid;
+    }
   }
 }

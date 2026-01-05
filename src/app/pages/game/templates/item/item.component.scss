@@ -1,0 +1,27 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: .75rem;
+  border-radius: 0.5rem;
+  background-color: #333;
+  white-space: nowrap;
+  .item-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f2c480;
+  }
+  .item-desc {
+    overflow: hidden;
+    max-width: 50%;
+    text-overflow: ellipsis;
+    text-align: right;
+  }
+  &.canUse {
+    cursor: pointer;
+  }
+  .mat-tootlip {
+    font-size: large;
+  }
+}

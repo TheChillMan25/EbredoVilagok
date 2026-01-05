@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router';
 import { IndexComponent } from './pages/index/index.component';
 import { PagenotfoundComponent } from './shared/pagenotfound/pagenotfound.component';
-import { authGuard, publicGuard } from './shared/guards/auth/auth.guard';
+import {
+  authGuard,
+  gameGuard,
+  publicGuard,
+} from './shared/guards/auth/auth.guard';
 import { deactivateGuard } from './shared/guards/deactivate/deactivate.guard';
 
 export const routes: Routes = [
@@ -108,13 +112,31 @@ export const routes: Routes = [
     canActivate: [authGuard],
     canDeactivate: [deactivateGuard],
   },
-  /* {
+  {
     path: 'jatek',
     title: 'Játék',
     loadComponent: () =>
       import('./pages/game/game.component').then((m) => m.GameComponent),
     canActivate: [authGuard],
-  }, */
+  },
+  {
+    path: 'jatek/:id/lobby',
+    loadComponent: () =>
+      import('./pages/game/lobby/lobby.component').then(
+        (m) => m.LobbyComponent
+      ),
+    canActivate: [authGuard, gameGuard],
+    canDeactivate: [deactivateGuard],
+  },
+  {
+    path: 'jatek/:id',
+    loadComponent: () =>
+      import('./pages/game/game-area/game-area.component').then(
+        (m) => m.GameAreaComponent
+      ),
+    canActivate: [authGuard, gameGuard],
+    canDeactivate: [deactivateGuard],
+  },
   {
     path: '',
     redirectTo: 'index',

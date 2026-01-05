@@ -1,0 +1,69 @@
+<div id="content">
+  @if(!isLoading){ @if(game){
+  <div id="lobby-header" style="grid-area: header">
+    <span style="grid-area: connection" class="text-name"
+      >Csatlakozási kód: <span id="code">{{ game.id }}</span></span
+    >
+    <span class="lobby-name" style="grid-area: name">{{ game.name }}</span>
+    <span class="lobby-owner" style="grid-area: host">{{
+      game.ownerName
+    }}</span>
+  </div>
+  <div id="players" style="grid-area: players">
+    <span class="title text-name"
+      >Játékosok:
+      <span>{{ game.players.length }} / {{ game.maxPlayers }}</span></span
+    >
+    <hr />
+    <div id="player-container">
+      @for (item of game.players; track $index) {
+      <app-player-template
+        [player]="item"
+        [role]="role"
+        (kickPlayerEvent)="kickPlayer($event)"
+      ></app-player-template>
+      }
+    </div>
+  </div>
+  <div id="adventure" style="grid-area: adventure">
+    <div id="adventure-header">
+      <span class="text-name"
+        >Kaland címe:
+        <span class="adventure-name">{{ game.adventure?.name }}</span></span
+      >
+      <span class="text-name"
+        >Kaland hossza:
+        <span class="adventure-lenght"
+          >{{ game.adventure?.events?.length }} esemény</span
+        >
+      </span>
+    </div>
+    <span class="text-name" style="font-size: x-large">Események:</span>
+    <div class="adventure-events">
+      @for (item of game.adventure!.events; track $index) {
+      <app-event-template [event]="item"></app-event-template>
+      }
+    </div>
+  </div>
+  <div id="actions" style="grid-area: actions">
+    @if(player && role === PlayerRole.PLAYER){
+    <button mat-flat-button (click)="ready()">
+      @if(player.status === PlayerStatus.NOTREADY){Készen állok!}@else{Nem állok
+      készen.}
+    </button>
+    } @if(role === PlayerRole.HOST){
+    <button
+      mat-flat-button
+      [disabled]="!allReady || game.players.length === 0"
+      (click)="startGame()"
+    >
+      Játék indítása
+    </button>
+    }
+    <button mat-flat-button (click)="leaveGame()">Játék elhagyása</button>
+  </div>
+  } }@else {
+  <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
+  }
+  <mat-error class="error-message">{{ error }}</mat-error>
+</div>

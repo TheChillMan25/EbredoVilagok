@@ -1,0 +1,21 @@
+<div class="player" [ngClass]="{ showCharacter: showCharacter }">
+  <div class="player-header">
+    <mat-icon
+      >@if(player.status ===
+      PlayerStatus.NOTREADY){person}@else{check}</mat-icon
+    >
+    <span>{{ player.username }}</span>
+  </div>
+  <div class="fake-button" (click)="toggleCharacter()">Karakter</div>
+  @if(role === 0){
+  <div class="fake-button" matTooltip="Kirúgás" (click)="kickPlayer()">
+    <mat-icon>logout</mat-icon>
+  </div>
+  }
+</div>
+<div class="character-container" [ngClass]="{ show: showCharacter }">
+  <app-karakter-template
+    [character]="player.character!"
+    [isPublic]="true"
+  ></app-karakter-template>
+</div>

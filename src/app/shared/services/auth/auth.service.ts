@@ -56,7 +56,8 @@ export class AuthService {
         email: email,
         characters: [],
         adventures: [],
-      });
+        games: [],
+      } as User);
       return userCredential;
     } catch (error) {
       console.error('Hiba a regisztráció során:', error);
