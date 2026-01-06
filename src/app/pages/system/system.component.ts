@@ -31,6 +31,15 @@ import {
   MatCardActions,
 } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';
+import { ItemService } from '../../shared/services/item/item.service';
+import {
+  Armour,
+  Cigar,
+  Food,
+  Item,
+  SpecialItem,
+  Weapon,
+} from '../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-system',
@@ -83,11 +92,39 @@ export class SystemComponent {
     adv: 5,
     act: 7,
   };
+  items?: {
+    weapons: Weapon[];
+    armours: Armour[];
+    generalItems: Item[];
+    foodRations: Food[];
+    medicalItems: SpecialItem[];
+    specialDrinks: SpecialItem[];
+    cigars: Cigar[];
+  };
 
-  ngOnInit(): void {
+  constructor(private itemService: ItemService) {}
+
+  async ngOnInit() {
     setBackground('table');
+    await this.itemService.initItems();
+    this.setUpItems();
     this.setActiveSegment('character');
     this.checkFirstVisit();
+  }
+
+  setUpItems() {
+    this.items = {
+      weapons: this.itemService.getItemsByGroup('weapons') as Weapon[],
+      armours: this.itemService.getItemsByGroup('armours') as Armour[],
+      generalItems: this.itemService.getItemsByGroup('general') as Item[],
+      foodRations: this.itemService.getItemsByGroup('food') as Food[],
+      medicalItems: this.itemService.getItemsByGroup('heal') as SpecialItem[],
+      specialDrinks: this.itemService.getItemsByGroup(
+        'specDrinks'
+      ) as SpecialItem[],
+      cigars: this.itemService.getItemsByGroup('cigars') as Cigar[],
+    };
+    console.log(this.items);
   }
 
   setActiveSegment(segment: 'character' | 'adventure' | 'actions'): void {

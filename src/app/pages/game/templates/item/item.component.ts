@@ -1,12 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import {
-  Food,
-  GeneralItem,
-  SpecialItem,
-} from '../../../../shared/models/items';
 import { MatTooltip } from '@angular/material/tooltip';
 import { NgClass } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { Food, Item, SpecialItem } from '../../../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-item',
@@ -15,7 +11,7 @@ import { MatIcon } from '@angular/material/icon';
   styleUrl: './item.component.scss',
 })
 export class ItemComponent {
-  @Input() item!: Food | SpecialItem | GeneralItem;
+  @Input() item!: Food | SpecialItem | Item;
   @Input() canUse = false;
   @Output() selectItemEvent = new EventEmitter<void>();
 

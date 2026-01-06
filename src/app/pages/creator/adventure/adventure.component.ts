@@ -24,18 +24,6 @@ import {
   NPC,
 } from '../../../shared/models/models';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { NationData } from '../../../shared/models/NationData';
-import {
-  CharacterDisadvantages,
-  CharacterVirtues,
-} from '../../../shared/models/virtues_disadvantages';
-import { armours, weapons } from '../../../shared/models/equipment';
-import {
-  foodRations,
-  items,
-  medicalItems,
-  specialDrinks,
-} from '../../../shared/models/items';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Observable, Subscription, take } from 'rxjs';
 import { MapContainerComponent } from '../../../shared/functional/map-container/map-container.component';
@@ -123,9 +111,9 @@ export class AdventureComponent implements CanComponentDeactivate {
   npcForm!: FormGroup;
   npcError: string = '';
 
-  npcCharacter = {
+  /* npcCharacter = {
     species: NationData.map((nation) => nation.nationName),
-    weapons: weapons.map((weapon) => weapon.name),
+    weapons: weapons.map((weapon: Weapon) => weapon.name),
     armours: armours,
     virtues: CharacterVirtues.map((virtue) => virtue.name),
     disadvantages: CharacterDisadvantages.map((disadv) => disadv.name),
@@ -134,7 +122,7 @@ export class AdventureComponent implements CanComponentDeactivate {
       .map((item) => item.name)
       .concat(specialDrinks.map((item) => item.name)),
     generalItems: items.map((item) => item.name),
-  };
+  }; */
 
   myCharacters!: Character[];
 

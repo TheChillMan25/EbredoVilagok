@@ -18,7 +18,6 @@ import { MapContainerComponent } from '../../../shared/functional/map-container/
 import { NgClass } from '@angular/common';
 import {
   getHome,
-  getItem,
   getSpeciesSpecial,
   setBackground,
 } from '../../../shared/functional/functions';
@@ -27,11 +26,15 @@ import {
   Location,
 } from '../../../shared/models/map_locations';
 import { ItemComponent } from '../templates/item/item.component';
-import { Food, GeneralItem, SpecialItem } from '../../../shared/models/items';
+import {
+  Food,
+  Item,
+  SpecialItem,
+} from '../../../shared/models/game_interfaces';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Armour, Weapon } from '../../../shared/models/game_interfaces';
-import { getArmour, getWeapon } from '../../../shared/models/equipment';
+import { ItemService } from '../../../shared/services/item/item.service';
 
 @Component({
   selector: 'app-game-area',
@@ -43,7 +46,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   @ViewChild('map') map!: MapContainerComponent;
   activeInventory: 'f' | 's' | 'g' = 'g';
   currentInventory: any[] = [];
-  selectedItem: Food | SpecialItem | GeneralItem | null = null;
+  selectedItem: Food | SpecialItem | Item | null = null;
 
   gameId!: string;
   game!: Game | undefined | null;
@@ -88,11 +91,13 @@ export class GameAreaComponent implements CanComponentDeactivate {
     private authService: AuthService,
     private route: ActivatedRoute,
     private gameService: GameService,
-    private router: Router
+    private router: Router,
+    private itemService: ItemService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('#222', true);
+    await this.itemService.initItems();
     this.gameId = this.route.snapshot.paramMap.get('id')!;
     this.authService.currentUser.pipe(take(1)).subscribe((user) => {
       this.currentUserId = user!.uid;
@@ -148,9 +153,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       ),
       home: getHome(character.species, character.specialProperties.home),
       equipment: {
-        left: getWeapon(character.equipment.left),
-        right: getWeapon(character.equipment.right),
-        armour: getArmour(character.equipment.armour),
+        left: this.itemService.getItem('weapons', character.equipment.left),
+        right: this.itemService.getItem('weapons', character.equipment.right),
+        armour: this.itemService.getItem('armours', character.equipment.armour),
       },
     };
   }
@@ -179,19 +184,23 @@ export class GameAreaComponent implements CanComponentDeactivate {
       case 'f':
         if (this.currentInventory.length !== 0) this.currentInventory = [];
         this.player?.character?.items.food.forEach((f) => {
-          this.currentInventory.push(getItem('food', f));
+          this.currentInventory.push(this.itemService.getItem('food', f));
         });
         break;
       case 'g':
         if (this.currentInventory.length !== 0) this.currentInventory = [];
         this.player?.character?.items.generalItems.forEach((f) => {
-          this.currentInventory.push(getItem('generalItems', f));
+          this.currentInventory.push(
+            this.itemService.getItem('generalItems', f)
+          );
         });
         break;
       case 's':
         if (this.currentInventory.length !== 0) this.currentInventory = [];
         this.player?.character?.items.specialItems.forEach((f) => {
-          this.currentInventory.push(getItem('specialItems', f));
+          this.currentInventory.push(
+            this.itemService.getItem('specialItems', f)
+          );
         });
         break;
     }

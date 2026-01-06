@@ -1,11 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-
-interface Cigar {
-  color: string;
-  spice: string;
-  effect: string;
-}
+import { Cigar } from '../../../../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-cigar-items',
@@ -14,38 +9,13 @@ interface Cigar {
   styleUrls: ['./cigar-items.component.scss', '../../../system_shared.scss'],
 })
 export class CigarItemsComponent {
-  cigarData: Cigar[] = [
-    {
-      color: 'Piros',
-      spice: 'Paprika és bors',
-      effect: '+1 erő 10 percig',
-    },
-    {
-      color: 'Zöld',
-      spice: 'Alma és menta',
-      effect: '+1 ügyesség 10 percig',
-    },
-    {
-      color: 'Szürke',
-      spice: 'Dió és fahéj',
-      effect: '+1 kitartás 10 percig',
-    },
-    {
-      color: 'Lila',
-      spice: 'Leander és rózsa',
-      effect: '+1 ész 10 percig',
-    },
-    {
-      color: 'Sárga',
-      spice: 'Citrus és vadvirágok',
-      effect: '+1 fortély 10 percig',
-    },
-    {
-      color: 'Kék',
-      spice: 'Búzavirág és kamilla',
-      effect: '+1 akaraterő 10 percig',
-    },
-  ];
-  cigarSourceData = new MatTableDataSource<Cigar>(this.cigarData);
+  cigarSourceData = new MatTableDataSource<Cigar>();
   displayedColumns = ['color', 'spice', 'effect'];
+
+  @Input() set cigars(value: Cigar[] | undefined) {
+    console.log(value);
+    if (value && value.length > 0) {
+      this.cigarSourceData.data = value;
+    }
+  }
 }

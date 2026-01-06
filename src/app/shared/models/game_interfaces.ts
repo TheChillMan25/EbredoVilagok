@@ -9,7 +9,8 @@ export interface CombinedVirtueDisadvRow {
 }
 
 export interface Weapon extends Item {
-  dice: string;
+  diceCount: number;
+  damage: string;
   price: number;
   handed: 0 | 1 | 2;
 }
@@ -20,10 +21,23 @@ export interface Armour extends Item {
   price: number;
 }
 
+export interface Cigar extends Item {
+  color: string;
+  spice: string;
+  effect: string;
+}
+
+export enum ItemSize {
+  SMALL,
+  NORMAL,
+  LARGE,
+}
+
 export interface Item {
   id?: number;
   name: string;
   desc?: string;
+  size: ItemSize;
   type: ItemType;
   category: ItemCategory;
   uses?: number;
@@ -32,6 +46,8 @@ export interface Item {
 export enum ItemType {
   COMMON,
   FOOD,
+  MEDICAL,
+  CIGAR,
   SPECIAL,
   WEAPON,
   ARMOUR,

@@ -7,7 +7,7 @@
 </p>
 <p class="sub-title">A tájak italai</p>
 <div class="table-container">
-  @for (item of specialDrinks; track $index) {
+  @for (item of _specialDrinks; track $index) {
   <div class="spec-drink-container">
     <span
       ><strong>{{ item.name }}:</strong> {{ item.desc }}</span

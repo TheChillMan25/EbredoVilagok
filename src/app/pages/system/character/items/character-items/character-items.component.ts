@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Item } from '../../../../../shared/models/game_interfaces';
-import { items } from '../../../../../shared/models/items';
+import { ItemService } from '../../../../../shared/services/item/item.service';
 
 @Component({
   selector: 'app-character-items',
@@ -13,7 +13,12 @@ import { items } from '../../../../../shared/models/items';
   ],
 })
 export class CharacterItemsComponent {
-  items = items;
-  itemDataSource = new MatTableDataSource<Item>(this.items);
+  itemDataSource = new MatTableDataSource<Item>();
   displayedColumns: string[] = ['name', 'desc'];
+
+  @Input() set items(value: Item[] | undefined) {
+    if (value && value.length > 0) {
+      this.itemDataSource.data = value;
+    }
+  }
 }

@@ -3,25 +3,13 @@ import { Character } from '../models/models';
 import { NationData } from '../models/NationData';
 import { classes } from '../models/classes';
 import {
-  armours,
-  foodRations,
-  getWeapon,
-  items,
-  medicalItems,
-  specialDrinks,
-  weapons,
-} from '../models/items';
-import {
   CharacterVirtues,
   CharacterDisadvantages,
 } from '../models/virtues_disadvantages';
-import { Item, SpecialItem, Food } from '../models/game_interfaces';
+import { ItemService } from '../services/item/item.service';
 
 let virtues = CharacterVirtues.map((virtue) => virtue.name);
 let disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
-let specialItems = medicalItems
-  .map((item) => item.name)
-  .concat(specialDrinks.map((drink) => drink.name));
 
 export function setBackground(path: string, color: boolean = false) {
   const pageElement = document.getElementById('page');
@@ -179,26 +167,34 @@ export function getStat(stats: number[]) {
   return stat;
 }
 
-function createRandomEquipment() {
+function createRandomEquipment(itemService: ItemService) {
   while (true) {
     const equipment = {
-      left: Math.floor(Math.random() * weapons.length),
-      right: Math.floor(Math.random() * weapons.length),
-      armour: Math.floor(Math.random() * armours.length),
+      left: Math.floor(
+        Math.random() * itemService.getItemsByGroup('weapons').length
+      ),
+      right: Math.floor(
+        Math.random() * itemService.getItemsByGroup('weapons').length
+      ),
+      armour: Math.floor(
+        Math.random() * itemService.getItemsByGroup('armours').length
+      ),
     };
-    if (checkEquipment(equipment.left, equipment.right)) return equipment;
+    if (checkEquipment(equipment.left, equipment.right, itemService)) return equipment;
   }
 }
 
-function checkEquipment(left: number, right: number) {
+function checkEquipment(left: number, right: number, itemService: ItemService) {
   return !(
-    (getWeapon(left).handed === 2 && getWeapon(right).handed !== 0) ||
-    (getWeapon(left).handed !== 0 && getWeapon(right).handed === 2)
+    (itemService.getItem('weapons', left).handed === 2 &&
+      itemService.getItem('weapons', right).handed !== 0) ||
+    (itemService.getItem('weapons', left).handed !== 0 &&
+      itemService.getItem('weapons', right).handed === 2)
   );
 }
 
 export function createRandomCharacter(
-  charName: string
+  charName: string, itemService: ItemService
 ): Omit<Character, 'id' | 'userId'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
@@ -234,7 +230,7 @@ export function createRandomCharacter(
           Math.ceil(Math.random() * 4),
       },
     },
-    equipment: createRandomEquipment(),
+    equipment: createRandomEquipment(itemService),
     virtues: {
       virtues: [
         Math.floor(Math.random() * virtues.length),
@@ -243,11 +239,19 @@ export function createRandomCharacter(
       disadv: [Math.floor(Math.random() * disadvantages.length)],
     },
     items: {
-      food: [Math.max(Math.floor(Math.random() * foodRations.length - 1), 0)],
+      food: [
+        Math.floor(Math.random() * itemService.getItemsByGroup('food').length),
+      ],
       specialItems: [
-        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
-        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
-        Math.max(Math.floor(Math.random() * specialItems.length - 1), 0),
+        Math.floor(
+          Math.random() * itemService.getItemsByGroup('allSpecial').length
+        ),
+        Math.floor(
+          Math.random() * itemService.getItemsByGroup('allSpecial').length
+        ),
+        Math.floor(
+          Math.random() * itemService.getItemsByGroup('allSpecial').length
+        ),
       ],
       generalItems: [
         Math.floor(Math.random() * 99),
@@ -264,17 +268,4 @@ export function createRandomCharacter(
     },
   };
   return randomCharacter;
-}
-
-export function getItem(
-  type: 'food' | 'generalItems' | 'specialItems',
-  index: number
-): Food | SpecialItem | Item | null {
-  const map: Record<string, any> = {
-    food: foodRations,
-    generalItems: items,
-    specialItems: medicalItems.concat(specialDrinks),
-  };
-
-  return map[type][index] ? map[type][index] : null;
 }

@@ -154,7 +154,11 @@
       <div id="equipment" style="grid-area: eq">
         <span
           style="grid-area: left"
-          [matTooltip]="'Sebzés: ' + myCharacterSpecs?.equipment?.left?.dice"
+          [matTooltip]="
+            'Sebzés: ' +
+            myCharacterSpecs?.equipment?.left?.diceCount +
+            myCharacterSpecs?.equipment?.left?.damage
+          "
           >{{ myCharacterSpecs?.equipment?.left?.name }}</span
         ><mat-icon fontSet="material-symbols-outlined" style="grid-area: wIcon"
           >swords</mat-icon
@@ -162,7 +166,9 @@
           style="grid-area: right"
           [matTooltip]="
             myCharacterSpecs?.equipment?.right?.name !== 'Üres'
-              ? 'Sebzés: ' + myCharacterSpecs?.equipment?.right?.dice
+              ? 'Sebzés: ' +
+                myCharacterSpecs?.equipment?.right?.diceCount +
+                myCharacterSpecs?.equipment?.right?.damage
               : ''
           "
           >{{ myCharacterSpecs?.equipment?.right?.name }}</span

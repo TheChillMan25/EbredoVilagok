@@ -7,7 +7,7 @@
   eszközeit, vagy válasz ki 3 tárgyat a listáról.
 </p>
 <div class="table-container">
-  <mat-table [dataSource]="itemDataSource">
+  <mat-table [dataSource]="itemDataSource!">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Tárgy</mat-header-cell>
       <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>

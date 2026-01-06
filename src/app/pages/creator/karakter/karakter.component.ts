@@ -18,24 +18,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { NationData } from '../../../shared/models/NationData';
 import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
-import { armours, getWeapon, weapons } from '../../../shared/models/equipment';
-import { Armour } from '../../../shared/models/game_interfaces';
+import {
+  Armour,
+  Food,
+  SpecialItem,
+  Weapon,
+} from '../../../shared/models/game_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,
 } from '../../../shared/models/virtues_disadvantages';
-import {
-  foodRations,
-  items,
-  medicalItems,
-  specialDrinks,
-} from '../../../shared/models/items';
 import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Observable } from 'rxjs';
+import { ItemService } from '../../../shared/services/item/item.service';
 
 export interface CanComponentDeactivate {
   canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
@@ -70,8 +69,8 @@ export class KarakterComponent implements CanComponentDeactivate {
   currentHome: { desc: string; bonus: { name: string; mod: string }[] } | null =
     null;
 
-  weapons = weapons.map((weapon) => weapon.name);
-  armours: Armour[] = armours;
+  weapons = [];
+  armours = [] as Armour[];
 
   virtues = CharacterVirtues.map((virtue) => virtue.name);
   disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
@@ -105,26 +104,37 @@ export class KarakterComponent implements CanComponentDeactivate {
     },
   ];
 
-  foods = foodRations.map((food) => ({
-    name: food.name,
-    uses: food.uses,
-  }));
+  foods = [] as Food[];
   specialIndex = 0;
-  specialItems = medicalItems
-    .map((item) => item.name)
-    .concat(specialDrinks.map((drink) => drink.name));
+  specialItems = [] as SpecialItem[];
 
-  medicalItems = medicalItems.map((item) => item.name);
-  specialDrinks = specialDrinks.map((drink) => drink.name);
-  generalItems = items.map((item) => item.name);
+  /* medicalItems = medicalItems.map((item) => item.name);
+  specialDrinks = specialDrinks.map((drink) => drink.name); */
+  generalItems = []; /* items.map((item) => item.name); */
 
   showDiceMenu: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private charService: CharacterService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private itemService: ItemService
+  ) {
+    this.weapons = this.itemService
+      .getItemsByGroup('weapons')
+      .map((weapon: Weapon) => weapon.name);
+    this.armours = this.itemService.getItemsByGroup('armours');
+    this.foods = this.itemService.getItemsByGroup('food').map((food: Food) => ({
+      name: food.name,
+      uses: food.uses,
+    }));
+    this.specialItems = itemService
+      .getItemsByGroup('allSpecial')
+      .map((item: SpecialItem) => item.name);
+    this.generalItems = itemService
+      .getItemsByGroup('general')
+      .map((item: any) => item.name);
+  }
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
     if (this.mainForm.dirty) {
@@ -276,15 +286,19 @@ export class KarakterComponent implements CanComponentDeactivate {
     };
 
     if (
-      getWeapon(newCharacter.equipment.left).handed === 2 &&
-      getWeapon(newCharacter.equipment.right).handed !== 0
+      this.itemService.getItem('weapons', newCharacter.equipment.left)
+        .handed === 2 &&
+      this.itemService.getItem('weapons', newCharacter.equipment.right)
+        .handed !== 0
     ) {
       this.errorMessage =
         'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
       return;
     } else if (
-      getWeapon(newCharacter.equipment.right).handed === 2 &&
-      getWeapon(newCharacter.equipment.left).handed !== 0
+      this.itemService.getItem('weapons', newCharacter.equipment.right)
+        .handed === 2 &&
+      this.itemService.getItem('weapons', newCharacter.equipment.left)
+        .handed !== 0
     ) {
       this.errorMessage =
         'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
@@ -311,7 +325,8 @@ export class KarakterComponent implements CanComponentDeactivate {
       this.errorMessage = 'Töltsd ki a név mezőt!';
       return;
     }
-    const random = createRandomCharacter(charName);
+    const random = createRandomCharacter(charName, this.itemService);
+    console.log(random);
 
     this.mainForm.get('species')?.setValue(random.species);
     this.setRelevantSpeciesData(random.species);
