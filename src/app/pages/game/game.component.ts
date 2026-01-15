@@ -4,6 +4,7 @@ import {
   Adventure,
   Character,
   Game,
+  GameAction,
   Player,
   PlayerStatus,
 } from '../../shared/models/models';
@@ -155,10 +156,15 @@ export class GameComponent {
         currentPlayer: '',
         currentEvent: 0,
         players: [],
+        initiatives: [],
         isOpen: false,
         started: false,
         isCamping: false,
-        currentAction: null,
+        currentAction: {
+          performer: { id: '', name: '' },
+          primary: {} as GameAction,
+          secondary: {} as GameAction,
+        },
       };
       await this.gameService.createGame(newGame);
 
@@ -167,8 +173,8 @@ export class GameComponent {
         adventure: '',
         maxPlayers: '',
       });
-      this.isLoading = false;
       this.createError = 'A játék sikeresen létrehozva!';
+      this.isLoading = false;
     } catch (error) {
       this.isLoading = false;
       console.error('Hiba a játék létrehozásakor: ', error);
@@ -192,9 +198,9 @@ export class GameComponent {
 
   async loadGame(id: string) {
     try {
+      this.isLoading = true;
       let g = await this.gameService.updateGame(id, { isOpen: true });
       if (g) {
-        this.isLoading = false;
         this.gameService.PlayerRole = PlayerRole.HOST;
         this.router.navigate(['/jatek', id, 'lobby']);
       }
@@ -229,18 +235,21 @@ export class GameComponent {
         return;
       }
 
-      const player: Omit<Player, 'userId' | 'username'> = {
+      const player: Omit<Player, 'id' | 'name'> = {
         character: selectedCharacter,
-        currentAction: '',
         status: PlayerStatus.NOTREADY,
         initiative: null,
-        canDoPrimary: true,
+        actionsLeft: { primary: true, secondary: true },
+        lastAction: {
+          performer: { id: '', name: '' },
+          primary: {} as GameAction,
+          secondary: {} as GameAction,
+        },
         inCombat: false,
       };
 
       let g = await this.gameService.joinGame(game, player);
       if (g) {
-        this.isLoading = false;
         this.gameService.PlayerRole = PlayerRole.PLAYER;
         this.router.navigate(['/jatek', game, 'lobby']);
       }

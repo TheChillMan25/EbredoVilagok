@@ -1,5 +1,5 @@
 <form [formGroup]="mainForm" id="content">
-  <div id="main" class="container">
+  <div id="main" class="container" style="grid-area: main;">
     <span class="groupName">Egyéni tulajdonságok</span>
     <div style="display: flex; gap: 1rem">
       <mat-form-field appearance="outline" style="flex: 2">
@@ -81,73 +81,71 @@
       </button>
     </div>
   </div>
-  <div id="stat-virtue-container">
-    <div id="stats" class="container" formGroupName="stats">
-      <span class="groupName">Tulajdonságok </span>
-      @for (item of statsForm; track $index) {
-      <div
-        [id]="item.controlName"
-        [formGroupName]="item.controlName"
-        class="stat-container"
-      >
-        @for (field of item.fields; track $index) {
-        <mat-form-field appearance="outline">
-          <mat-label>{{ field.labelText }}</mat-label>
-          <input
-            type="number"
-            [min]="item.interval.min"
-            [max]="item.interval.max"
-            matInput
-            [formControlName]="field.groupName"
-          />
-        </mat-form-field>
-        }
-      </div>
-      }
-      <!-- <div id="diceMenu" class="fake-button" (click)="diceRollingMenu()">
-        <mat-icon>casino</mat-icon>
-      </div> -->
-    </div>
-    <div id="virtues" class="container" formGroupName="virtues">
-      <span class="groupName">Erények</span>
-      <div id="virtue-container" formGroupName="virtues">
-        <mat-form-field appearance="outline">
-          <mat-label>Erény</mat-label>
-          <mat-select [formControl]="getInputs('virtues.virtues').at(0)">
-            @for (item of virtues; track $index) {
-            <mat-option [value]="$index">{{ item }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Erény</mat-label>
-          <mat-select [formControl]="getInputs('virtues.virtues').at(1)">
-            @for (item of virtues; track $index) {
-            <mat-option [value]="$index">{{ item }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <span class="groupName">Hátrány</span>
+  <div id="stats" class="container" formGroupName="stats" style="grid-area: stats;">
+    <span class="groupName">Tulajdonságok </span>
+    @for (item of statsForm; track $index) {
+    <div
+      [id]="item.controlName"
+      [formGroupName]="item.controlName"
+      class="stat-container"
+    >
+      @for (field of item.fields; track $index) {
       <mat-form-field appearance="outline">
-        <mat-label>Hátrány</mat-label>
-        <mat-select [formControl]="getInputs('virtues.disadvantage').at(0)">
-          @for (item of disadvantages; track $index) {
+        <mat-label>{{ field.labelText }}</mat-label>
+        <input
+          type="number"
+          [min]="item.interval.min"
+          [max]="item.interval.max"
+          matInput
+          [formControlName]="field.groupName"
+        />
+        <mat-icon matSuffix fontSet="material-symbols-outlined">{{
+          field.icon
+        }}</mat-icon>
+      </mat-form-field>
+      }
+    </div>
+    }
+  </div>
+  <div id="virtues" class="container" formGroupName="virtues" style="grid-area: virtues;">
+    <span class="groupName">Erények</span>
+    <div id="virtue-container" formGroupName="virtues">
+      <mat-form-field appearance="outline">
+        <mat-label>Erény</mat-label>
+        <mat-select [formControl]="getInputs('virtues.virtues').at(0)">
+          @for (item of virtues; track $index) {
+          <mat-option [value]="$index">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Erény</mat-label>
+        <mat-select [formControl]="getInputs('virtues.virtues').at(1)">
+          @for (item of virtues; track $index) {
           <mat-option [value]="$index">{{ item }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
+    <span class="groupName">Hátrány</span>
+    <mat-form-field appearance="outline">
+      <mat-label>Hátrány</mat-label>
+      <mat-select [formControl]="getInputs('virtues.disadvantage').at(0)">
+        @for (item of disadvantages; track $index) {
+        <mat-option [value]="$index">{{ item }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
   </div>
-  <div id="equipment" class="container" formGroupName="equipment">
+  <div id="equipment" class="container" formGroupName="equipment" style="grid-area: equipment;">
     <span class="groupName">Felszerelés</span>
     <div class="rect">
       <mat-form-field appearance="outline">
         <mat-label>Bal kéz</mat-label>
         <mat-select formControlName="left">
-          @for (weapon of weapons; track $index) {
-          <mat-option class="padded-option" [value]="$index">{{
-            weapon
+          @for (weapon of weapons; track weapon.id) {
+          <mat-option class="padded-option" [value]="weapon.id">{{
+            weapon.name
           }}</mat-option>
           }
         </mat-select>
@@ -157,9 +155,9 @@
       <mat-form-field appearance="outline">
         <mat-label>Jobb kéz</mat-label>
         <mat-select formControlName="right">
-          @for (weapon of weapons; track $index) {
-          <mat-option class="padded-option" [value]="$index">{{
-            weapon
+          @for (weapon of weapons; track weapon.id) {
+          <mat-option class="padded-option" [value]="weapon.id">{{
+            weapon.name
           }}</mat-option>
           }
         </mat-select>
@@ -169,25 +167,25 @@
       <mat-form-field id="armour-field" appearance="outline">
         <mat-label>Páncél</mat-label>
         <mat-select formControlName="armour">
-          @for (armour of armours; track $index) {
-          <mat-option class="padded-option" [value]="$index"
-            ><span class="option-text"
-              >{{ armour.name }} - {{ armour.defValue }}
-              <mat-icon>shield</mat-icon></span
-            ></mat-option
-          >
+          @for (armour of armours; track armour.id) {
+          <mat-option class="padded-option" [value]="armour.id">
+            {{ armour.name }}
+            <mat-icon matTooltip="Védelmi érték: {{ armour.defValue }}"
+              >shield</mat-icon
+            >
+          </mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
   </div>
-  <div id="items" formGroupName="items" class="container">
+  <div id="items" formGroupName="items" class="container" style="grid-area: items;">
     <span class="groupName">Elengedhetetlen tárgyak</span>
     <mat-form-field appearance="outline">
       <mat-label>Élelem</mat-label>
       <mat-select [formControl]="getInputs('items.food').at(0)">
         @for (item of foods; track $index) {
-        <mat-option [value]="$index"
+        <mat-option [value]="item.id"
           >{{ item.name }} - {{ item.uses }} fejadag</mat-option
         >
         }
@@ -202,7 +200,7 @@
           } @else if($index === 11){
           <mat-optgroup label="Tájak italai"></mat-optgroup>
           }
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -214,7 +212,7 @@
           } @else if($index === 11){
           <mat-optgroup label="Tájak italai"></mat-optgroup>
           }
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -226,7 +224,7 @@
           } @else if($index === 11){
           <mat-optgroup label="Tájak italai"></mat-optgroup>
           }
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -237,7 +235,7 @@
         <mat-label>Tárgy</mat-label>
         <mat-select [formControl]="getInputs('items.generalItems').at(0)">
           @for (item of generalItems; track $index) {
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -245,7 +243,7 @@
         <mat-label>Tárgy</mat-label>
         <mat-select [formControl]="getInputs('items.generalItems').at(1)">
           @for (item of generalItems; track $index) {
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -253,7 +251,7 @@
         <mat-label>Tárgy</mat-label>
         <mat-select [formControl]="getInputs('items.generalItems').at(2)">
           @for (item of generalItems; track $index) {
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -261,7 +259,7 @@
         <mat-label>Tárgy</mat-label>
         <mat-select [formControl]="getInputs('items.generalItems').at(3)">
           @for (item of generalItems; track $index) {
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -269,7 +267,7 @@
         <mat-label>Tárgy</mat-label>
         <mat-select [formControl]="getInputs('items.generalItems').at(4)">
           @for (item of generalItems; track $index) {
-          <mat-option [value]="$index">{{ item }}</mat-option>
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>

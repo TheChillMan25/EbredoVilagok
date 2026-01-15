@@ -29,6 +29,7 @@
         }
       </div>
       <div id="event-footer">
+        <div id="advError" class="error-message">{{ advError }}</div>
         <mat-form-field
           style="margin-left: auto; width: 100%"
           appearance="outline"
@@ -36,7 +37,6 @@
           <mat-label>Kalandnév (min. 3)</mat-label>
           <input matInput type="text" [formControl]="adventureName" />
         </mat-form-field>
-        <div id="advError" class="error-message">{{ advError }}</div>
         <div id="footer-btns">
           <div
             id="create-btn"

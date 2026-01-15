@@ -114,15 +114,15 @@ export class SystemComponent {
 
   setUpItems() {
     this.items = {
-      weapons: this.itemService.getItemsByGroup('weapons') as Weapon[],
-      armours: this.itemService.getItemsByGroup('armours') as Armour[],
-      generalItems: this.itemService.getItemsByGroup('general') as Item[],
-      foodRations: this.itemService.getItemsByGroup('food') as Food[],
-      medicalItems: this.itemService.getItemsByGroup('heal') as SpecialItem[],
-      specialDrinks: this.itemService.getItemsByGroup(
+      weapons: this.itemService.getItemGroup('weapons') as Weapon[],
+      armours: this.itemService.getItemGroup('armours') as Armour[],
+      generalItems: this.itemService.getItemGroup('general') as Item[],
+      foodRations: this.itemService.getItemGroup('food') as Food[],
+      medicalItems: this.itemService.getItemGroup('heal') as SpecialItem[],
+      specialDrinks: this.itemService.getItemGroup(
         'specDrinks'
       ) as SpecialItem[],
-      cigars: this.itemService.getItemsByGroup('cigars') as Cigar[],
+      cigars: this.itemService.getItemGroup('cigars') as Cigar[],
     };
     console.log(this.items);
   }

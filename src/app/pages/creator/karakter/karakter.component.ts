@@ -21,6 +21,8 @@ import { MatIcon } from '@angular/material/icon';
 import {
   Armour,
   Food,
+  Inventory,
+  Item,
   SpecialItem,
   Weapon,
 } from '../../../shared/models/game_interfaces';
@@ -35,6 +37,7 @@ import { NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Observable } from 'rxjs';
 import { ItemService } from '../../../shared/services/item/item.service';
+import { noWhitespaceValidator } from '../../forum/post-template/post-template.component';
 
 export interface CanComponentDeactivate {
   canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
@@ -69,7 +72,7 @@ export class KarakterComponent implements CanComponentDeactivate {
   currentHome: { desc: string; bonus: { name: string; mod: string }[] } | null =
     null;
 
-  weapons = [];
+  weapons = [] as Weapon[];
   armours = [] as Armour[];
 
   virtues = CharacterVirtues.map((virtue) => virtue.name);
@@ -79,26 +82,30 @@ export class KarakterComponent implements CanComponentDeactivate {
     {
       controlName: 'physical',
       fields: [
-        { groupName: 'ero', labelText: 'Erő' },
-        { groupName: 'ugyesseg', labelText: 'Ügyesség' },
-        { groupName: 'kitartas', labelText: 'Kitartás' },
+        { groupName: 'str', labelText: 'Erő', icon: 'fitness_center' },
+        {
+          groupName: 'dex',
+          labelText: 'Ügyesség',
+          icon: 'sports_martial_arts',
+        },
+        { groupName: 'end', labelText: 'Kitartás', icon: 'directions_run' },
       ],
       interval: { min: -3, max: 3 },
     },
     {
       controlName: 'mental',
       fields: [
-        { groupName: 'esz', labelText: 'Ész' },
-        { groupName: 'fortely', labelText: 'Fortély' },
-        { groupName: 'akaratero', labelText: 'Akaraterő' },
+        { groupName: 'int', labelText: 'Ész', icon: 'auto_stories' },
+        { groupName: 'cun', labelText: 'Fortély', icon: 'psychology' },
+        { groupName: 'wil', labelText: 'Akaraterő', icon: 'diamond' },
       ],
       interval: { min: -3, max: 3 },
     },
     {
       controlName: 'main',
       fields: [
-        { groupName: 'hp', labelText: 'HP' },
-        { groupName: 'sp', labelText: 'SP' },
+        { groupName: 'hp', labelText: 'HP', icon: 'health_metrics' },
+        { groupName: 'sp', labelText: 'SP', icon: 'mindfulness' },
       ],
       interval: { min: 1, max: 20 },
     },
@@ -107,34 +114,16 @@ export class KarakterComponent implements CanComponentDeactivate {
   foods = [] as Food[];
   specialIndex = 0;
   specialItems = [] as SpecialItem[];
-
-  /* medicalItems = medicalItems.map((item) => item.name);
-  specialDrinks = specialDrinks.map((drink) => drink.name); */
-  generalItems = []; /* items.map((item) => item.name); */
+  generalItems = [] as (Item | Inventory)[];
 
   showDiceMenu: boolean = false;
 
   constructor(
     private fb: FormBuilder,
+    private itemService: ItemService,
     private charService: CharacterService,
-    private router: Router,
-    private itemService: ItemService
-  ) {
-    this.weapons = this.itemService
-      .getItemsByGroup('weapons')
-      .map((weapon: Weapon) => weapon.name);
-    this.armours = this.itemService.getItemsByGroup('armours');
-    this.foods = this.itemService.getItemsByGroup('food').map((food: Food) => ({
-      name: food.name,
-      uses: food.uses,
-    }));
-    this.specialItems = itemService
-      .getItemsByGroup('allSpecial')
-      .map((item: SpecialItem) => item.name);
-    this.generalItems = itemService
-      .getItemsByGroup('general')
-      .map((item: any) => item.name);
-  }
+    private router: Router
+  ) {}
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
     if (this.mainForm.dirty) {
@@ -152,14 +141,25 @@ export class KarakterComponent implements CanComponentDeactivate {
     }
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('paper_bg');
     this.initForm();
+    await this.itemService.initItems();
+    this.weapons = this.itemService.getItemGroup('weapons') as Weapon[];
+    this.armours = this.itemService.getItemGroup('armours') as Armour[];
+    this.foods = this.itemService.getItemGroup('food') as Food[];
+    this.specialItems = this.itemService.getItemGroup(
+      'allSpecial'
+    ) as SpecialItem[];
+    this.generalItems = this.itemService.getItemGroup('general') as (
+      | Item
+      | Inventory
+    )[];
   }
 
   initForm() {
     this.mainForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [noWhitespaceValidator,Validators.required, Validators.minLength(3)]],
       species: ['', Validators.required],
       class: ['', Validators.required],
       specialProperties: this.fb.group({
@@ -168,30 +168,30 @@ export class KarakterComponent implements CanComponentDeactivate {
       }),
       stats: this.fb.group({
         physical: this.fb.group({
-          ero: [
-            '',
+          str: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          ugyesseg: [
-            '',
+          dex: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          kitartas: [
-            '',
+          end: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         mental: this.fb.group({
-          esz: [
-            '',
+          int: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          fortely: [
-            '',
+          cun: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          akaratero: [
-            '',
+          wil: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
@@ -236,7 +236,29 @@ export class KarakterComponent implements CanComponentDeactivate {
         'Karakter nem készíthető el, tölts ki minden kötelező mezőt!';
       return;
     }
+    this.isLoading = true;
     const formValue = this.mainForm.value;
+
+    let food: Food[] = [];
+    formValue.items.food.forEach((c: number | null) => {
+      if (c) {
+        food.push(this.itemService.getItemById('food', c) as Food);
+      }
+    });
+    let special: SpecialItem[] = [];
+    formValue.items.specialItems.forEach((c: number | null) => {
+      if (c) {
+        special.push(
+          this.itemService.getItemById('allSpecial', c) as SpecialItem
+        );
+      }
+    });
+    let general: (Item | Inventory)[] = [];
+    formValue.items.generalItems.forEach((c: number | null) => {
+      if (c) {
+        general.push(this.itemService.getItemById('allGeneral', c));
+      }
+    });
 
     let newCharacter: Omit<Character, 'id' | 'userId'> = {
       currentAdventure: '',
@@ -244,66 +266,61 @@ export class KarakterComponent implements CanComponentDeactivate {
       species: formValue.species || '',
       class: formValue.class || '',
       level: 1,
-      specialProperties: formValue.specialProperties || {
-        speciesProperty: 0,
-        home: 0,
+      specialProperties: {
+        speciesProperty: formValue.specialProperties.speciesProperty ?? 0,
+        home: formValue.specialProperties.home ?? 0,
       },
-      stats: formValue.stats || {
+      stats: {
         physical: {
-          ero: 1,
-          ugyesseg: 1,
-          kitartas: 1,
+          str: formValue.stats.physical.str ?? 1,
+          dex: formValue.stats.physical.dex ?? 1,
+          end: formValue.stats.physical.end ?? 1,
         },
         mental: {
-          esz: 1,
-          fortely: 1,
-          akaratero: 1,
+          int: formValue.stats.mental.int ?? 1,
+          cun: formValue.stats.mental.cun ?? 1,
+          wil: formValue.stats.mental.wil ?? 1,
         },
         main: {
-          hp: 1,
-          sp: 1,
+          hp: formValue.stats.main.hp ?? 1,
+          maxHP: formValue.stats.main.hp ?? 1,
+          sp: formValue.stats.main.sp ?? 1,
+          maxSP: formValue.stats.main.sp ?? 1,
         },
       },
-      equipment: formValue.equipment || {
-        left: '',
-        right: '',
-        armour: '',
+      equipment: {
+        left:
+          (this.itemService.getItemById(
+            'weapons',
+            formValue.equipment.left
+          ) as Weapon) ?? '',
+        right:
+          (this.itemService.getItemById(
+            'weapons',
+            formValue.equipment.right
+          ) as Weapon) ?? '',
+        armour:
+          (this.itemService.getItemById(
+            'armours',
+            formValue.equipment.armour
+          ) as Armour) ?? '',
       },
-      virtues: formValue.virtues || {
-        virtues: [],
-        disadvantage: [],
+      virtues: {
+        virtues: formValue.virtues.virtues ?? [],
+        disadv: formValue.virtues.disadvantage ?? [],
       },
-      items: formValue.items || {
-        food: [],
-        specialItems: [],
-        generalItems: [],
-        weaponItems: [],
+      items: {
+        food: food ?? [],
+        specialItems: special ?? [],
+        generalItems: general ?? [],
+        equipmentItems: [],
       },
       wounds: {
         small: 0,
         large: 0,
       },
+      activeStatuses: [],
     };
-
-    if (
-      this.itemService.getItem('weapons', newCharacter.equipment.left)
-        .handed === 2 &&
-      this.itemService.getItem('weapons', newCharacter.equipment.right)
-        .handed !== 0
-    ) {
-      this.errorMessage =
-        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
-      return;
-    } else if (
-      this.itemService.getItem('weapons', newCharacter.equipment.right)
-        .handed === 2 &&
-      this.itemService.getItem('weapons', newCharacter.equipment.left)
-        .handed !== 0
-    ) {
-      this.errorMessage =
-        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
-      return;
-    }
 
     this.charService
       .addCharacter(newCharacter)
@@ -311,6 +328,7 @@ export class KarakterComponent implements CanComponentDeactivate {
         this.mainForm.reset();
       })
       .catch((error) => {
+        this.isLoading = false;
         console.error('Hiba a karakter létrehozása során: ', error);
       })
       .finally(() => {
@@ -326,6 +344,21 @@ export class KarakterComponent implements CanComponentDeactivate {
       return;
     }
     const random = createRandomCharacter(charName, this.itemService);
+    const foodArray = this.mainForm.get('items.food') as FormArray;
+    foodArray.clear();
+    random.items.food.forEach((item) => {
+      if (item?.id) foodArray.push(new FormControl(item.id));
+    });
+    const specialArray = this.mainForm.get('items.specialItems') as FormArray;
+    specialArray.clear();
+    random.items.specialItems.forEach((item) => {
+      if (item?.id) specialArray.push(new FormControl(item.id));
+    });
+    const generalArray = this.mainForm.get('items.generalItems') as FormArray;
+    generalArray.clear();
+    random.items.generalItems.forEach((item) => {
+      if (item?.id) generalArray.push(new FormControl(item.id));
+    });
     console.log(random);
 
     this.mainForm.get('species')?.setValue(random.species);
@@ -338,12 +371,15 @@ export class KarakterComponent implements CanComponentDeactivate {
         speciesProperty: random.specialProperties.speciesProperty,
       },
       stats: random.stats,
-      equipment: random.equipment,
+      equipment: {
+        left: random.equipment.left.id,
+        right: random.equipment.right.id,
+        armour: random.equipment.armour.id,
+      },
       virtues: {
         virtues: random.virtues.virtues,
         disadvantage: random.virtues.disadv,
       },
-      items: random.items,
     });
 
     this.mainForm

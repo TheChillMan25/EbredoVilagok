@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Character, Game, Player, User } from '../../models/models';
+import { Game, GameAction, Player, User } from '../../models/models';
 import {
   doc,
   getDoc,
@@ -10,7 +10,6 @@ import {
   where,
   documentId,
   updateDoc,
-  getDocs,
 } from 'firebase/firestore';
 import {
   firstValueFrom,
@@ -26,8 +25,8 @@ import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 
 export enum PlayerRole {
-  HOST,
-  PLAYER,
+  HOST = 'HOST',
+  PLAYER = 'PLAYER',
 }
 
 export function checkRole(userId: string, ownerId: string): PlayerRole {
@@ -44,11 +43,7 @@ export function checkRole(userId: string, ownerId: string): PlayerRole {
 export class GameService {
   private _PlayerRole!: PlayerRole;
 
-  constructor(
-    private firestore: Firestore,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
   set PlayerRole(value: PlayerRole) {
     this._PlayerRole = value;
@@ -125,7 +120,7 @@ export class GameService {
               return games.filter((game) => {
                 const isHost = game.ownerId === user.uid;
                 const isJoined = game.players?.some(
-                  (player) => player.userId === user.uid
+                  (player) => player.id === user.uid
                 );
 
                 return !isHost && !isJoined;
@@ -178,7 +173,7 @@ export class GameService {
 
       const gameData = gameSnap.data() as Game;
       const isOwner = gameData.ownerId === user.uid;
-      const isPlayer = gameData.players?.some((p) => p.userId === user.uid);
+      const isPlayer = gameData.players?.some((p) => p.id === user.uid);
 
       if (!isOwner && !isPlayer) {
         throw new Error('Nincs jogosultságod módosítani ezt a játékot!');
@@ -193,7 +188,7 @@ export class GameService {
 
   async joinGame(
     gameId: string,
-    player: Omit<Player, 'userId' | 'username'>
+    player: Omit<Player, 'id' | 'name'>
   ): Promise<Game> {
     try {
       const user = await firstValueFrom(
@@ -223,13 +218,13 @@ export class GameService {
       if (currentPlayers.length >= 6) {
         throw new Error('Nem lehet csatlakozni! Megtelt a lobby.');
       }
-      if (currentPlayers.some((p) => p.userId === user.uid)) {
+      if (currentPlayers.some((p) => p.id === user.uid)) {
         throw new Error('Már csatlakoztál ehhez a játékhoz.');
       }
       const newPlayer: Player = {
         ...player,
-        username: userData.username as string,
-        userId: user.uid,
+        name: userData.username as string,
+        id: user.uid,
       };
       const updatedPlayers = [...currentPlayers, newPlayer];
       await updateDoc(gameDocRef, { players: updatedPlayers });
@@ -251,17 +246,28 @@ export class GameService {
       const gameDoc = await getDoc(gameDocRef);
       if (!gameDoc.exists()) throw new Error('Játék nem található!');
 
-      let updateData: any = null;
+      let updateData: Partial<Game> | null = null;
 
       switch (role) {
         case PlayerRole.HOST:
-          updateData = { isOpen: false, players: [] };
+          updateData = {
+            isOpen: false,
+            players: [],
+            started: false,
+            currentPlayer: '',
+            currentAction: {
+              performer: {
+                id: '',
+                name: '',
+              },
+              primary: {} as GameAction,
+              secondary: {} as GameAction,
+            },
+          };
           break;
         case PlayerRole.PLAYER:
           const gameData = gameDoc.data() as Game;
-          const newPlayers = gameData.players.filter(
-            (p) => p.userId !== user.uid
-          );
+          const newPlayers = gameData.players.filter((p) => p.id !== user.uid);
           updateData = { players: newPlayers };
           break;
         default:
@@ -270,7 +276,6 @@ export class GameService {
 
       if (updateData) {
         await updateDoc(gameDocRef, updateData);
-        this.router.navigateByUrl('/jatek');
       }
     } catch (error) {
       console.error('Hiba a játék elhagyásakor: ', error);

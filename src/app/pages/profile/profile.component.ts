@@ -37,7 +37,9 @@ export class ProfileComponent {
     setBackground('bg');
     this.loadUserProfile();
     try {
-      this.showCharacter = localStorage.getItem('showCharacter') === 'true';
+      this.showCharacter = localStorage.getItem('showCharacter')
+        ? localStorage.getItem('showCharacter') === 'true'
+        : true;
     } catch (error) {
       localStorage.setItem('showCharacter', 'true');
       this.showCharacter = true;

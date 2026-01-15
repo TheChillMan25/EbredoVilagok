@@ -13,9 +13,11 @@ import { Food, Item, SpecialItem } from '../../../../shared/models/game_interfac
 export class ItemComponent {
   @Input() item!: Food | SpecialItem | Item;
   @Input() canUse = false;
+  @Input() host = false;
   @Output() selectItemEvent = new EventEmitter<void>();
 
   selectItem() {
+    if(!this.host)
     this.selectItemEvent.emit();
   }
 }

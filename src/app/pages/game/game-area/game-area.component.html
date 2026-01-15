@@ -1,138 +1,87 @@
-<div id="content">
+<div
+  id="content"
+  [ngClass]="{
+    hostLayout: role === PlayerRole.HOST,
+    inspectNPC: player,
+    loading: isLoading
+  }"
+>
+  @if(!isLoading){
   <div id="players" class="container" style="grid-area: players">
     <div class="header" style="grid-area: header">Csapat</div>
     <div class="body" style="grid-area: body">
-      @for (player of game?.players; track player?.userId) {
-      <div
-        class="player"
-        [ngClass]="{ current: player?.userId === game?.currentPlayer }"
-      >
-        <span class="player-name" style="grid-area: name">{{
-          player?.username
-        }}</span
-        ><span class="player-character" style="grid-area: char">{{
-          player?.character?.name
-        }}</span
-        ><span class="player-stats" style="grid-area: hp"
-          >{{ player?.character?.stats?.main?.hp
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Hárítási pont"
-            >health_metrics</mat-icon
-          ></span
-        >
-        <span class="player-stats" style="grid-area: sp"
-          >{{ player?.character?.stats?.main?.sp
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Stressz pont"
-            >mindfulness</mat-icon
-          ></span
-        >
-        <span class="player-stats" style="grid-area: sW"
-          >{{ player?.character?.wounds?.small
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Kis seb(ek)"
-            >healing</mat-icon
-          ></span
-        ><span class="player-stats" style="grid-area: lW"
-          >{{ player?.character?.wounds?.large
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Nagy seb(ek)"
-            >femur</mat-icon
-          ></span
-        >
-      </div>
+      @for (player of game?.players; track player?.id) {
+      <app-player-npc
+        [object]="player"
+        [currentPlayer]="game?.currentPlayer"
+        [myTurn]="myTurn"
+        [role]="role === PlayerRole.HOST ? 'host' : ''"
+        [selectedTargetId]="selectedTarget?.id ?? currentPlayer?.id"
+        (clickedEvent)="controlSelection('character', player.id)"
+      ></app-player-npc>
       }
     </div>
   </div>
-  <div id="inventory" class="container" style="grid-area: inventory">
+  <div id="npcs" class="container" style="grid-area: npcs">
+    <div class="header" style="grid-area: header">NPC</div>
+    <div class="body" style="grid-area: body">
+      @for (npc of currentEvent?.NPCs; track $index) {
+      <app-player-npc
+        [object]="npc"
+        [currentPlayer]="game?.currentPlayer"
+        [myTurn]="myTurn"
+        [role]="role === PlayerRole.HOST ? 'host' : ''"
+        [selectedTargetId]="selectedTarget?.id"
+        (clickedEvent)="controlSelection('character', npc.id)"
+      ></app-player-npc>
+      }
+    </div>
+  </div>
+  <div id="current-event" class="container" style="grid-area: current-event">
+    @if(role === PlayerRole.HOST){
     <div class="header" style="grid-area: header">
-      Hátizsák:
-      <div id="inventory-pages">
-        <div
-          class="page"
-          [ngClass]="{ active: activeInventory === 'g' }"
-          (click)="selectInventory('g')"
-        >
-          Általános
-        </div>
-        <div
-          class="page"
-          [ngClass]="{ active: activeInventory === 's' }"
-          (click)="selectInventory('s')"
-        >
-          Különleges
-        </div>
-        <div
-          class="page"
-          [ngClass]="{ active: activeInventory === 'f' }"
-          (click)="selectInventory('f')"
-        >
-          Étel
-        </div>
+      <div class="fake-button" [ngClass]="{ hidden: firtsEvent }">
+        <mat-icon>arrow_left</mat-icon>
+      </div>
+      <span style="margin: 0 auto">Esemény</span>
+      <div class="fake-button" [ngClass]="{ hidden: lastEvent }">
+        <mat-icon>arrow_right</mat-icon>
       </div>
     </div>
+    }@else {
+    <div class="header" style="grid-area: header">Esemény</div>
+    }
     <div class="body" style="grid-area: body">
-      @for (item of currentInventory; track $index) {
-      <app-item
-        [item]="item"
-        (selectItemEvent)="selectItem($index)"
-        [canUse]="myTurn"
-      ></app-item>
-      }
-    </div>
-  </div>
-  <div id="actions" class="container" style="grid-area: actions">
-    <div class="header" style="grid-area: header">Akciók</div>
-    <div class="body" style="grid-area: body">
-      <div
-        class="fake-button"
-        matTooltip="Tárgy használat"
-        style="grid-area: useItem"
-      >
-        <mat-icon fontSet="material-symbols-outlined">grocery</mat-icon>
+      <div id="event-name" style="grid-area: name">
+        <span class="text-name">
+          @if(game?.isCamping){Táborozás}@else{{{ currentEvent?.name }}}</span
+        >
       </div>
-      <div class="fake-button" matTooltip="Táborozás" style="grid-area: camp">
-        <mat-icon fontSet="material-symbols-outlined">camping</mat-icon>
+      <div id="event-desc" style="grid-area: desc">
+        <span>
+          <span class="text-name">Leirás:</span> {{ currentEvent?.desc }}</span
+        >
       </div>
-      <div class="fake-button" matTooltip="Beszéd" style="grid-area: talk">
-        <mat-icon fontSet="material-symbols-outlined">voice_selection</mat-icon>
+      <div id="event-story" style="grid-area: story">
+        <span>
+          <span class="text-name">Történet:</span>
+          {{ currentEvent?.story }}
+        </span>
       </div>
-      <div
-        class="fake-button"
-        matTooltip="Kereskedés"
-        [ngClass]="{ disabled: hasHostileNPC }"
-        style="grid-area: trade"
-      >
-        <mat-icon fontSet="material-symbols-outlined">handshake</mat-icon>
+      <div id="event-location" style="grid-area: loc">
+        <span
+          ><span class="text-name">Helyszín: </span>
+          <span id="event-location-link" (click)="locateCurrentEventLocation()">
+            {{ currentEvent?.location }}
+          </span>
+        </span>
       </div>
-      <div
-        class="fake-button"
-        matTooltip="Támadás"
-        [ngClass]="{ disabled: !hasHostileNPC }"
-        style="grid-area: attack"
-      >
-        <mat-icon fontSet="material-symbols-outlined">swords</mat-icon>
-      </div>
-      <div
-        class="fake-button"
-        matTooltip="Lopás"
-        [ngClass]="{ disabled: !hasHostileNPC }"
-        style="grid-area: steal"
-      >
-        <mat-icon fontSet="material-symbols-outlined">back_hand</mat-icon>
+      <div id="map-container" class="container" style="grid-area: map">
+        <app-map-container #map></app-map-container>
       </div>
     </div>
   </div>
-  @if(role === PlayerRole.HOST){
-  <div class="class-container" style="grid-area: info">
-    <div class="header" style="grid-area: header">Valami</div>
-    <div class="body" style="grid-area: body"></div>
-  </div>
-  }@else if (role === PlayerRole.PLAYER) {
+  @if (role === PlayerRole.PLAYER) {
   <div id="character" class="container" style="grid-area: info">
     <div class="header" style="grid-area: header">Karakter</div>
     <div class="body" style="grid-area: body">
@@ -159,10 +108,12 @@
             myCharacterSpecs?.equipment?.left?.diceCount +
             myCharacterSpecs?.equipment?.left?.damage
           "
-          >{{ myCharacterSpecs?.equipment?.left?.name }}</span
-        ><mat-icon fontSet="material-symbols-outlined" style="grid-area: wIcon"
-          >swords</mat-icon
-        ><span
+        >
+          {{ myCharacterSpecs?.equipment?.left?.name }} </span
+        ><mat-icon fontSet="material-symbols-outlined" style="grid-area: wIcon">
+          swords
+        </mat-icon>
+        <span
           style="grid-area: right"
           [matTooltip]="
             myCharacterSpecs?.equipment?.right?.name !== 'Üres'
@@ -171,103 +122,931 @@
                 myCharacterSpecs?.equipment?.right?.damage
               : ''
           "
-          >{{ myCharacterSpecs?.equipment?.right?.name }}</span
-        ><span
+        >
+          {{ myCharacterSpecs?.equipment?.right?.name }}
+        </span>
+        <span
+          class="character-armour"
           style="grid-area: armour"
           [matTooltip]="
             'Védelem: ' + myCharacterSpecs?.equipment?.armour?.defValue
           "
-          >{{ myCharacterSpecs?.equipment?.armour?.name
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            style="grid-area: aIcon"
-            >shield</mat-icon
-          ></span
         >
+          {{ myCharacterSpecs?.equipment?.armour?.name }}
+          <mat-icon fontSet="material-symbols-outlined" style="grid-area: aIcon"
+            >shield</mat-icon
+          >
+        </span>
+      </div>
+    </div>
+  </div>
+  <div id="inventory" class="container" style="grid-area: inventory">
+    <div class="header" style="grid-area: header">
+      Hátizsák:
+      <div id="inventory-pages">
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 's' }"
+          (click)="selectInventory('s')"
+        >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Különleges tárgyak"
+            >science</mat-icon
+          >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Különleges tárgyak"
+            >health_cross</mat-icon
+          >
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'f' }"
+          (click)="selectInventory('f')"
+        >
+          <mat-icon fontSet="material-symbols-outlined" matTooltip="Étel(ek)"
+            >beer_meal</mat-icon
+          >
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'g' }"
+          (click)="selectInventory('g')"
+        >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Általános tárgyak"
+            >category</mat-icon
+          >
+        </div>
+        <!-- <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'e' }"
+          (click)="selectInventory('g')"
+        >
+          <mat-icon fontSet="material-symbols-outlined" matTooltip="Felszerelés"
+            >colorize</mat-icon
+          >
+        </div> -->
+      </div>
+    </div>
+    <div class="body" style="grid-area: body">
+      @for (item of currentInventory; track $index) {
+      <app-item
+        [item]="item"
+        (selectItemEvent)="controlSelection('item', $index)"
+        [canUse]="myTurn"
+        [ngClass]="{ selected: selectedItemIdx === $index }"
+      ></app-item>
+      }
+    </div>
+  </div>
+  <div id="other" class="container" style="grid-area: other">
+    <div class="header" style="grid-area: header">Egyéb</div>
+    <div class="body" style="grid-area: body">
+      @if(myTurn){
+      <div class="fake-button" (click)="finishTurn()" matTooltip="Kör vége">
+        <mat-icon>fast_forward</mat-icon>
+      </div>
+      <div class="fake-button" matTooltip="Dobás">
+        <mat-icon fontSet="material-symbols-outlined">ifl</mat-icon>
+      </div>
+      }
+      <div
+        class="fake-button"
+        (click)="leaveGame()"
+        matTooltip="Kilépés a játékból"
+      >
+        <mat-icon>logout</mat-icon>
+      </div>
+    </div>
+  </div>
+  <div id="actions" class="container" style="grid-area: actions">
+    <div class="header" style="grid-area: header">Akciók</div>
+    <div class="body" style="grid-area: body">
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.USEITEM)"
+        matTooltip="Tárgy használat"
+        style="grid-area: useItem"
+        [ngClass]="{
+          disabled:
+            (!player?.actionsLeft?.primary &&
+              !player?.actionsLeft?.secondary) ||
+            !myTurn
+        }"
+      >
+        <mat-icon fontSet="material-symbols-outlined">grocery</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.CAMP)"
+        matTooltip="Táborozás"
+        style="grid-area: camp"
+        [ngClass]="{ disabled: !player?.actionsLeft?.primary || !myTurn }"
+      >
+        <mat-icon fontSet="material-symbols-outlined">camping</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.TALK)"
+        matTooltip="Beszéd"
+        style="grid-area: talk"
+        [ngClass]="{ disabled: !player?.actionsLeft?.primary || !myTurn }"
+      >
+        <mat-icon fontSet="material-symbols-outlined">voice_selection</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.TRADE)"
+        matTooltip="Kereskedés"
+        [ngClass]="{
+          disabled: onlyHostileNPC || !player?.actionsLeft?.primary || !myTurn
+        }"
+        style="grid-area: trade"
+      >
+        <mat-icon fontSet="material-symbols-outlined">storefront</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.ATTACK)"
+        matTooltip="Támadás"
+        [ngClass]="{
+          disabled: !hasHostileNPC || !player?.actionsLeft?.primary || !myTurn
+        }"
+        style="grid-area: attack"
+      >
+        <mat-icon fontSet="material-symbols-outlined">swords</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.STEAL)"
+        matTooltip="Lopás"
+        [ngClass]="{
+          disabled: !hasHostileNPC || !player?.actionsLeft?.primary || !myTurn
+        }"
+        style="grid-area: steal"
+      >
+        <mat-icon fontSet="material-symbols-outlined">money_bag</mat-icon>
       </div>
     </div>
   </div>
   }
-  <div id="current-event" class="container" style="grid-area: current-event">
-    <div class="header" style="grid-area: header">Esemény</div>
+  <div
+    id="actionUI"
+    class="ui-container"
+    [ngClass]="{ show: actionPanelVisible }"
+    (click)="showActionPanel($event, ActionType.NONE, false)"
+  >
+    @if(!isPerformingAction){
+    <form [formGroup]="actionForm" (ngSubmit)="performAction()">
+      <span class="ui-title">Akció végrehajtása</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Akció típusa</mat-label>
+        <mat-select formControlName="type">
+          @for (item of ActionTypes; track $index) {
+          <mat-option [value]="item.value">{{ item.viewValue }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if (actionForm.get('type')?.value !== ActionType.USEITEM &&
+      actionForm.get('type')?.value !== ActionType.CAMP && selectedTarget) {
+      <span id="action-target">
+        @if($any(selectedTarget).name){
+        {{ $any(selectedTarget).name }}
+        }@else{
+        {{ $any(selectedTarget).username }}}
+      </span>
+      }
+      <mat-checkbox
+        #isPrimaryCheckbox
+        formControlName="isPrimary"
+        [checked]="!player?.actionsLeft?.secondary"
+        [disabled]="!player?.actionsLeft?.primary"
+        >Elsődleges akció</mat-checkbox
+      >
+      <mat-checkbox #isPartyWideCheckbox formControlName="isPartyWide"
+        >Party szintű akció</mat-checkbox
+      >
+      @if(actionForm.get('type')?.value === ActionType.USEITEM){
+      <mat-form-field appearance="outline">
+        <mat-label>Tárgy</mat-label>
+        <mat-select formControlName="item">
+          @for (group of groupedItems; track group.label) {
+          <mat-optgroup [label]="group.label">
+            @for (item of group.items; track $index) {
+            <mat-option [value]="item.id">
+              {{ item.name }} {{ $any(item).combat ? "(HK)" : "" }}
+            </mat-option>
+            }
+          </mat-optgroup>
+          } @if (groupedItems.length === 0) {
+          <mat-option disabled>Nincsenek tárgyaid</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if(actionError !== ''){
+      <mat-error>{{ actionError }}</mat-error>
+      } }
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="!actionForm.get('type')?.value"
+      >
+        Végrehajtás
+      </button>
+    </form>
+    }@else {
+    <mat-progress-spinner></mat-progress-spinner>
+    }
+  </div>
+  @if(role === PlayerRole.HOST){
+  <div id="other" class="container" style="grid-area: other">
+    <div class="header" style="grid-area: header">Egyéb</div>
     <div class="body" style="grid-area: body">
-      <div id="event-name" style="grid-area: name">
-        <span class="text-name">
-          @if(game?.isCamping){Táborozás}@else{{{ currentEvent?.name }}}</span
-        >
+      @if(myTurn){
+      <div class="fake-button" (click)="finishTurn()" matTooltip="Kör vége">
+        <mat-icon>fast_forward</mat-icon>
       </div>
-      <div id="event-desc" style="grid-area: desc">
-        <span
-          ><span class="text-name">Leirás:</span> {{ currentEvent?.desc }}</span
-        >
-      </div>
-      <div id="event-story" style="grid-area: story">
-        <span
-          ><span class="text-name">Történet:</span>
-          {{ currentEvent?.story }}</span
-        >
-      </div>
-      <div id="event-location" style="grid-area: loc">
-        <span
-          ><span class="text-name">Helyszín: </span>
-          <span
-            id="event-location-link"
-            (click)="locateCurrentEventLocation()"
-            >{{ currentEvent?.location }}</span
-          ></span
-        >
-      </div>
-      <div id="map-container" class="container" style="grid-area: map">
-        <app-map-container #map></app-map-container>
+      }
+      <div
+        class="fake-button"
+        (click)="leaveGame()"
+        matTooltip="Játék bezárása"
+      >
+        Bezárás<mat-icon>close</mat-icon>
       </div>
     </div>
   </div>
-  <div id="npcs" class="container" style="grid-area: npcs">
-    <div class="header" style="grid-area: header">NPC</div>
+  @if(player){
+  <div id="character" class="container" style="grid-area: info">
+    <div class="header" style="grid-area: header">Karakter</div>
     <div class="body" style="grid-area: body">
-      @for (npc of currentEvent?.NPCs; track $index) {
-      <div class="player">
-        <span class="player-name" style="grid-area: name">{{ npc?.name }}</span
-        ><span class="player-character" style="grid-area: char">{{
-          npc?.character?.name
-        }}</span
-        ><span class="player-stats" style="grid-area: hp"
-          >{{ npc?.character?.stats?.main?.hp
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Hárítási pont"
-            >health_metrics</mat-icon
-          ></span
+      <span id="character-name" style="grid-area: name">{{
+        player.character?.name
+      }}</span>
+      <span id="character-class" style="grid-area: class">{{
+        player.character?.class
+      }}</span>
+      <span id="speciesSpecial" style="grid-area: sSpec">{{
+        myCharacterSpecs?.speciesSpecial?.desc
+      }}</span>
+      <div id="home-bonuses" style="grid-area: home">
+        <span id="bonus-title">Bónusz ismeretek:</span>
+        @for (item of myCharacterSpecs?.home?.bonus; track $index) {
+        <span class="bonus">{{ item.name }}: {{ item.mod }}</span
+        >}
+      </div>
+      <div id="equipment" style="grid-area: eq">
+        <span
+          style="grid-area: left"
+          [matTooltip]="
+            'Sebzés: ' +
+            myCharacterSpecs?.equipment?.left?.diceCount +
+            myCharacterSpecs?.equipment?.left?.damage
+          "
         >
-        <span class="player-stats" style="grid-area: sp"
-          >{{ npc?.character?.stats?.main?.sp
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Stressz pont"
-            >mindfulness</mat-icon
-          ></span
+          {{ myCharacterSpecs?.equipment?.left?.name }}
+        </span>
+        <mat-icon fontSet="material-symbols-outlined" style="grid-area: wIcon"
+          >swords</mat-icon
         >
-        <span class="player-stats" style="grid-area: sW"
-          >{{ npc?.character?.wounds?.small
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Kis seb(ek)"
-            >healing</mat-icon
-          ></span
-        ><span class="player-stats" style="grid-area: lW"
-          >{{ npc?.character?.wounds?.large
-          }}<mat-icon
-            fontSet="material-symbols-outlined"
-            matTooltip="Nagy seb(ek)"
-            >femur</mat-icon
-          ></span
+        <span
+          style="grid-area: right"
+          [matTooltip]="
+            myCharacterSpecs?.equipment?.right?.name !== 'Üres'
+              ? 'Sebzés: ' +
+                myCharacterSpecs?.equipment?.right?.diceCount +
+                myCharacterSpecs?.equipment?.right?.damage
+              : ''
+          "
         >
+          {{ myCharacterSpecs?.equipment?.right?.name }}
+        </span>
+        <span
+          class="character-armour"
+          style="grid-area: armour"
+          [matTooltip]="
+            'Védelem: ' + myCharacterSpecs?.equipment?.armour?.defValue
+          "
+        >
+          {{ myCharacterSpecs?.equipment?.armour?.name }}
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            style="grid-area: aIcon"
+          >
+            shield
+          </mat-icon>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div id="inventory" class="container" style="grid-area: inventory">
+    <div class="header" style="grid-area: header">
+      Hátizsák:
+      <div id="inventory-pages">
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 's' }"
+          (click)="selectInventory('s')"
+        >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Különleges tárgyak"
+            >science</mat-icon
+          >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Különleges tárgyak"
+            >health_cross</mat-icon
+          >
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'f' }"
+          (click)="selectInventory('f')"
+        >
+          <mat-icon fontSet="material-symbols-outlined" matTooltip="Étel(ek)"
+            >beer_meal</mat-icon
+          >
+        </div>
+        <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'g' }"
+          (click)="selectInventory('g')"
+        >
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            matTooltip="Általános tárgyak"
+            >category</mat-icon
+          >
+        </div>
+        <!-- <div
+          class="page"
+          [ngClass]="{ active: activeInventory === 'e' }"
+          (click)="selectInventory('g')"
+        >
+          <mat-icon fontSet="material-symbols-outlined" matTooltip="Felszerelés"
+            >colorize</mat-icon
+          >
+        </div> -->
+      </div>
+    </div>
+    <div class="body" style="grid-area: body">
+      @for (item of currentInventory; track $index) {
+      <app-item
+        [item]="item"
+        (selectItemEvent)="controlSelection('item', $index)"
+        [canUse]="myTurn"
+        [ngClass]="{ selected: selectedItemIdx === $index }"
+      ></app-item>
+      }
+    </div>
+  </div>
+  <div id="other" class="container" style="grid-area: other">
+    <div class="header" style="grid-area: header">Egyéb</div>
+    <div class="body" style="grid-area: body">
+      @if(myTurn){
+      <div class="fake-button" (click)="finishTurn()" matTooltip="Kör vége">
+        <mat-icon>fast_forward</mat-icon>
+      </div>
+      <div class="fake-button" matTooltip="Dobás">
+        <mat-icon fontSet="material-symbols-outlined">ifl</mat-icon>
       </div>
       }
     </div>
   </div>
-  <div id="control" class="container" style="grid-area: control">
-    <div class="header" style="grid-area: header">Vezérlés</div>
-    <div class="body" style="grid-area: body"></div>
+  <div id="actions" class="container" style="grid-area: actions">
+    <div class="header" style="grid-area: header">Akciók</div>
+    <div class="body" style="grid-area: body">
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.USEITEM)"
+        matTooltip="Tárgy használat"
+        [ngClass]="{ disabled: !myTurn }"
+        style="grid-area: useItem"
+      >
+        <mat-icon fontSet="material-symbols-outlined">grocery</mat-icon>
+      </div>
+      <div
+        class="fake-button"
+        (click)="showActionPanel($event, ActionType.ATTACK)"
+        matTooltip="Támadás"
+        [ngClass]="{ disabled: !hasHostileNPC }"
+        style="grid-area: attack"
+      >
+        <mat-icon fontSet="material-symbols-outlined">swords</mat-icon>
+      </div>
+    </div>
   </div>
+  }@else {
+  <div id="player-control" class="container" style="grid-area: pControl">
+    <div class="header">{{ currentPlayer?.name }}</div>
+    <div class="body">
+      <div class="current-actions" style="grid-area: actions">
+        <div
+          class="current-action"
+          [ngClass]="{
+            target: currentPlayer?.lastAction?.primary?.target,
+            item: currentPlayer?.lastAction?.primary?.item,
+            dots:
+              !currentPlayer?.lastAction?.primary?.target &&
+              !currentPlayer?.lastAction?.primary?.item
+          }"
+          style="grid-area: primary"
+        >
+          <span class="host-info-title" style="grid-area: title"
+            >Elsődleges</span
+          >
+          @if(currentPlayer?.lastAction?.primary?.type){
+          <span class="action-type" style="grid-area: type">
+            {{ getActionName(currentPlayer?.lastAction?.primary?.type!) }}
+          </span>
+          } @if(currentPlayer?.lastAction?.primary?.target){
+          <span class="action-target" style="grid-area: target">
+            {{ currentPlayer?.lastAction?.primary?.target }}
+          </span>
+          } @else if(currentPlayer?.lastAction?.primary?.item){
+          <span class="action-item" style="grid-area: item">
+            "{{ currentPlayer?.lastAction?.primary?.item }}"
+          </span>
+          } @else{
+          <span style="grid-area: dots">...</span>
+          }
+        </div>
+        <div
+          class="current-action"
+          [ngClass]="{
+            target: currentPlayer?.lastAction?.secondary?.target,
+            item: currentPlayer?.lastAction?.secondary?.item,
+            dots:
+              !currentPlayer?.lastAction?.secondary?.target &&
+              !currentPlayer?.lastAction?.secondary?.item
+          }"
+          style="grid-area: secondary"
+        >
+          <span class="host-info-title" style="grid-area: title"
+            >Másodlagos</span
+          >
+          @if(currentPlayer?.lastAction?.secondary?.type){
+          <span class="action-type" style="grid-area: type">
+            {{ getActionName(currentPlayer?.lastAction?.secondary?.type!) }}
+          </span>
+          } @if(currentPlayer?.lastAction?.secondary?.target){
+          <span class="action-target" style="grid-area: target">
+            {{ currentPlayer?.lastAction?.secondary?.target }}
+          </span>
+          } @else if(currentPlayer?.lastAction?.secondary?.item){
+          <span class="action-item" style="grid-area: item">
+            "{{ currentPlayer?.lastAction?.secondary?.item }}"
+          </span>
+          } @else {
+          <span style="grid-area: dots">...</span>
+          }
+        </div>
+      </div>
+      <div class="status-container" style="grid-area: statuses">
+        <span class="host-info-title" style="grid-area: title">Hatások</span>
+        <div class="statuses" style="grid-area: statuses">
+          @for (item of currentPlayer?.character?.activeStatuses; track
+          item.type) {
+          <div
+            class="active-status"
+            (click)="selectPlayerStatus(item)"
+            [ngClass]="{ selected: item.type === selectedPlayerStatus?.type }"
+          >
+            <span class="status-name">
+              {{ getStatusDetails(item.type).name }}
+            </span>
+            <mat-icon fontSet="material-symbols-outlined" class="status-icon">
+              {{ getStatusDetails(item.type).icon }}
+            </mat-icon>
+          </div>
+          }
+        </div>
+        <div
+          class="fake-button"
+          (click)="showPanel('status', $event)"
+          style="grid-area: add"
+        >
+          <mat-icon>add</mat-icon>
+        </div>
+        <div
+          class="fake-button"
+          (click)="removeStatusFromPlayer()"
+          [ngClass]="{
+            disabled:
+              isLoadingStatus ||
+              currentPlayer?.character?.activeStatuses?.length === 0
+          }"
+          style="grid-area: remove"
+        >
+          <mat-icon>remove</mat-icon>
+        </div>
+      </div>
+      <div id="inventory" style="grid-area: items">
+        <div class="header">
+          Hátizsák:
+          <div id="inventory-pages">
+            <div
+              class="page"
+              [ngClass]="{ active: activeInventory === 's' }"
+              (click)="selectInventory('s')"
+            >
+              <mat-icon
+                fontSet="material-symbols-outlined"
+                matTooltip="Különleges tárgyak"
+                >science</mat-icon
+              >
+              <mat-icon
+                fontSet="material-symbols-outlined"
+                matTooltip="Különleges tárgyak"
+                >health_cross</mat-icon
+              >
+            </div>
+            <div
+              class="page"
+              [ngClass]="{ active: activeInventory === 'f' }"
+              (click)="selectInventory('f')"
+            >
+              <mat-icon
+                fontSet="material-symbols-outlined"
+                matTooltip="Étel(ek)"
+                >beer_meal</mat-icon
+              >
+            </div>
+            <div
+              class="page"
+              [ngClass]="{ active: activeInventory === 'g' }"
+              (click)="selectInventory('g')"
+            >
+              <mat-icon
+                fontSet="material-symbols-outlined"
+                matTooltip="Általános tárgyak"
+                >category</mat-icon
+              >
+            </div>
+            <!-- <div
+              class="page"
+              [ngClass]="{ active: activeInventory === 'e' }"
+              (click)="selectInventory('g')"
+            >
+              <mat-icon
+                fontSet="material-symbols-outlined"
+                matTooltip="Felszerelés"
+                >colorize</mat-icon
+              >
+            </div> -->
+          </div>
+        </div>
+        <div class="body" style="grid-area: body">
+          @for (item of currentInventory; track $index) {
+          <app-item
+            [item]="item"
+            [canUse]="myTurn"
+            [host]="true"
+            [ngClass]="{ selected: selectedItemIdx === $index }"
+          ></app-item>
+          }
+        </div>
+        <div class="footer">
+          <button mat-flat-button (click)="showPanel('item', $event)">
+            <mat-icon>add</mat-icon>Tárgy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    id="addStatusUI"
+    class="ui-container"
+    (click)="showPanel('status', $event, false)"
+    [ngClass]="{ show: addStatusPanelVisible }"
+  >
+    <form [formGroup]="addStatusForm" (ngSubmit)="addStatusToPlayer()">
+      <span class="ui-title">Státusz hozzáadása</span>
+      <mat-form-field appearance="outline">
+        <mat-label>Státusz típus</mat-label>
+        <mat-select formControlName="type">
+          @for (item of StatusTypes; track $index) {
+          <mat-option [value]="item.value"
+            >{{ getStatusDetails(item.value).name
+            }}<mat-icon fontSet="material-symbols-outlined">{{
+              getStatusDetails(item.value).icon
+            }}</mat-icon></mat-option
+          >
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Időtartam (kör)</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="duration"
+          min="1"
+          max="100"
+          step="1"
+        />
+      </mat-form-field>
+      @if(hasStatusValue){
+      <mat-form-field appearance="outline">
+        <mat-label>Módosító érték</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="value"
+          min="1"
+          max="1000"
+          step="1"
+        />
+        <mat-icon
+          fontSet="material-symbols-outlined"
+          matSuffix
+          matTooltip="Egyes státuszok ennyi HP-t csökkentenek körönként"
+          >help</mat-icon
+        >
+      </mat-form-field>
+      } @if(addStatusError !== ''){
+      <mat-error>{{ addStatusError }}</mat-error>
+      }
+      <button mat-flat-button type="submit" [disabled]="isLoadingStatus">
+        Hozzáad
+      </button>
+    </form>
+  </div>
+  <div
+    id="addItemUI"
+    class="ui-container"
+    (click)="showPanel('item', $event, false)"
+    [ngClass]="{ show: addItemPanelVisible }"
+  >
+    <form
+      [formGroup]="addItemForm"
+      (ngSubmit)="addNewItemToPlayer()"
+      [ngClass]="{ showEffect: addItemForm.get('hasEffect')?.value }"
+    >
+      @if(!addItemForm.get('hasEffect')?.value){
+      <span class="ui-title" style="grid-area: mainTitle">
+        Tárgy hozzáadása
+      </span>
+      <mat-form-field appearance="outline" style="grid-area: existingItem">
+        <mat-label>Tárgy</mat-label>
+        <mat-select formControlName="existingItem">
+          <mat-option [value]="''">Válassz...</mat-option>
+          @for (item of allItems; track item.id) {
+          <mat-option [value]="item">{{ item.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      }
+      <div
+        id="new-item-container"
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1rem;
+          grid-area: newItemContainer;
+        "
+        [ngClass]="{
+          disabled: addItemForm.get('existingItem')?.value
+        }"
+      >
+        <span class="ui-title">Új tárgy</span>
+        <mat-form-field appearance="outline">
+          <mat-label>
+            Név {{ addItemForm.get("newItemName")?.value?.length }}/20
+          </mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="newItemName"
+            maxlength="20"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Típus</mat-label>
+          <mat-select formControlName="newItemType">
+            @for (item of ItemTypes; track $index) {
+            <mat-option [value]="item.value"
+              ><mat-icon fontSet="material-symbols-outlined">{{
+                item.icon
+              }}</mat-icon
+              >{{ item.name }}</mat-option
+            >
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Kategória</mat-label>
+          <mat-select formControlName="newItemCategory">
+            @for (item of ItemCategories; track $index) {
+            <mat-option [value]="item.value">
+              <mat-icon fontSet="material-symbols-outlined">
+                {{ item.icon }}
+              </mat-icon>
+              {{ item.name }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if((addItemForm.get('newItemType')?.value === "SPECIAL" ||
+        addItemForm.get('newItemType')?.value === "MEDICAL") &&
+        addItemForm.get('hasEffect')?.value){
+        <mat-form-field appearance="outline">
+          <mat-label>Hatás leírása</mat-label>
+          <textarea
+            matInput
+            cdkTextareaAutosize
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="4"
+            cdkAutosizeMaxRows="30"
+            formControlName="newItemEffectDesc"
+          ></textarea>
+        </mat-form-field>
+        } @if(addItemForm.get('newItemCategory')?.value === "CONSUMABLE"){
+        <mat-form-field appearance="outline">
+          <mat-label>Mennyiség</mat-label>
+          <input matInput type="number" formControlName="newItemUses" />
+        </mat-form-field>
+        }
+        <mat-form-field appearance="outline">
+          <mat-label
+            >Leírás
+            {{ addItemForm.get("newItemDesc")?.value.length }}/200</mat-label
+          >
+          <textarea
+            matInput
+            cdkTextareaAutosize
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="4"
+            cdkAutosizeMaxRows="30"
+            formControlName="newItemDesc"
+          ></textarea>
+        </mat-form-field>
+        <mat-checkbox
+          formControlName="hasEffect"
+          [disabled]="
+            addItemForm.get('newItemCategory')?.value !== 'CONSUMABLE'
+          "
+        >
+          Hatás
+        </mat-checkbox>
+      </div>
+      @if(addItemError !== ''){
+      <mat-error>
+        @if(addItemForm.get('newItemName')?.hasError('whitespace') &&
+        addItemForm.get('newItemName')?.value.length > 0){ A név nem lehet üres!
+        } @else if(addItemForm.get('newItemDesc')?.hasError('whitespace') &&
+        addItemForm.get('newItemDesc')?.value.length > 0){ A leírás nem lehet
+        üres! }@else{
+        {{ addItemError }}}
+      </mat-error>
+      }
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="isLoadingItem"
+        style="grid-area: button"
+      >
+        Hozzáad
+      </button>
+    </form>
+
+    @if(addItemForm.get('hasEffect')?.value){
+    <form
+      id="newItemEffect"
+      [formGroup]="newItemEffectForm"
+      style="grid-area: newItemEffects"
+      [ngClass]="{ showEffect: addItemForm.get('hasEffect')?.value }"
+    >
+      <mat-form-field appearance="outline">
+        <mat-label>Státusz típus</mat-label>
+        <mat-select formControlName="type">
+          @for (effect of EffectTypes; track $index) {
+          <mat-option [value]="effect.value">
+            {{ effect.name }}
+            <mat-icon fontSet="material-symbols-outlined">{{
+              effect.icon
+            }}</mat-icon>
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if(effectHasDuration){
+      <mat-form-field appearance="outline">
+        <mat-label>Időtartam (kör)</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="duration"
+          min="1"
+          max="100"
+          step="1"
+        />
+      </mat-form-field>
+      @if(newItemEffectForm.get('type')?.value === 'BUFF_STAT'){
+      <mat-form-field appearance="outline">
+        <mat-label>Stat</mat-label>
+        <mat-select formControlName="stat">
+          @for (stat of Stats; track $index) {
+          <mat-option [value]="stat.value">
+            {{ stat.name }}
+            <mat-icon fontSet="material-symbols-outlined">{{
+              stat.icon
+            }}</mat-icon>
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      }@else {
+      <mat-form-field appearance="outline">
+        <mat-label>Státusz</mat-label>
+        <mat-select formControlName="status">
+          @for (status of StatusTypes; track $index) {
+          <mat-option [value]="status.value"
+            >{{ getStatusDetails(status.value).name }}
+            <mat-icon fontSet="material-symbols-outlined">
+              {{ getStatusDetails(status.value).icon }}
+            </mat-icon>
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      } } @if(effectHasValue){
+      <mat-form-field appearance="outline" style="grid-area: newEffect">
+        <mat-label>Módosító érték</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="value"
+          min="1"
+          max="1000"
+          step="1"
+        />
+        <mat-icon
+          fontSet="material-symbols-outlined"
+          matSuffix
+          matTooltip="Például: Egyes státuszok ennyi HP-t csökkentenek körönként"
+        >
+          help
+        </mat-icon>
+      </mat-form-field>
+      } @if(addItemEffectError){
+      <mat-error>{{ addItemEffectError }}</mat-error>
+      }
+      <button
+        mat-flat-button
+        (click)="addEffectToNewItem()"
+        [disabled]="!newItemEffectForm.get('type')?.value"
+        type="button"
+      >
+        Hozzáad
+      </button>
+      <div
+        id="newEffectsContainer"
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          max-height: 50%;
+        "
+      >
+        @for (item of newItemEffects; track $index) {
+        <div class="effect">
+          <mat-icon fontSet="material-symbols-outlined">
+            {{ getEffectDetails(item.type).icon }}
+          </mat-icon>
+          {{ getEffectDetails(item.type).name }}
+          @if(item.status){
+          <span>{{ getStatusDetails(item.status!).name }}</span>
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            [matTooltip]="item.duration + ' kör'"
+          >
+            {{ getStatusDetails(item.status!).icon }}
+          </mat-icon>
+          } @if(item.stat){
+          <span>{{ getStatDetails(item.stat!).name }}</span>
+          <mat-icon
+            fontSet="material-symbols-outlined"
+            [matTooltip]="item.duration + ' kör'"
+          >
+            {{ getStatDetails(item.stat!).icon }}
+          </mat-icon>
+          }
+        </div>
+        }
+      </div>
+    </form>
+    }
+  </div>
+  } } } @else {
+  <mat-progress-spinner
+    mode="indeterminate"
+    style="grid-area: loading"
+  ></mat-progress-spinner>
+  }
 </div>

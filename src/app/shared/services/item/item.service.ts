@@ -50,6 +50,7 @@ export class ItemService {
     weapons: [] as Weapon[],
     armours: [] as Armour[],
     inventory: [] as Inventory[],
+    allGeneral: [] as (Item | Inventory)[],
   };
   constructor(private firestore: Firestore) {}
 
@@ -114,7 +115,6 @@ export class ItemService {
         index++;
       });
       cigars.forEach((item, originalIndex) => {
-        console.log(item, ItemType[item.type]);
         const itemDoc = doc(itemsRef, index.toString());
         batch.set(itemDoc, {
           ...item,
@@ -205,27 +205,84 @@ export class ItemService {
           break;
         default:
           console.warn(
-            `Nem található kategórai "${item.name}" tárgyhoz: ${
-              ItemType[item.type]
-            }`
+            `Nem található kategórai "${item.name}" tárgyhoz: ${item.type}`
           );
       }
       this.itemsMap['allSpecial'] = [
         ...this.itemsMap['heal'],
         ...this.itemsMap['specDrinks'],
       ];
+      this.itemsMap['allGeneral'] = [
+        ...this.itemsMap['general'],
+        ...this.itemsMap['inventory'],
+      ];
     });
     console.log('Tárgyak betöltése sikeres!', this.itemsMap);
   }
-  getItem(group: string, index: number) {
-    if (this.itemsMap[group]) {
-      return this.itemsMap[group][index] as any;
-    }
+  getItemById(
+    group:
+      | 'food'
+      | 'heal'
+      | 'specDrinks'
+      | 'weapons'
+      | 'armours'
+      | 'general'
+      | 'inventory'
+      | 'cigars'
+      | 'allSpecial'
+      | 'allGeneral',
+    id: number
+  ): Item | Food | SpecialItem | Weapon | Armour | Cigar | Inventory {
+    const item = this.itemsMap[group].find((i) => i.id === id);
+    return item!;
   }
-  getItemsByGroup(groupName: string) {
+  getItemByIndex(
+    group:
+      | 'food'
+      | 'heal'
+      | 'specDrinks'
+      | 'weapons'
+      | 'armours'
+      | 'general'
+      | 'inventory'
+      | 'cigars'
+      | 'allSpecial'
+      | 'allGeneral',
+    idx: number
+  ): Item | Food | SpecialItem | Weapon | Armour | Cigar | Inventory {
+    return this.itemsMap[group][idx];
+  }
+  getItemGroup(
+    groupName: string
+  ):
+    | Item[]
+    | Food[]
+    | SpecialItem[]
+    | Weapon[]
+    | Armour[]
+    | Cigar[]
+    | Inventory[] {
     if (this.itemsMap[groupName]) {
-      return this.itemsMap[groupName] as any;
+      return this.itemsMap[groupName];
     }
     return [];
+  }
+  getAllItems() {
+    let items = [
+      ...this.itemsMap['food'],
+      ...this.itemsMap['heal'],
+      ...this.itemsMap['specDrinks'],
+      ...this.itemsMap['cigars'],
+      ...this.itemsMap['general'],
+      ...this.itemsMap['inventory'],
+      ...this.itemsMap['weapons'],
+      ...this.itemsMap['armours'],
+    ];
+    return items;
+  }
+  generateNewItemID(id: number = 0) {
+    const lastID =
+      this.getAllItems().sort((a: Item, b: Item) => b.id! - a.id!)[0].id ?? 250;
+    return lastID > id ? lastID + 1 : id + 1;
   }
 }

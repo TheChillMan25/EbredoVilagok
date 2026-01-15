@@ -14,6 +14,7 @@ import { AuthService } from '../../../shared/services/auth/auth.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
+import { setBackground } from '../../../shared/functional/functions';
 @Component({
   selector: 'app-lobby',
   imports: [
@@ -80,6 +81,7 @@ export class LobbyComponent implements CanComponentDeactivate {
   }
 
   ngOnInit() {
+    setBackground('#222', true);
     this.gameId = this.route.snapshot.paramMap.get('id') || '';
     this.authService.currentUser.pipe(take(1)).subscribe((user) => {
       this.currentUserId = user!.uid;
@@ -91,41 +93,44 @@ export class LobbyComponent implements CanComponentDeactivate {
     if (this.gameSub) this.gameSub.unsubscribe();
   }
 
-  async loadGameData() {
+  loadGameData() {
     try {
       if (this.gameId === '') {
         this.router.navigate(['/jatek']);
         return;
       }
       this.isLoading = true;
-      this.gameSub = this.gameService
-        .getGame(this.gameId)
-        .subscribe((value) => {
-          this.game = value;
-          this.role = checkRole(this.currentUserId, this.game.ownerId);
-          if (this.role === PlayerRole.PLAYER) {
-            this.player = this.game.players.find(
-              (p) => p.userId === this.currentUserId
-            )!;
-          } else if (this.game.players) {
-            this.allReady = this.game.players.every(
-              (p) => p.status === PlayerStatus.READY
-            );
-          }
-          if (this.game.started) {
-            this.dontWarnLeaving = true;
-            this.router.navigate(['jatek/', this.gameId]);
-          } else if (!this.game.isOpen && this.role === PlayerRole.PLAYER) {
-            this.dontWarnLeaving = true;
-            this.leaveGame();
-          } else if (
-            !this.game.players.find((p) => p.userId === this.currentUserId) &&
-            this.role === PlayerRole.PLAYER
-          ) {
-            this.dontWarnLeaving = true;
-            this.leaveGame();
-          }
-        });
+      this.gameSub = this.gameService.getGame(this.gameId).subscribe((game) => {
+        if (!game) {
+          this.dontWarnLeaving = true;
+          this.router.navigateByUrl('/jatek');
+          return;
+        }
+        this.game = game;
+        this.role = checkRole(this.currentUserId, this.game.ownerId);
+        if (this.role === PlayerRole.PLAYER) {
+          this.player = this.game.players.find(
+            (p) => p.id === this.currentUserId
+          )!;
+        } else if (this.game.players) {
+          this.allReady = this.game.players.every(
+            (p) => p.status === PlayerStatus.READY
+          );
+        }
+        if (this.game.started) {
+          this.dontWarnLeaving = true;
+          this.router.navigate(['jatek/', this.gameId]);
+        } else if (!this.game.isOpen && this.role === PlayerRole.PLAYER) {
+          this.dontWarnLeaving = true;
+          this.router.navigateByUrl('/jatek');
+        } else if (
+          !this.game.players.find((p) => p.id === this.currentUserId) &&
+          this.role === PlayerRole.PLAYER
+        ) {
+          this.dontWarnLeaving = true;
+          this.router.navigateByUrl('/jatek');
+        }
+      });
       this.isLoading = false;
     } catch (error) {
       this.isLoading = false;
@@ -138,20 +143,21 @@ export class LobbyComponent implements CanComponentDeactivate {
       this.isLoading = true;
       this.dontWarnLeaving = true;
       await this.gameService.leaveGame(this.gameId, this.role);
-      this.isLoading = false;
+      this.router.navigateByUrl('/jatek');
     } catch (error) {
       this.isLoading = false;
-      error = 'Hiba ajáték elhagyásakor!';
+      this.error = 'Hiba ajáték elhagyásakor!';
+      this.router.navigateByUrl('/jatek');
       console.error('Hiba a játék elhagyásakor: ', error);
     }
   }
 
   async kickPlayer(id: string) {
     try {
-      if (!this.game.players.find((p) => p.userId === id)) {
+      if (!this.game.players.find((p) => p.id === id)) {
         return;
       }
-      const updatedPlayers = this.game.players.filter((p) => p.userId !== id);
+      const updatedPlayers = this.game.players.filter((p) => p.id !== id);
       await this.gameService.updateGame(this.gameId, {
         players: updatedPlayers,
       });
@@ -164,11 +170,11 @@ export class LobbyComponent implements CanComponentDeactivate {
   async ready() {
     try {
       if (this.role !== PlayerRole.PLAYER) return;
-      if (!this.game.players.find((p) => p.userId === this.currentUserId)) {
+      if (!this.game.players.find((p) => p.id === this.currentUserId)) {
         return;
       }
       const updatedPlayers = this.game.players.map((player) => {
-        if (player.userId === this.currentUserId) {
+        if (player.id === this.currentUserId) {
           return {
             ...player,
             status:
@@ -199,11 +205,29 @@ export class LobbyComponent implements CanComponentDeactivate {
           'Nem indítható el a játék, mert még nem mindenki áll készen!';
         return;
       }
+      let initiatives: { id: string; initiative: number; finished: boolean }[] =
+        [];
 
-      await this.gameService.updateGame(this.gameId, {
+      this.game.players.forEach((p) => {
+        p.initiative = Math.ceil(Math.random() * 20);
+        initiatives.push({
+          id: p.id,
+          initiative: p.initiative,
+          finished: false,
+        });
+      });
+      initiatives.sort((a, b) => b.initiative - a.initiative);
+      const firstPlayer = initiatives[0].id;
+
+      const updateData = {
         started: true,
         isOpen: false,
-      });
+        players: this.game.players,
+        initiatives: initiatives,
+        currentPlayer: firstPlayer,
+      };
+
+      await this.gameService.updateGame(this.gameId, updateData);
     } catch (error) {
       this.error = 'Hiba a játék indításakor!';
       console.error('Hiba a játék indításakor: ', error);

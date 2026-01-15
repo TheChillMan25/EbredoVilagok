@@ -8,6 +8,59 @@ export interface CombinedVirtueDisadvRow {
   right?: VirtueDisadvBase;
 }
 
+export enum ItemSize {
+  SMALL = 'SMALL',
+  NORMAL = 'NORMAL',
+  LARGE = 'LARGE',
+}
+
+export enum ItemType {
+  COMMON = 'COMMON',
+  FOOD = 'FOOD',
+  MEDICAL = 'MEDICAL',
+  CIGAR = 'CIGAR',
+  SPECIAL = 'SPECIAL',
+  WEAPON = 'WEAPON',
+  ARMOUR = 'ARMOUR',
+  AMMO = 'AMMO',
+  SPICE = 'SPICE',
+  BAG = 'BAG',
+}
+
+export enum ItemCategory {
+  EQIUPMENT = 'EQIUPMENT',
+  CONSUMABLE = 'CONSUMABLE',
+  GENERAL = 'GENERAL',
+  INVENTORY = 'INVENTORY',
+}
+
+export interface Item {
+  id?: number;
+  name: string;
+  desc?: string;
+  size: ItemSize;
+  type: ItemType;
+  category: ItemCategory;
+  uses?: number;
+  effects?: ItemEffect[];
+}
+
+export interface Inventory extends Item {
+  canStore: ItemType[];
+  storage: { id: string; amount: number }[];
+  space: number;
+}
+
+export interface SpecialItem extends Item {
+  effectDesc?: string;
+  isPartyWide?: boolean;
+  combat?: boolean;
+}
+
+export interface Food extends Item {
+  heal?: number;
+}
+
 export interface Weapon extends Item {
   diceCount: number;
   damage: string;
@@ -24,56 +77,59 @@ export interface Armour extends Item {
 export interface Cigar extends Item {
   color: string;
   spice: string;
-  effect: string;
+  effectDesc: string;
+  effects: ItemEffect[];
 }
 
-export enum ItemSize {
-  SMALL,
-  NORMAL,
-  LARGE,
+export enum StatusType {
+  BLEED = 'BLEED',
+  POISON = 'POISON',
+  BURN = 'BURN',
+  PROSTHETIC = 'PROSTHETIC',
+  FIRE_RES = 'FIRE_RES',
+  POISON_RES = 'POISON_RES',
+  ADVANTAGE = 'ADVANTAGE',
+  DISADVANTAGE = 'DISADVANTAGE',
+  ANIMAL_TOUNGE = 'ANIMAL_TOUNGE',
+  FREE_MAGIC = 'FREE_MAGIC',
+  SLEEP = 'SLEEP',
+  STRESS_RES = 'STRESS_RES',
+  FULL_BELLY = 'FULL_BELLY',
 }
 
-export interface Item {
-  id?: number;
-  name: string;
-  desc?: string;
-  size: ItemSize;
-  type: ItemType;
-  category: ItemCategory;
-  uses?: number;
+export interface ActiveStatus {
+  type: StatusType;
+  duration: number;
+  value?: number;
 }
 
-export enum ItemType {
-  COMMON,
-  FOOD,
-  MEDICAL,
-  CIGAR,
-  SPECIAL,
-  WEAPON,
-  ARMOUR,
-  AMMO,
-  SPICE,
-  BAG,
+export enum EffectType {
+  HEAL_HP = 'HEAL_HP',
+  HEAL_SP = 'HEAL_SP',
+  HEAL_SMALL_WOUND = 'HEAL_SMALL_WOUND',
+  HEAL_LARGE_WOUND = 'HEAL_LARGE_WOUND',
+  BUFF_STAT = 'BUFF_STAT',
+  REMOVE_STATUS = 'REMOVE_STATUS',
+  ADD_STATUS = 'ADD_STATUS',
 }
 
-export enum ItemCategory {
-  EQIUPMENT,
-  CONSUMABLE,
-  GENERAL,
-  INVENTORY,
+export interface ItemEffect {
+  type: EffectType;
+  value?: number;
+  stat?: string;
+  status?: StatusType;
+  duration?: number;
+  target?: 'self' | 'target' | 'party';
 }
 
-export interface Inventory extends Item {
-  canStore: ItemType[];
-  storage: { id: string; amount: number }[];
-  space: number;
-}
-
-export interface Food extends Item {
-  heal: number;
-}
-export interface SpecialItem extends Item {
-  effect: string;
-  isPartyWide: boolean;
-  combat: boolean;
+export enum GameErrorCauses {
+  NoPrimaryAction,
+  NoSecondaryAction,
+  HPAlreadyFull,
+  SPAlreadyFull,
+  NoSmallWounds,
+  NoLargeWounds,
+  NoStatToBuff,
+  NoStatusToAdd,
+  NoStatusToRemove,
 }

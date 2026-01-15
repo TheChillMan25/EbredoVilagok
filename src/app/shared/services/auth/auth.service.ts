@@ -10,7 +10,16 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
 } from '@angular/fire/auth';
-import { doc, Firestore, setDoc, collection } from '@angular/fire/firestore';
+import {
+  doc,
+  Firestore,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  getDoc,
+} from '@angular/fire/firestore';
 import { User } from '../../models/models';
 
 @Injectable({
@@ -44,25 +53,53 @@ export class AuthService {
     username: string
   ): Promise<UserCredential> {
     try {
+      const taken = await this.isUsernameTaken(username);
+      if (taken) {
+        throw new Error('A felhasználónév már foglalt!', {
+          cause: 'TakenUsername',
+        });
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password
       );
 
-      await this.createUserData(userCredential.user.uid, {
-        id: userCredential.user.uid,
-        username: username,
-        email: email,
-        characters: [],
-        adventures: [],
-        games: [],
-      } as User);
+      const userId = userCredential.user.uid;
+
+      try {
+        const usernameRef = doc(this.firestore, 'Usernames', username);
+        if ((await getDoc(usernameRef)).exists()) {
+          throw new Error('A felhasználónév már foglalt!', {
+            cause: 'TakenUsername',
+          });
+        }
+        await setDoc(usernameRef, { taken: true });
+
+        await this.createUserData(userCredential.user.uid, {
+          id: userCredential.user.uid,
+          username: username,
+          email: email,
+          characters: [],
+          adventures: [],
+          games: [],
+        } as User);
+      } catch (error) {
+        await userCredential.user.delete();
+        throw error;
+      }
       return userCredential;
     } catch (error) {
       console.error('Hiba a regisztráció során:', error);
       throw error;
     }
+  }
+
+  private async isUsernameTaken(username: string): Promise<boolean> {
+    const usernameRef = doc(this.firestore, 'Usernames', username);
+    const docSnap = await getDoc(usernameRef);
+    return docSnap.exists();
   }
 
   private async createUserData(

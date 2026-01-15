@@ -1,0 +1,78 @@
+<div
+  class="player"
+  (click)="clicked()"
+  [ngClass]="{
+    current: object?.id === currentPlayer,
+    selected: selectedTargetId === object?.id,
+    canSelect: myTurn || role === 'host'
+  }"
+>
+  <span
+    class="player-name"
+    style="grid-area: name"
+    [matTooltip]="object?.character?.name"
+  >
+    {{ object?.name }}
+  </span>
+  <mat-icon fontSet="material-symbols-outlined" style="grid-area: cIcon">
+    @if(object?.inCombat){swords}
+  </mat-icon>
+  <span
+    class="player-stats"
+    matTooltip="{{ object?.character?.stats?.main?.hp }}/{{
+      object?.character?.stats?.main?.maxHP
+    }}"
+    style="grid-area: hp"
+  >
+    {{ object?.character?.stats?.main?.hp }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Hárítási pont">
+      health_metrics
+    </mat-icon>
+  </span>
+  <span
+    class="player-stats"
+    matTooltip="{{ object?.character?.stats?.main?.sp }}/{{
+      object?.character?.stats?.main?.maxSP
+    }}"
+    style="grid-area: sp"
+  >
+    {{ object?.character?.stats?.main?.sp }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Stressz pont">
+      mindfulness
+    </mat-icon>
+  </span>
+  <span class="player-stats" style="grid-area: sW">
+    {{ object?.character?.wounds?.small }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Kis seb(ek)">
+      healing
+    </mat-icon>
+  </span>
+  <span class="player-stats" style="grid-area: lW">
+    {{ object?.character?.wounds?.large }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Nagy seb(ek)">
+      femur
+    </mat-icon>
+  </span>
+  <div class="status-effects" style="grid-area: statEf">
+    @for (status of object?.character?.activeStatuses; track $index) {
+    <mat-icon
+      fontSet="material-symbols-outlined"
+      [matTooltip]="getStatusDetails(status.type).name"
+    >
+      {{ getStatusDetails(status.type).icon }}
+    </mat-icon>
+    }
+  </div>
+  <div class="action-indicator" style="grid-area: actionsLeft">
+    <div
+      class="action-line primary"
+      matTooltip="Elsődleges"
+      [ngClass]="{ available: hasPrimaryAction }"
+    ></div>
+    <div
+      class="action-line secondary"
+      matTooltip="Másodlagos"
+      [ngClass]="{ available: hasSecondaryAction }"
+    ></div>
+  </div>
+</div>

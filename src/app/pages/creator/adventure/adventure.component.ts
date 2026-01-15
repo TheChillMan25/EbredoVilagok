@@ -21,6 +21,7 @@ import {
   Adventure,
   AdventureEvent,
   Character,
+  GameAction,
   NPC,
 } from '../../../shared/models/models';
 import { MatSelect, MatOption } from '@angular/material/select';
@@ -48,6 +49,7 @@ import { MatButton } from '@angular/material/button';
 import { AdventureService } from '../../../shared/services/adventure/adventure.service';
 import { Router } from '@angular/router';
 import { CanComponentDeactivate } from '../karakter/karakter.component';
+import { noWhitespaceValidator } from '../../forum/post-template/post-template.component';
 
 @Component({
   selector: 'app-adventure',
@@ -110,19 +112,6 @@ export class AdventureComponent implements CanComponentDeactivate {
   eventError: string = '';
   npcForm!: FormGroup;
   npcError: string = '';
-
-  /* npcCharacter = {
-    species: NationData.map((nation) => nation.nationName),
-    weapons: weapons.map((weapon: Weapon) => weapon.name),
-    armours: armours,
-    virtues: CharacterVirtues.map((virtue) => virtue.name),
-    disadvantages: CharacterDisadvantages.map((disadv) => disadv.name),
-    food: foodRations.map((food) => food.name),
-    specialItems: medicalItems
-      .map((item) => item.name)
-      .concat(specialDrinks.map((item) => item.name)),
-    generalItems: items.map((item) => item.name),
-  }; */
 
   myCharacters!: Character[];
 
@@ -199,13 +188,16 @@ export class AdventureComponent implements CanComponentDeactivate {
   initForms() {
     this.eventForm = this.fb.group({
       location: ['', [Validators.required]],
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      desc: [''],
-      story: [''],
+      name: [
+        '',
+        [noWhitespaceValidator, Validators.required, Validators.minLength(3)],
+      ],
+      desc: ['', [noWhitespaceValidator]],
+      story: ['', [noWhitespaceValidator]],
     });
 
     this.npcForm = this.fb.group({
-      name: ['', [Validators.required]],
+      name: ['', [noWhitespaceValidator, Validators.required]],
       attitude: ['neutral', [Validators.required]],
       actions: this.fb.group(
         {
@@ -384,6 +376,14 @@ export class AdventureComponent implements CanComponentDeactivate {
         name: npcValues.name,
         actions: npcValues.actions,
         attitude: npcValues.attitude,
+        actionsLeft: { primary: true, secondary: true },
+        inCombat: false,
+        initiative: null,
+        lastAction: {
+          performer: { id: '', name: '' },
+          primary: {} as GameAction,
+          secondary: {} as GameAction,
+        },
         character: this.myCharacters.find(
           (char) => char.id === npcValues.character
         ),

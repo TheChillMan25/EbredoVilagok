@@ -7,6 +7,19 @@ import {
   CharacterDisadvantages,
 } from '../models/virtues_disadvantages';
 import { ItemService } from '../services/item/item.service';
+import {
+  Armour,
+  Cigar,
+  EffectType,
+  Food,
+  Inventory,
+  Item,
+  ItemSize,
+  SpecialItem,
+  StatusType,
+  Weapon,
+} from '../models/game_interfaces';
+import { items } from '../models/items';
 
 let virtues = CharacterVirtues.map((virtue) => virtue.name);
 let disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
@@ -170,35 +183,82 @@ export function getStat(stats: number[]) {
 function createRandomEquipment(itemService: ItemService) {
   while (true) {
     const equipment = {
-      left: Math.floor(
-        Math.random() * itemService.getItemsByGroup('weapons').length
-      ),
-      right: Math.floor(
-        Math.random() * itemService.getItemsByGroup('weapons').length
-      ),
-      armour: Math.floor(
-        Math.random() * itemService.getItemsByGroup('armours').length
-      ),
+      left: itemService.getItemByIndex(
+        'weapons',
+        Math.floor(Math.random() * itemService.getItemGroup('weapons').length)
+      ) as Weapon,
+      right: itemService.getItemByIndex(
+        'weapons',
+        Math.floor(Math.random() * itemService.getItemGroup('weapons').length)
+      ) as Weapon,
+      armour: itemService.getItemByIndex(
+        'armours',
+        Math.floor(Math.random() * itemService.getItemGroup('armours').length)
+      ) as Armour,
     };
-    if (checkEquipment(equipment.left, equipment.right, itemService)) return equipment;
+    if (checkEquipment(equipment.left, equipment.right)) return equipment;
   }
 }
 
-function checkEquipment(left: number, right: number, itemService: ItemService) {
+function checkEquipment(left: Weapon, right: Weapon) {
   return !(
-    (itemService.getItem('weapons', left).handed === 2 &&
-      itemService.getItem('weapons', right).handed !== 0) ||
-    (itemService.getItem('weapons', left).handed !== 0 &&
-      itemService.getItem('weapons', right).handed === 2)
+    (left.handed === 2 && right.handed !== 0) ||
+    (left.handed !== 0 && right.handed === 2)
   );
 }
 
+function createItems(
+  group: 'food' | 'allSpecial' | 'allGeneral',
+  itemService: ItemService
+) {
+  let iterations = group === 'food' ? 1 : group === 'allSpecial' ? 3 : 5;
+  let items: (Item | Food | SpecialItem | Inventory | Cigar)[] = [];
+  const l = itemService.getItemGroup(group).length;
+  if (!l) return [];
+  let successfulAdds = 0;
+  let safetyCounter = 0;
+  while (successfulAdds < iterations && safetyCounter < 100) {
+    safetyCounter++;
+    const originalItem = itemService.getItemByIndex(
+      group,
+      Math.floor(Math.random() * l)
+    );
+    if (originalItem) {
+      const existingItemIndex = items.findIndex(
+        (i) => i.id === originalItem.id
+      );
+      if (existingItemIndex > -1) {
+        let existingItem = items[existingItemIndex];
+        if ('uses' in existingItem && 'uses' in originalItem) {
+          existingItem.uses =
+            (existingItem.uses || 0) + (originalItem.uses || 0);
+          successfulAdds++;
+        }
+      } else {
+        const newItem = { ...originalItem };
+        items.push(newItem);
+        successfulAdds++;
+      }
+    }
+  }
+  return items;
+}
+
 export function createRandomCharacter(
-  charName: string, itemService: ItemService
+  charName: string,
+  itemService: ItemService
 ): Omit<Character, 'id' | 'userId'> {
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
   let stats = createStats();
+  const hp = Math.ceil(Math.random() * 6),
+    sp =
+      Math.ceil(Math.random() * 4) +
+      Math.ceil(Math.random() * 4) +
+      Math.ceil(Math.random() * 4);
+  let food = createItems('food', itemService) as Food[];
+  let specItems = createItems('allSpecial', itemService) as SpecialItem[];
+  let genItems = createItems('allGeneral', itemService) as (Item | Inventory)[];
   let randomCharacter: Omit<Character, 'id' | 'userId'> = {
     currentAdventure: '',
     name: charName || '',
@@ -213,21 +273,20 @@ export function createRandomCharacter(
     },
     stats: {
       physical: {
-        ero: getStat(stats),
-        ugyesseg: getStat(stats),
-        kitartas: getStat(stats),
+        str: getStat(stats),
+        dex: getStat(stats),
+        end: getStat(stats),
       },
       mental: {
-        esz: getStat(stats),
-        fortely: getStat(stats),
-        akaratero: getStat(stats),
+        int: getStat(stats),
+        cun: getStat(stats),
+        wil: getStat(stats),
       },
       main: {
-        hp: Math.ceil(Math.random() * 6),
-        sp:
-          Math.ceil(Math.random() * 4) +
-          Math.ceil(Math.random() * 4) +
-          Math.ceil(Math.random() * 4),
+        hp: hp,
+        maxHP: hp,
+        sp: sp,
+        maxSP: sp,
       },
     },
     equipment: createRandomEquipment(itemService),
@@ -239,33 +298,95 @@ export function createRandomCharacter(
       disadv: [Math.floor(Math.random() * disadvantages.length)],
     },
     items: {
-      food: [
-        Math.floor(Math.random() * itemService.getItemsByGroup('food').length),
-      ],
-      specialItems: [
-        Math.floor(
-          Math.random() * itemService.getItemsByGroup('allSpecial').length
-        ),
-        Math.floor(
-          Math.random() * itemService.getItemsByGroup('allSpecial').length
-        ),
-        Math.floor(
-          Math.random() * itemService.getItemsByGroup('allSpecial').length
-        ),
-      ],
-      generalItems: [
-        Math.floor(Math.random() * 99),
-        Math.floor(Math.random() * 99),
-        Math.floor(Math.random() * 99),
-        Math.floor(Math.random() * 99),
-        Math.floor(Math.random() * 99),
-      ],
-      weaponItems: [],
+      food: food,
+      specialItems: specItems,
+      generalItems: genItems,
+      equipmentItems: [],
     },
     wounds: {
       small: 0,
       large: 0,
     },
+    activeStatuses: [],
   };
   return randomCharacter;
+}
+
+export function getStatusDetails(statusType: StatusType): {
+  icon: string;
+  name: string;
+} {
+  switch (statusType) {
+    case StatusType.BLEED:
+      return { icon: 'water_drop', name: 'Vérzés' };
+    case StatusType.POISON:
+      return { icon: 'skull', name: 'Mérgezés' };
+    case StatusType.BURN:
+      return { icon: 'mode_heat', name: 'Égés' };
+    case StatusType.PROSTHETIC:
+      return { icon: 'precision_manufacturing', name: 'Protézis' };
+    case StatusType.DISADVANTAGE:
+      return { icon: 'keyboard_double_arrow_down', name: 'Hátrány' };
+    case StatusType.ADVANTAGE:
+      return { icon: 'keyboard_double_arrow_up', name: 'Előny' };
+    case StatusType.FIRE_RES:
+      return { icon: 'shield_with_heart', name: 'Tűzállóság' };
+    case StatusType.POISON_RES:
+      return { icon: 'health_and_safety', name: 'Méreg ellenállás' };
+    case StatusType.STRESS_RES:
+      return { icon: 'psychology', name: 'Stressz védelem' };
+    case StatusType.FREE_MAGIC:
+      return { icon: 'wand_shine', name: 'Ingyen varázslat' };
+    case StatusType.FULL_BELLY:
+      return { icon: 'restaurant', name: 'Teli has' };
+    case StatusType.ANIMAL_TOUNGE:
+      return { icon: 'pets', name: 'Állatok nyelve' };
+    case StatusType.SLEEP:
+      return { icon: 'moon_stars', name: 'Alvás' };
+    default:
+      return { icon: '', name: '' };
+  }
+}
+
+export function getEffectDetails(effectType: EffectType): {
+  icon: string;
+  name: string;
+} {
+  switch (effectType) {
+    case EffectType.ADD_STATUS:
+      return { icon: 'add', name: 'Státusz' };
+    case EffectType.REMOVE_STATUS:
+      return { icon: 'remove', name: 'Státusz' };
+    case EffectType.BUFF_STAT:
+      return { icon: 'trending_up', name: 'Stat' };
+    case EffectType.HEAL_HP:
+      return { icon: 'health_metrics', name: 'Gyógyítás' };
+    case EffectType.HEAL_SP:
+      return { icon: 'mindfulness', name: 'Gyógyítás' };
+    case EffectType.HEAL_SMALL_WOUND:
+      return { icon: 'healing', name: 'Gyógyítás' };
+    case EffectType.HEAL_LARGE_WOUND:
+      return { icon: 'femur', name: 'Gyógyítás' };
+    default:
+      return { icon: '', name: '' };
+  }
+}
+
+export function getStatDetails(stat: string): { icon: string; name: string } {
+  switch (stat) {
+    case 'str':
+      return { icon: 'fitness_center', name: 'Erő' };
+    case 'dex':
+      return { icon: 'sports_martial_arts', name: 'Ügyesség' };
+    case 'end':
+      return { icon: 'directions_run', name: 'Kitartás' };
+    case 'int':
+      return { icon: 'auto_stories', name: 'Ész' };
+    case 'cun':
+      return { icon: 'psychology', name: 'Fortély' };
+    case 'wil':
+      return { icon: 'diamond', name: 'Akaraterő' };
+    default:
+      return { icon: '', name: '' };
+  }
 }

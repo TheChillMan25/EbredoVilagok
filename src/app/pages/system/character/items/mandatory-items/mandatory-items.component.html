@@ -51,9 +51,11 @@
   </article>
   @for (item of medicalItems; track $index) {
   <div class="item">
-    <strong class="item-name">{{ item.name }}:</strong>
+    <strong class="item-name"
+      >{{ item.name }} {{ item.combat ? "(HK)" : "" }}:</strong
+    >
     <p class="italic-text item-desc">{{ item.desc }}</p>
-    <p class="item-effect">{{ item.effect }}</p>
+    <p class="item-effect">{{ item.effectDesc }}</p>
   </div>
   }
 </div>

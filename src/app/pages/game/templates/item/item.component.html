@@ -1,16 +1,25 @@
 <div class="item" (click)="selectItem()" [ngClass]="{ canUse: canUse }">
-  <span class="item-name"
-    >{{ item.name }}@if($any(item).effect){<mat-icon
+  <span class="item-name">
+    <span style="grid-area: text">
+      {{ item.name }} {{ $any(item).combat ? "(HK)" : "" }}
+    </span>
+    @if($any(item).effectDesc){
+    <mat-icon
       fontSet="material-symbols-outlined"
-      [matTooltip]="$any(item).effect"
-      >help</mat-icon
-    >}@if($any(item).heal !== undefined){<span
-      >( {{ $any(item).portion }} fejadag )</span
-    ><mat-icon
+      [matTooltip]="$any(item).effectDesc"
+    >
+      help
+    </mat-icon>
+    } @if($any(item).heal !== undefined){
+    <span> ( {{ $any(item).uses }} fejadag ) </span>
+    <mat-icon
       fontSet="material-symbols-outlined"
       [matTooltip]="'Gyógyítás: ' + $any(item).heal + ' HP'"
-      >help</mat-icon
-    >}</span
-  >
+      style="grid-area: icon"
+    >
+      help
+    </mat-icon>
+    }
+  </span>
   <span class="item-desc" matTooltip="{{ item.desc }}">{{ item.desc }}</span>
 </div>

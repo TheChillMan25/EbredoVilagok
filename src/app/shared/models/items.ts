@@ -1,6 +1,7 @@
 import {
   Armour,
   Cigar,
+  EffectType,
   Food,
   Inventory,
   Item,
@@ -8,6 +9,7 @@ import {
   ItemSize,
   ItemType,
   SpecialItem,
+  StatusType,
   Weapon,
 } from './game_interfaces';
 
@@ -20,6 +22,13 @@ export const foodRations: Food[] = [
     uses: 1,
     heal: 0,
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.HEAL_HP,
+        target: 'self',
+        value: 0,
+      },
+    ],
   },
   {
     name: 'Szerény',
@@ -29,6 +38,13 @@ export const foodRations: Food[] = [
     uses: 2,
     heal: 1,
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.HEAL_HP,
+        target: 'self',
+        value: 1,
+      },
+    ],
   },
   {
     name: 'Elégséges',
@@ -38,6 +54,13 @@ export const foodRations: Food[] = [
     uses: 3,
     heal: 2,
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.HEAL_HP,
+        target: 'self',
+        value: 2,
+      },
+    ],
   },
   {
     name: 'Bőséges',
@@ -47,6 +70,13 @@ export const foodRations: Food[] = [
     uses: 4,
     heal: 3,
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.HEAL_HP,
+        target: 'self',
+        value: 3,
+      },
+    ],
   },
 ];
 
@@ -58,8 +88,16 @@ export const medicalItems: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect: '1 kis sebet gyógyít be',
+    effectDesc: '1 kis sebet gyógyít be',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SMALL_WOUND,
+        target: 'self',
+        value: 1,
+      },
+    ],
   },
   {
     name: 'Sebvarró tű és cérna',
@@ -68,18 +106,34 @@ export const medicalItems: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect: '2 kis sebet gyógyít be',
+    effectDesc: '2 kis sebet gyógyít be',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SMALL_WOUND,
+        target: 'self',
+        value: 2,
+      },
+    ],
   },
   {
-    name: 'Fájdalomcsillapító (HK)',
+    name: 'Fájdalomcsillapító',
     desc: 'Kis kapszula zsibbasztó anyagokkal, ízre enyhén édes.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect: 'Gyógyulsz 1 stresszt',
+    effectDesc: 'Gyógyulsz 1 stresszt',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SP,
+        target: 'self',
+        value: 1,
+      },
+    ],
   },
   {
     name: 'Nyugtató füstölő',
@@ -88,61 +142,116 @@ export const medicalItems: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: true,
     combat: false,
-    effect:
+    effectDesc:
       'Gyógyulsz 2 stresszt és minden 1 mezőre lévő szövetséges karakter szintén gyógyul 1 stresszt',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SP,
+        target: 'self',
+        value: 2,
+      },
+      { type: EffectType.HEAL_SP, target: 'party', value: 1 },
+    ],
   },
   {
-    name: 'Sebforrasztó (HK)',
+    name: 'Sebforrasztó',
     desc: 'Egy rúnákkal televésett fémlap. Ha egy kemény tárgynak nekiütjük, elkezd felhevülni és képes beforrasztani bármilyen nyílt sebet.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect: 'Elállítja a vérzést',
+    effectDesc: 'Elállítja a vérzést',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.REMOVE_STATUS,
+        target: 'self',
+        status: StatusType.BLEED,
+      },
+    ],
   },
   {
-    name: 'Fertőtlenítő kenőcs (HK)',
+    name: 'Fertőtlenítő kenőcs',
     desc: 'Különböző gyógyfüvekből és állati részekből kikevert kenőcs fém tubusban. Az illata olyan, mint a méznek és a rothadásnak.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect:
+    effectDesc:
       'Tűzállóvá teszi és enyhíti az égett bőrt. Elállítja és megakadályozza az égést',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.REMOVE_STATUS,
+        target: 'self',
+        status: StatusType.BURN,
+      },
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.FIRE_RES,
+        duration: 10,
+      },
+    ],
   },
   {
-    name: 'Ellenméreg (HK)',
+    name: 'Ellenméreg',
     desc: 'Holtágiak és mérgező lények nyálmirigyeiből készült, halványzöld, keserű ital.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect: 'A legtöbb közönséges mérget hatástalanítja',
+    effectDesc: 'A legtöbb közönséges mérget hatástalanítja',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.REMOVE_STATUS,
+        target: 'self',
+        status: StatusType.POISON,
+      },
+    ],
   },
   {
-    name: 'Gyógyító injekció (HK)',
+    name: 'Gyógyító injekció',
     desc: 'Ikorból készült injekció, a szúrás után olyan mintha az egész tested vízbe dobták volna.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect: 'Azonnal begyógyít 1 kis sebet. Függőséget tud okozni',
+    effectDesc: 'Azonnal begyógyít 1 kis sebet. Függőséget tud okozni',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SMALL_WOUND,
+        target: 'self',
+        value: 1,
+      },
+    ],
   },
   {
-    name: 'Gyógyító főzet (HK)',
+    name: 'Gyógyító főzet',
     desc: 'Ikor alapú bájital viasszal lezárt nehéz üvegben. A folyadék megállás nélkül kavarog benne.',
     type: ItemType.MEDICAL,
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: true,
-    effect:
+    effectDesc:
       'Azonnal begyógyít 2 kis sebet. Nagyobb eséllyel függőséget tud okozni',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_SMALL_WOUND,
+        target: 'self',
+        value: 2,
+      },
+    ],
   },
   {
     name: 'Protézis',
@@ -151,9 +260,17 @@ export const medicalItems: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect:
+    effectDesc:
       'Egy nagy sebet semlegesít, de a végtaggal kapcsolatos próbákra hátrányt kapsz',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.HEAL_LARGE_WOUND,
+        target: 'self',
+        value: 1,
+      },
+    ],
   },
 ];
 
@@ -165,8 +282,17 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect: '10 percig előnyt kapsz minden erőpróbábra.',
+    effectDesc: '10 percig előnyt kapsz minden erőpróbábra.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.ADVANTAGE,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Az istenek könnye',
@@ -175,9 +301,18 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect:
+    effectDesc:
       '5 percig a következő varázslatod ár megfizetése nélkül tudod használni.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.FREE_MAGIC,
+        duration: 5,
+      },
+    ],
   },
   {
     name: 'Tündérméz',
@@ -186,9 +321,18 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect:
+    effectDesc:
       'Erős altató hatása van, akár egy napon keresztül is alszik az elfogyasztója, ha meg nem zavarják.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'target',
+        status: StatusType.SLEEP,
+        duration: 10000,
+      },
+    ],
   },
   {
     name: 'Bitómámor',
@@ -197,9 +341,18 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect:
+    effectDesc:
       'Egy óráig nem tud idegösszeroppanást kapni az elfogyasztója, a hatás lejárta után viszont az összes elszenvedett stressz sebzést megkapja.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.STRESS_RES,
+        duration: 30,
+      },
+    ],
   },
   {
     name: 'Monyóktej',
@@ -208,8 +361,17 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect: '10 percig beszélni tudsz az állatok nyelvén a környezetedben.',
+    effectDesc: '10 percig beszélni tudsz az állatok nyelvén a környezetedben.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.ANIMAL_TOUNGE,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Sen Altio',
@@ -218,8 +380,17 @@ export const specialDrinks: SpecialItem[] = [
     category: ItemCategory.CONSUMABLE,
     isPartyWide: false,
     combat: false,
-    effect: 'A táborozásnál felér egy elégséges étkezéssel.',
+    effectDesc: 'A táborozásnál felér egy elégséges étkezéssel.',
     size: ItemSize.NORMAL,
+    uses: 1,
+    effects: [
+      {
+        type: EffectType.ADD_STATUS,
+        target: 'self',
+        status: StatusType.FULL_BELLY,
+        duration: 1,
+      },
+    ],
   },
 ];
 
@@ -604,8 +775,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Piros',
     spice: 'Paprika és bors',
-    effect: '+1 erő 10 percig',
+    effectDesc: '+1 erő 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'str',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Fűszeres cigaretta',
@@ -614,8 +794,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Zöld',
     spice: 'Alma és menta',
-    effect: '+1 ügyesség 10 percig',
+    effectDesc: '+1 ügyesség 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'dex',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Fűszeres cigaretta',
@@ -624,8 +813,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Szürke',
     spice: 'Dió és fahéj',
-    effect: '+1 kitartás 10 percig',
+    effectDesc: '+1 kitartás 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'end',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Fűszeres cigaretta',
@@ -634,8 +832,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Lila',
     spice: 'Leander és rózsa',
-    effect: '+1 ész 10 percig',
+    effectDesc: '+1 ész 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'int',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Fűszeres cigaretta',
@@ -644,8 +851,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Sárga',
     spice: 'Citrus és vadvirágok',
-    effect: '+1 fortély 10 percig',
+    effectDesc: '+1 fortély 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'cun',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
   {
     name: 'Fűszeres cigaretta',
@@ -654,8 +870,17 @@ export const cigars: Cigar[] = [
     category: ItemCategory.CONSUMABLE,
     color: 'Kék',
     spice: 'Búzavirág és kamilla',
-    effect: '+1 akaraterő 10 percig',
+    effectDesc: '+1 akaraterő 10 percig',
     size: ItemSize.NORMAL,
+    effects: [
+      {
+        type: EffectType.BUFF_STAT,
+        target: 'self',
+        stat: 'wil',
+        value: 1,
+        duration: 10,
+      },
+    ],
   },
 ];
 

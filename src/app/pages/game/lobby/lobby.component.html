@@ -5,9 +5,9 @@
       >Csatlakozási kód: <span id="code">{{ game.id }}</span></span
     >
     <span class="lobby-name" style="grid-area: name">{{ game.name }}</span>
-    <span class="lobby-owner" style="grid-area: host">{{
-      game.ownerName
-    }}</span>
+    <span class="lobby-owner" style="grid-area: host">
+      {{ game.ownerName }}
+    </span>
   </div>
   <div id="players" style="grid-area: players">
     <span class="title text-name"
@@ -64,6 +64,7 @@
   </div>
   } }@else {
   <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
-  }
+  } @if(error !== ''){
   <mat-error class="error-message">{{ error }}</mat-error>
+  }
 </div>

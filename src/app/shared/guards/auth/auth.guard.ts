@@ -42,7 +42,7 @@ export const gameGuard: CanActivateFn = (route, _state) => {
         take(1),
         map((game) => {
           if (!game) return router.createUrlTree(['/jatek']);
-          const isPlayer = game.players.some((p) => p.userId === user.uid);
+          const isPlayer = game.players.some((p) => p.id === user.uid);
           const isHost = game.ownerId === user.uid;
           if (isPlayer || isHost) return true;
           return router.createUrlTree(['/jatek']);

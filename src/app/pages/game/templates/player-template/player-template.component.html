@@ -4,10 +4,10 @@
       >@if(player.status ===
       PlayerStatus.NOTREADY){person}@else{check}</mat-icon
     >
-    <span>{{ player.username }}</span>
+    <span>{{ player.name }}</span>
   </div>
   <div class="fake-button" (click)="toggleCharacter()">Karakter</div>
-  @if(role === 0){
+  @if(role === PlayerRole.HOST){
   <div class="fake-button" matTooltip="Kirúgás" (click)="kickPlayer()">
     <mat-icon>logout</mat-icon>
   </div>

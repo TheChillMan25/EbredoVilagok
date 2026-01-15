@@ -1,5 +1,13 @@
 import { FieldValue, Timestamp } from 'firebase/firestore';
-import { Food, Item, SpecialItem } from './game_interfaces';
+import {
+  ActiveStatus,
+  Armour,
+  Food,
+  Inventory,
+  Item,
+  SpecialItem,
+  Weapon,
+} from './game_interfaces';
 
 export interface User {
   id: string | null | undefined;
@@ -17,8 +25,8 @@ export interface ForumUser {
 }
 
 export enum ForumTopic {
-  CHARACTER,
-  ADVENTURE,
+  CHARACTER = 'CHARACTER',
+  ADVENTURE = 'ADVENTURE',
 }
 
 export interface Character {
@@ -35,39 +43,42 @@ export interface Character {
   };
   stats: {
     physical: {
-      ero: number;
-      ugyesseg: number;
-      kitartas: number;
+      str: number;
+      dex: number;
+      end: number;
     };
     mental: {
-      esz: number;
-      fortely: number;
-      akaratero: number;
+      int: number;
+      cun: number;
+      wil: number;
     };
     main: {
       hp: number;
+      maxHP: number;
       sp: number;
+      maxSP: number;
     };
   };
   equipment: {
-    left: number;
-    right: number;
-    armour: number;
+    left: Weapon;
+    right: Weapon;
+    armour: Armour;
   };
   virtues: {
     virtues: number[];
     disadv: number[];
   };
   items: {
-    food: number[];
-    specialItems: number[];
-    generalItems: number[];
-    weaponItems: string[];
+    food: Food[];
+    specialItems: SpecialItem[];
+    generalItems: (Item | Inventory)[];
+    equipmentItems: (Weapon | Armour)[];
   };
   wounds: {
     small: number;
     large: number;
   };
+  activeStatuses: ActiveStatus[];
 }
 
 export type PublicCharacter = Omit<
@@ -118,19 +129,26 @@ export type PublicAdventure = Omit<
 >;
 
 export enum PlayerStatus {
-  READY,
-  NOTREADY,
+  READY = 'READY',
+  NOTREADY = 'NOTREADY',
 }
 
-export interface Player {
-  userId: string;
-  username: string;
-  status: PlayerStatus;
+export interface GameParticipant {
+  id: string;
+  name: string;
   character?: Character;
-  canDoPrimary: boolean;
-  currentAction: string;
+  lastAction: {
+    performer: { id: string; name: string };
+    primary: GameAction;
+    secondary: GameAction;
+  };
+  actionsLeft: { primary: boolean; secondary: boolean };
   initiative: number | null;
   inCombat: boolean;
+}
+
+export interface Player extends GameParticipant {
+  status: PlayerStatus;
 }
 
 export interface AdventureEvent {
@@ -143,10 +161,7 @@ export interface AdventureEvent {
   completed: boolean;
 }
 
-export interface NPC {
-  id: string;
-  name: string;
-  character: Character | null | undefined;
+export interface NPC extends GameParticipant {
   attitude: 'neutral' | 'hostile';
   actions: boolean[];
 }
@@ -157,9 +172,14 @@ export interface Game {
   ownerId: string;
   name: string;
   maxPlayers: number;
+  initiatives: { id: string; initiative: number; finished: boolean }[];
   players: Player[];
   currentPlayer: string;
-  currentAction: GameAction | null;
+  currentAction: {
+    performer: { id: string; name: string };
+    primary: GameAction;
+    secondary: GameAction;
+  };
   currentEvent: number;
   adventure?: Adventure;
   isOpen: boolean;
@@ -169,18 +189,17 @@ export interface Game {
 }
 
 export enum ActionType {
-  USEITEM,
-  CAMP,
-  TALK,
-  TRADE,
-  FIGHT,
-  STEAL,
+  USEITEM = 'USEITEM',
+  CAMP = 'CAMP',
+  TALK = 'TALK',
+  TRADE = 'TRADE',
+  ATTACK = 'ATTACK',
+  STEAL = 'STEAL',
+  NONE = 'NONE',
 }
 
 export interface GameAction {
   type: ActionType;
-  isPrimary: boolean;
-  isPartyWide: boolean;
-  targetId?: string;
-  item?: Food | SpecialItem | Item;
+  target?: string;
+  item?: string;
 }

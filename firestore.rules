@@ -39,6 +39,11 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/Users/$(request.auth.uid)).data;
     }
 
+    match /Usernames/{username} {
+      allow get: if true; // Bárki megnézheti, hogy létezik-e a név
+      allow create: if isSignedIn(); // Csak a regisztrációs folyamat (vagy admin) írhatja
+    }
+
     match /Users/{userId} {
       
       // OLVASÁS:

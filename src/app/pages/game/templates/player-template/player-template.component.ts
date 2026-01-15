@@ -16,7 +16,9 @@ export class PlayerTemplateComponent {
   @Input() player!: Player;
   @Input() role!: PlayerRole;
   @Output() kickPlayerEvent = new EventEmitter<string>();
+
   PlayerStatus = PlayerStatus;
+  PlayerRole = PlayerRole;
   showCharacter = false;
 
   toggleCharacter() {
@@ -25,6 +27,6 @@ export class PlayerTemplateComponent {
 
   kickPlayer() {
     if (this.role === PlayerRole.HOST)
-      this.kickPlayerEvent.emit(this.player.userId);
+      this.kickPlayerEvent.emit(this.player.id);
   }
 }

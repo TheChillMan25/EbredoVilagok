@@ -3,7 +3,7 @@
   grid-template-areas:
     "header header"
     "actions adventure"
-    "error adventure"
+    ". adventure"
     "players adventure";
   align-items: unset;
   justify-content: unset;
@@ -27,6 +27,10 @@
 
     .lobby-name {
       color: #f2c480;
+      font-size: xx-large;
+    }
+    .lobby-owner{
+      font-size: large;
     }
   }
   #players,

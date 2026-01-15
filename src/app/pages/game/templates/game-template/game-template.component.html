@@ -1,7 +1,8 @@
 <div class="game">
   <span class="game-name">{{ game.name }}</span>
   <mat-icon
-    >@if(game.isPublic && type === 'myGame'){people}@else if(!game.isPublic && type === 'myGame'){lock}</mat-icon
+    >@if(game.isPublic && type === 'myGame'){public}@else if(!game.isPublic &&
+    type === 'myGame'){lock}</mat-icon
   >
   <span class="game-players"
     ><span class="current-players">{{ game.players.length }}</span

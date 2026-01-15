@@ -93,12 +93,13 @@ export class UserService {
               food: [],
               specialItems: [],
               generalItems: [],
-              weaponItems: [],
+              equipmentItems: [],
             },
             wounds: characterData?.['wounds'] ?? {
               small: 0,
               large: 0,
             },
+            activeStatuses: [],
           };
           characters.push(character);
         });

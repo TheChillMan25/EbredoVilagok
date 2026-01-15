@@ -1,6 +1,13 @@
 #content {
   display: grid;
-  grid-template-columns: 24% 24% 24% 24%;
+  grid-template-columns:
+    calc(25% - 1rem) calc(25% - 1rem) calc(25% - 1rem)
+    calc(25% - 1rem);
+  gap: 1rem;
+  grid-template-rows: calc(50% - 0.5rem) calc(50% - 0.5rem);
+  grid-template-areas:
+    "main stats equipment items"
+    "main virtues equipment items";
   justify-content: space-between;
   align-items: unset;
   padding: 1rem;
@@ -62,52 +69,44 @@
       }
     }
   }
+  #stats {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-rows: 1fr 6fr;
+    grid-template-columns: auto auto auto;
+    align-items: center;
 
-  #stat-virtue-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    > div {
-      height: 100%;
-    }
-    #stats {
+    .groupName {
       position: relative;
-      display: grid;
-      gap: 0.5rem;
-      grid-template-columns: auto auto auto;
-      align-items: center;
+      grid-column: span 3;
+    }
 
-      .groupName {
-        position: relative;
-        grid-column: span 3;
+    mat-form-field {
+      width: 6rem;
+
+      input {
+        text-align: center;
       }
 
-      mat-form-field {
-        width: 6rem;
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
 
-        input {
-          text-align: center;
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-
-        input[type="number"] {
-          -moz-appearance: textfield;
-        }
+      input[type="number"] {
+        -moz-appearance: textfield;
       }
     }
-    #virtues {
-      flex-direction: column;
+  }
+  #virtues {
+    flex-direction: column;
 
-      #virtue-container {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
+    #virtue-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
   }
 
@@ -182,9 +181,6 @@
     }
   }
 }
-mat-option {
-  text-indent: 1rem;
-}
 .padded-option {
   padding: 0.5rem;
 }
@@ -252,10 +248,6 @@ div.mat-mdc-select-panel {
 @media (max-width: 1230px) {
   .groupName {
     font-size: large;
-  }
-
-  mat-label {
-    font-size: smaller;
   }
 }
 

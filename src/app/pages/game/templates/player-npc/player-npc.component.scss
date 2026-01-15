@@ -1,0 +1,68 @@
+.player {
+  display: grid;
+  grid-template-areas:
+    "name name actionsLeft hp sp"
+    "statEf statEf cIcon sW lW";
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #333;
+  padding: 1rem;
+
+  &.selected {
+    border: 0.2rem dashed #666;
+    border-radius: 0.5rem;
+  }
+  &.canSelect {
+    cursor: pointer;
+  }
+  &.current {
+    border: 0.2rem solid #f2c480;
+  }
+  .player-name {
+    font-size: large;
+    color: #f2c480;
+  }
+  .player-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    mat-icon {
+      color: #f2c480;
+    }
+  }
+
+  .action-indicator {
+    position: relative;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-block;
+    vertical-align: middle;
+
+    .action-line {
+      position: absolute;
+      width: 3px;
+      height: 18px;
+      background-color: #666;
+      top: 3px;
+      transition: all 0.3s ease;
+      opacity: 0.3;
+
+      &.available {
+        background-color: #f5f5f5;
+        opacity: 1;
+      }
+
+      &.primary {
+        left: 0.35rem;
+      }
+
+      &.secondary {
+        right: 0.35rem;
+      }
+    }
+  }
+}
+
+.player:not(.current) .action-indicator {
+  opacity: 0.5;
+}

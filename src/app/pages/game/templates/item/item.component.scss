@@ -1,20 +1,23 @@
 .item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
   gap: 0.5rem;
-  padding: .75rem;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   background-color: #333;
-  white-space: nowrap;
+  cursor: default;
   .item-name {
-    display: flex;
+    display: grid;
+    grid-template-areas: "text icon";
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 0.5rem;
     color: #f2c480;
   }
   .item-desc {
     overflow: hidden;
-    max-width: 50%;
+    white-space: nowrap;
     text-overflow: ellipsis;
     text-align: right;
   }
