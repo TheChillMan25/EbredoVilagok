@@ -70,6 +70,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatInputModule } from '@angular/material/input';
 import { noWhitespaceValidator } from '../../forum/post-template/post-template.component';
+import { DiceRollerComponent } from '../../../shared/functional/dice-roller/dice-roller.component';
 
 @Component({
   selector: 'app-game-area',
@@ -93,6 +94,7 @@ import { noWhitespaceValidator } from '../../forum/post-template/post-template.c
     MatError,
     MatButtonModule,
     MatProgressSpinnerModule,
+    DiceRollerComponent,
   ],
   templateUrl: './game-area.component.html',
   styleUrl: './game-area.component.scss',
@@ -273,6 +275,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       icon: 'remove',
     },
   ];
+
+  showDiceRoller = false;
+  diceToRoll: string[] = ['d20'];
 
   allItems: any[] = [];
 
@@ -557,6 +562,23 @@ export class GameAreaComponent implements CanComponentDeactivate {
         this.selectedNPC = null;
       }
     });
+  }
+
+  openDiceRoller(dice: string[] = ['d20']) {
+    this.diceToRoll = dice;
+    this.showDiceRoller = true;
+  }
+
+  onDiceRollFinished(results: number[]) {
+    const sum = results.reduce((a, b) => a + b, 0);
+    const details = results.join(' + ');
+    this.openSnackBar(`Dobás eredménye: ${sum} (${details})`);
+
+    console.log('Dobott értékek:', results);
+  }
+
+  closeDiceRoller() {
+    this.showDiceRoller = false;
   }
 
   resetSelectedItem() {
