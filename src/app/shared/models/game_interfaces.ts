@@ -133,3 +133,7 @@ export enum GameErrorCauses {
   NoStatusToAdd,
   NoStatusToRemove,
 }
+
+export enum CharacterCreationErrorCauses{
+  InvalidFormData
+}

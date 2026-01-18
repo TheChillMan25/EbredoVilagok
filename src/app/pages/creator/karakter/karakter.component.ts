@@ -1,6 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import {
   convertSpeciesNameToKey,
+  createCharacter,
   createRandomCharacter,
   setBackground,
 } from '../../../shared/functional/functions';
@@ -20,6 +21,7 @@ import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
 import {
   Armour,
+  CharacterCreationErrorCauses,
   Food,
   Inventory,
   Item,
@@ -60,6 +62,7 @@ export interface CanComponentDeactivate {
 })
 export class KarakterComponent implements CanComponentDeactivate {
   isLoading: boolean = false;
+  dontWarnBeforeLeave = false;
 
   errorMessage: string = '';
   mainForm!: FormGroup;
@@ -123,9 +126,10 @@ export class KarakterComponent implements CanComponentDeactivate {
     private itemService: ItemService,
     private charService: CharacterService,
     private router: Router
-  ) {}
+  ) { }
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.dontWarnBeforeLeave) return true;
     if (this.mainForm.dirty) {
       return confirm(
         'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
@@ -159,7 +163,7 @@ export class KarakterComponent implements CanComponentDeactivate {
 
   initForm() {
     this.mainForm = this.fb.group({
-      name: ['', [noWhitespaceValidator,Validators.required, Validators.minLength(3)]],
+      name: ['', [noWhitespaceValidator, Validators.required, Validators.minLength(3)]],
       species: ['', Validators.required],
       class: ['', Validators.required],
       specialProperties: this.fb.group({
@@ -230,111 +234,24 @@ export class KarakterComponent implements CanComponentDeactivate {
     });
   }
 
-  createCharacter() {
-    if (!this.mainForm.valid) {
-      this.errorMessage =
-        'Karakter nem készíthető el, tölts ki minden kötelező mezőt!';
+  async createCharacter() {
+    try {
+      this.isLoading = true;
+      const newCharacter = createCharacter(this.mainForm, this.itemService)
+      await this.charService
+        .addCharacter(newCharacter)
+      console.log('Karakter létrehozva: ', newCharacter);
+      this.dontWarnBeforeLeave = true;
+      localStorage.setItem('visibleContainerOnProfile', 'characters');
+      this.router.navigateByUrl('/profil');
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error('Hiba a karakter létrehozása során: ', error);
+      if (error.cause === CharacterCreationErrorCauses.InvalidFormData) {
+        this.errorMessage = error.message;
+      }
       return;
     }
-    this.isLoading = true;
-    const formValue = this.mainForm.value;
-
-    let food: Food[] = [];
-    formValue.items.food.forEach((c: number | null) => {
-      if (c) {
-        food.push(this.itemService.getItemById('food', c) as Food);
-      }
-    });
-    let special: SpecialItem[] = [];
-    formValue.items.specialItems.forEach((c: number | null) => {
-      if (c) {
-        special.push(
-          this.itemService.getItemById('allSpecial', c) as SpecialItem
-        );
-      }
-    });
-    let general: (Item | Inventory)[] = [];
-    formValue.items.generalItems.forEach((c: number | null) => {
-      if (c) {
-        general.push(this.itemService.getItemById('allGeneral', c));
-      }
-    });
-
-    let newCharacter: Omit<Character, 'id' | 'userId'> = {
-      currentAdventure: '',
-      name: formValue.name || '',
-      species: formValue.species || '',
-      class: formValue.class || '',
-      level: 1,
-      specialProperties: {
-        speciesProperty: formValue.specialProperties.speciesProperty ?? 0,
-        home: formValue.specialProperties.home ?? 0,
-      },
-      stats: {
-        physical: {
-          str: formValue.stats.physical.str ?? 1,
-          dex: formValue.stats.physical.dex ?? 1,
-          end: formValue.stats.physical.end ?? 1,
-        },
-        mental: {
-          int: formValue.stats.mental.int ?? 1,
-          cun: formValue.stats.mental.cun ?? 1,
-          wil: formValue.stats.mental.wil ?? 1,
-        },
-        main: {
-          hp: formValue.stats.main.hp ?? 1,
-          maxHP: formValue.stats.main.hp ?? 1,
-          sp: formValue.stats.main.sp ?? 1,
-          maxSP: formValue.stats.main.sp ?? 1,
-        },
-      },
-      equipment: {
-        left:
-          (this.itemService.getItemById(
-            'weapons',
-            formValue.equipment.left
-          ) as Weapon) ?? '',
-        right:
-          (this.itemService.getItemById(
-            'weapons',
-            formValue.equipment.right
-          ) as Weapon) ?? '',
-        armour:
-          (this.itemService.getItemById(
-            'armours',
-            formValue.equipment.armour
-          ) as Armour) ?? '',
-      },
-      virtues: {
-        virtues: formValue.virtues.virtues ?? [],
-        disadv: formValue.virtues.disadvantage ?? [],
-      },
-      items: {
-        food: food ?? [],
-        specialItems: special ?? [],
-        generalItems: general ?? [],
-        equipmentItems: [],
-      },
-      wounds: {
-        small: 0,
-        large: 0,
-      },
-      activeStatuses: [],
-    };
-
-    this.charService
-      .addCharacter(newCharacter)
-      .then(() => {
-        this.mainForm.reset();
-      })
-      .catch((error) => {
-        this.isLoading = false;
-        console.error('Hiba a karakter létrehozása során: ', error);
-      })
-      .finally(() => {
-        console.log('Karakter létrehozva: ', newCharacter);
-        this.router.navigateByUrl('/profil');
-      });
   }
 
   createRandomCharacter() {

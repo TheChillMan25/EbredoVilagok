@@ -20,6 +20,7 @@ import {
   Weapon,
 } from '../models/game_interfaces';
 import { items } from '../models/items';
+import { FormGroup } from '@angular/forms';
 
 let virtues = CharacterVirtues.map((virtue) => virtue.name);
 let disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
@@ -310,6 +311,97 @@ export function createRandomCharacter(
     activeStatuses: [],
   };
   return randomCharacter;
+}
+
+export function createCharacter(form: FormGroup, itemService: ItemService): Omit<Character, 'id' | 'userId'> {
+  if (form.invalid) {
+    throw new Error('Karakter nem készíthető el, tölts ki minden kötelező mezőt!');
+  }
+  const formValue = form.value;
+
+  let food: Food[] = [];
+  formValue.items.food.forEach((c: number | null) => {
+    if (c) {
+      food.push(itemService.getItemById('food', c) as Food);
+    }
+  });
+  let special: SpecialItem[] = [];
+  formValue.items.specialItems.forEach((c: number | null) => {
+    if (c) {
+      special.push(
+        itemService.getItemById('allSpecial', c) as SpecialItem
+      );
+    }
+  });
+  let general: (Item | Inventory)[] = [];
+  formValue.items.generalItems.forEach((c: number | null) => {
+    if (c) {
+      general.push(itemService.getItemById('allGeneral', c));
+    }
+  });
+
+  let newCharacter: Omit<Character, 'id' | 'userId'> = {
+    currentAdventure: '',
+    name: formValue.name || '',
+    species: formValue.species || '',
+    class: formValue.class || '',
+    level: 1,
+    specialProperties: {
+      speciesProperty: formValue.specialProperties.speciesProperty ?? 0,
+      home: formValue.specialProperties.home ?? 0,
+    },
+    stats: {
+      physical: {
+        str: formValue.stats.physical.str ?? 1,
+        dex: formValue.stats.physical.dex ?? 1,
+        end: formValue.stats.physical.end ?? 1,
+      },
+      mental: {
+        int: formValue.stats.mental.int ?? 1,
+        cun: formValue.stats.mental.cun ?? 1,
+        wil: formValue.stats.mental.wil ?? 1,
+      },
+      main: {
+        hp: formValue.stats.main.hp ?? 1,
+        maxHP: formValue.stats.main.hp ?? 1,
+        sp: formValue.stats.main.sp ?? 1,
+        maxSP: formValue.stats.main.sp ?? 1,
+      },
+    },
+    equipment: {
+      left:
+        (itemService.getItemById(
+          'weapons',
+          formValue.equipment.left
+        ) as Weapon) ?? '',
+      right:
+        (itemService.getItemById(
+          'weapons',
+          formValue.equipment.right
+        ) as Weapon) ?? '',
+      armour:
+        (itemService.getItemById(
+          'armours',
+          formValue.equipment.armour
+        ) as Armour) ?? '',
+    },
+    virtues: {
+      virtues: formValue.virtues.virtues ?? [],
+      disadv: formValue.virtues.disadvantage ?? [],
+    },
+    items: {
+      food: food ?? [],
+      specialItems: special ?? [],
+      generalItems: general ?? [],
+      equipmentItems: [],
+    },
+    wounds: {
+      small: 0,
+      large: 0,
+    },
+    activeStatuses: [],
+  };
+  return newCharacter;
 }
 
 export function getStatusDetails(statusType: StatusType): {

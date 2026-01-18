@@ -1,5 +1,5 @@
 import { Component, HostListener, ViewChild } from '@angular/core';
-import { setBackground } from '../../../shared/functional/functions';
+import { convertSpeciesNameToKey, createCharacter, setBackground } from '../../../shared/functional/functions';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -7,6 +7,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   AbstractControl,
+  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -24,7 +25,7 @@ import {
   GameAction,
   NPC,
 } from '../../../shared/models/models';
-import { MatSelect, MatOption } from '@angular/material/select';
+import { MatSelect, MatOption, MatOptgroup } from '@angular/material/select';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Observable, Subscription, take } from 'rxjs';
 import { MapContainerComponent } from '../../../shared/functional/map-container/map-container.component';
@@ -50,6 +51,14 @@ import { AdventureService } from '../../../shared/services/adventure/adventure.s
 import { Router } from '@angular/router';
 import { CanComponentDeactivate } from '../karakter/karakter.component';
 import { noWhitespaceValidator } from '../../forum/post-template/post-template.component';
+import { Weapon, Armour, Food, SpecialItem, Item, Inventory } from '../../../shared/models/game_interfaces';
+import { NationData } from '../../../shared/models/NationData';
+import { CharacterVirtues, CharacterDisadvantages } from '../../../shared/models/virtues_disadvantages';
+import { ItemService } from '../../../shared/services/item/item.service';
+import { MatTooltip } from "@angular/material/tooltip";
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../../shared/services/auth/auth.service';
+import { species } from '../../world/species/species_desc_data';
 
 @Component({
   selector: 'app-adventure',
@@ -64,6 +73,7 @@ import { noWhitespaceValidator } from '../../forum/post-template/post-template.c
     ReactiveFormsModule,
     MatInputModule,
     MatSelect,
+    MatOptgroup,
     MatOption,
     MapContainerComponent,
     MatCard,
@@ -73,6 +83,7 @@ import { noWhitespaceValidator } from '../../forum/post-template/post-template.c
     MatCardContent,
     MatCardFooter,
     MatButton,
+    MatTooltip,
   ],
   templateUrl: './adventure.component.html',
   styleUrl: './adventure.component.scss',
@@ -80,11 +91,15 @@ import { noWhitespaceValidator } from '../../forum/post-template/post-template.c
 export class AdventureComponent implements CanComponentDeactivate {
   @ViewChild(MapContainerComponent) map!: MapContainerComponent;
   isLoading: boolean = false;
+  snackBar = new MatSnackBar()
+
+  private userId = '';
 
   skipLeaveConfirm: boolean = false;
 
   showEvents: boolean = false;
   showNPCs: boolean = false;
+  newCharacterVisible = false;
   showUseManual: boolean = false;
 
   modify: boolean = false;
@@ -111,7 +126,62 @@ export class AdventureComponent implements CanComponentDeactivate {
   eventForm!: FormGroup;
   eventError: string = '';
   npcForm!: FormGroup;
+  npcCharacterForm!: FormGroup;
   npcError: string = '';
+
+  newNPCCharacters: Character[] = []
+  /* NPC NEW CHARACTER */
+  speciesList = NationData.map((nation) => nation.nationName);
+  currentSpeciesProperties: { desc: string }[] = [];
+  currentSpeciesHomes: {
+    desc: string;
+    bonus: { name: string; mod: string }[];
+  }[] = [];
+  currentHome: { desc: string; bonus: { name: string; mod: string }[] } | null =
+    null;
+  weapons = [] as Weapon[];
+  armours = [] as Armour[];
+
+  virtues = CharacterVirtues.map((virtue) => virtue.name);
+  disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
+
+  statsForm = [
+    {
+      controlName: 'physical',
+      fields: [
+        { groupName: 'str', labelText: 'Erő', icon: 'fitness_center' },
+        {
+          groupName: 'dex',
+          labelText: 'Ügyesség',
+          icon: 'sports_martial_arts',
+        },
+        { groupName: 'end', labelText: 'Kitartás', icon: 'directions_run' },
+      ],
+      interval: { min: -15, max: 15 },
+    },
+    {
+      controlName: 'mental',
+      fields: [
+        { groupName: 'int', labelText: 'Ész', icon: 'auto_stories' },
+        { groupName: 'cun', labelText: 'Fortély', icon: 'psychology' },
+        { groupName: 'wil', labelText: 'Akaraterő', icon: 'diamond' },
+      ],
+      interval: { min: -15, max: 15 },
+    },
+    {
+      controlName: 'main',
+      fields: [
+        { groupName: 'hp', labelText: 'HP', icon: 'health_metrics' },
+        { groupName: 'sp', labelText: 'SP', icon: 'mindfulness' },
+      ],
+      interval: { min: 1, max: 50 },
+    },
+  ];
+
+  foods = [] as Food[];
+  specialIndex = 0;
+  specialItems = [] as SpecialItem[];
+  generalItems = [] as (Item | Inventory)[];
 
   myCharacters!: Character[];
 
@@ -121,8 +191,10 @@ export class AdventureComponent implements CanComponentDeactivate {
     private fb: FormBuilder,
     private charService: CharacterService,
     private advService: AdventureService,
-    private router: Router
-  ) {}
+    private itemService: ItemService,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
     if (this.skipLeaveConfirm) return true;
@@ -141,9 +213,23 @@ export class AdventureComponent implements CanComponentDeactivate {
     }
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('paper_bg');
+    this.authService.currentUser.pipe(take(1)).subscribe(user => {
+      this.userId = user?.uid ?? ''
+    })
     this.initForms();
+    await this.itemService.initItems();
+    this.weapons = this.itemService.getItemGroup('weapons') as Weapon[];
+    this.armours = this.itemService.getItemGroup('armours') as Armour[];
+    this.foods = this.itemService.getItemGroup('food') as Food[];
+    this.specialItems = this.itemService.getItemGroup(
+      'allSpecial'
+    ) as SpecialItem[];
+    this.generalItems = this.itemService.getItemGroup('general') as (
+      | Item
+      | Inventory
+    )[];
 
     this.myCharSub = this.charService
       .getAllCharacters()
@@ -199,42 +285,66 @@ export class AdventureComponent implements CanComponentDeactivate {
     this.npcForm = this.fb.group({
       name: ['', [noWhitespaceValidator, Validators.required]],
       attitude: ['neutral', [Validators.required]],
-      actions: this.fb.group(
-        {
-          talk: [false],
-          trade: [false],
-          fight: [false],
-          steal: [false],
-        },
-        { validators: [this.checkActions()] }
-      ),
+      isTrader: [false],
       character: ['', [Validators.required]],
     });
 
-    this.toggleActions('neutral');
-
-    this.npcForm
-      .get('attitude')
-      ?.valueChanges.subscribe((att: 'neutral' | 'hostile') => {
-        this.attitude = att;
-        this.toggleActions(att);
-      });
+    this.npcCharacterForm = this.fb.group({
+      name: [''],
+      species: [''],
+      specialProperties: this.fb.group({
+        speciesSpecial: [''],
+        home: [''],
+      }),
+      equipment: this.fb.group({
+        left: [''],
+        right: [''],
+        armour: [''],
+      }),
+      stats: this.fb.group({
+        physical: this.fb.group({
+          str: [0, [Validators.min(-15), Validators.max(15)]],
+          dex: [0, [Validators.min(-15), Validators.max(15)]],
+          end: [0, [Validators.min(-15), Validators.max(15)]],
+        }),
+        mental: this.fb.group({
+          int: [0, [Validators.min(-15), Validators.max(15)]],
+          cun: [0, [Validators.min(-15), Validators.max(15)]],
+          wil: [0, [Validators.min(-15), Validators.max(15)]]
+        }),
+        main: this.fb.group({
+          hp: [null, [Validators.min(1)]],
+          sp: [null, [Validators.min(1)]]
+        }),
+      }),
+      virtues: this.fb.group({
+        virtues: [''],
+        disadv: [''],
+      }),
+      items: this.fb.group({
+        food: this.fb.array<FormControl<number>>([new FormControl()]),
+        specialItems: this.fb.array<FormControl<number>>([
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+        ]),
+        generalItems: this.fb.array<FormControl<number>>([
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+          new FormControl(),
+        ]),
+      })
+    })
   }
 
-  private toggleActions(att: 'neutral' | 'hostile') {
-    const { talk, trade, fight, steal } = this.getActions().controls;
+  getInputs(which: string): FormArray<FormControl<number>> {
+    return this.npcCharacterForm.get(which) as FormArray<FormControl<number>>;
+  }
 
-    if (att === 'neutral') {
-      talk.enable();
-      trade.enable();
-      fight.disable();
-      steal.disable();
-    } else {
-      talk.disable();
-      trade.disable();
-      fight.enable();
-      steal.enable();
-    }
+  openSnackBar(msg: string) {
+    this.snackBar.open(msg, '', { duration: 2500 })
   }
 
   addEvent() {
@@ -320,7 +430,6 @@ export class AdventureComponent implements CanComponentDeactivate {
         this.npcForm.patchValue({
           name: npc?.name,
           attitude: npc?.attitude,
-          actions: npc?.actions,
           character: npc?.character,
         });
     }
@@ -341,10 +450,37 @@ export class AdventureComponent implements CanComponentDeactivate {
         character: '',
       });
       this.attitude = 'neutral';
-      this.toggleActions('neutral');
     } else {
       this.eventError = '';
       resetable.reset();
+    }
+  }
+
+  toggleNewCharacter() {
+    this.newCharacterVisible = !this.newCharacterVisible
+  }
+
+  setRelevantSpeciesData(value: any) {
+    let currentSpecies = convertSpeciesNameToKey(value);
+    this.currentSpeciesProperties =
+      species[currentSpecies!.landID][currentSpecies!.speciesID].speciesSpecial;
+    this.currentSpeciesHomes =
+      species[currentSpecies!.landID][currentSpecies!.speciesID].homes;
+  }
+  createNPCCharacter() {
+    try {
+      let newCharacter: Character = {
+        ...createCharacter(this.npcCharacterForm, this.itemService),
+        id: `${this.userId}-${this.newNPCCharacters.length}`,
+        userId: this.userId
+      };
+      console.log(newCharacter);
+      this.newNPCCharacters.push(newCharacter);
+      this.newCharacterVisible = false
+      this.npcCharacterForm.reset();
+    } catch (error: any) {
+      this.openSnackBar(error.message)
+      return;
     }
   }
 
@@ -361,33 +497,32 @@ export class AdventureComponent implements CanComponentDeactivate {
       if (modifiedNPC) {
         modifiedNPC.name = npcValues.name;
         modifiedNPC.attitude = npcValues.attitude;
-        modifiedNPC.actions = npcValues.actions;
         modifiedNPC.character = npcValues.character;
         this.modify = false;
         this.modifyingIndex = null;
       }
     } else {
-      if (this.attitude === 'hostile' && !npcValues.character) {
-        this.npcError = 'Adj meg egy karaktert';
-        return;
-      }
+      let character = this.myCharacters.find(
+        (char) => char.id === npcValues.character
+      ) ?? this.newNPCCharacters.find(
+        (char) => char.id === npcValues.character
+      )
       let npc: NPC = {
         id: `${this.selectedAdventureEvent?.id}-${this.selectedAdventureEvent?.NPCs.length}`,
         name: npcValues.name,
-        actions: npcValues.actions,
         attitude: npcValues.attitude,
         actionsLeft: { primary: true, secondary: true },
         inCombat: false,
         initiative: null,
+        isTrader: npcValues.attitude === 'neutral' && npcValues.isTrader,
         lastAction: {
           performer: { id: '', name: '' },
           primary: {} as GameAction,
           secondary: {} as GameAction,
         },
-        character: this.myCharacters.find(
-          (char) => char.id === npcValues.character
-        ),
+        character: character,
       };
+      console.log(npc);
       this.selectedAdventureEvent?.NPCs.push(npc);
     }
     this.hideUIs('npcs');
@@ -467,6 +602,7 @@ export class AdventureComponent implements CanComponentDeactivate {
           this.selectedAdventureEvent = undefined;
           this.npcForm.reset();
           this.eventForm.reset();
+          localStorage.setItem('visibleContainerOnProfile', 'events')
         })
         .catch((error) => {
           console.error('Hiba a kaland hozzáadásakor: ', error);

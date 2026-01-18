@@ -31,17 +31,17 @@ export class ProfileComponent {
     private userService: UserService,
     private charService: CharacterService,
     private advService: AdventureService
-  ) {}
+  ) { }
 
   ngOnInit() {
     setBackground('bg');
     this.loadUserProfile();
     try {
-      this.showCharacter = localStorage.getItem('showCharacter')
-        ? localStorage.getItem('showCharacter') === 'true'
+      this.showCharacter = localStorage.getItem('visibleContainerOnProfile')
+        ? localStorage.getItem('visibleContainerOnProfile') === 'characters'
         : true;
     } catch (error) {
-      localStorage.setItem('showCharacter', 'true');
+      localStorage.setItem('visibleContainerOnProfile', 'characters');
       this.showCharacter = true;
       console.error(error);
     }
@@ -88,6 +88,6 @@ export class ProfileComponent {
   showContainer(container: string = '') {
     if (container === 'character') this.showCharacter = true;
     else this.showCharacter = false;
-    localStorage.setItem('showCharacter', this.showCharacter.toString());
+    localStorage.setItem('visibleContainerOnProfile', this.showCharacter ? 'characters' : 'events');
   }
 }

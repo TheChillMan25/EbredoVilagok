@@ -163,7 +163,7 @@ export interface AdventureEvent {
 
 export interface NPC extends GameParticipant {
   attitude: 'neutral' | 'hostile';
-  actions: boolean[];
+  isTrader: boolean;
 }
 
 export interface Game {
