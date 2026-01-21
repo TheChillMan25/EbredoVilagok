@@ -90,7 +90,7 @@ export class SystemComponent {
   mainPageIndexes = {
     char: 0,
     adv: 5,
-    act: 7,
+    act: 6,
   };
   items?: {
     weapons: Weapon[];
@@ -102,7 +102,7 @@ export class SystemComponent {
     cigars: Cigar[];
   };
 
-  constructor(private itemService: ItemService) {}
+  constructor(private itemService: ItemService) { }
 
   async ngOnInit() {
     setBackground('table');
@@ -128,7 +128,7 @@ export class SystemComponent {
   }
 
   setActiveSegment(segment: 'character' | 'adventure' | 'actions'): void {
-    this.handleMarkerVisualization(segment);
+    this.activeSegmentName = segment;
     this.activePageIndex = 0;
     switch (segment) {
       case 'character': {
@@ -172,23 +172,15 @@ export class SystemComponent {
 
   checkPage() {
     if (this.activePageIndex < this.mainPageIndexes['adv']) {
-      this.handleMarkerVisualization('character');
+      this.activeSegmentName = 'character';
     } else if (
       this.activePageIndex >= this.mainPageIndexes['adv'] &&
       this.activePageIndex < this.mainPageIndexes['act']
     ) {
-      this.handleMarkerVisualization('adventure');
+      this.activeSegmentName = 'adventure';
     } else {
-      this.handleMarkerVisualization('actions');
+      this.activeSegmentName = 'actions';
     }
-  }
-
-  handleMarkerVisualization(segment: 'character' | 'adventure' | 'actions') {
-    document
-      .getElementById(this.activeSegmentName)
-      ?.classList.remove('selectedMarker');
-    this.activeSegmentName = segment;
-    document.getElementById(segment)?.classList.add('selectedMarker');
   }
 
   toggleMarkers() {
