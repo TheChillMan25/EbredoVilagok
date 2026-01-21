@@ -5,10 +5,8 @@
       <span class="menu-name">Játék létrehozása</span>
       <form [formGroup]="newGameForm" (ngSubmit)="createGame()">
         <mat-form-field appearance="outline">
-          <mat-label
-            >Játék neve
-            {{ newGameForm.get("name")?.value.length }}/20</mat-label
-          >
+          <mat-label>Játék neve
+            {{ newGameForm.get("name")?.value.length }}/20</mat-label>
           <input matInput type="text" formControlName="name" maxlength="20" />
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -21,20 +19,12 @@
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Max játékos (db)</mat-label>
-          <input
-            matInput
-            type="number"
-            formControlName="maxPlayers"
-            min="1"
-            max="6"
-          />
+          <input matInput type="number" formControlName="maxPlayers" min="1" max="6" />
         </mat-form-field>
         <mat-checkbox formControlName="isPublic">Publikus</mat-checkbox>
-        <mat-error class="error-message"
-          >@if(newGameForm.get('name')?.hasError('whitespace') &&
+        <mat-error class="error-message">@if(newGameForm.get('name')?.hasError('whitespace') &&
           newGameForm.get('name')?.value.length > 0){ Nem lehet üres a név!
-          }@else{ {{ createError }} }</mat-error
-        >
+          }@else{ {{ createError }} }</mat-error>
         <button mat-flat-button type="submit">Létrehozás</button>
       </form>
     </div>
@@ -42,11 +32,8 @@
       <span class="menu-name">Játékaim</span>
       <div id="myGames" class="games-container">
         @if(myGames.length > 0){ @for (item of myGames; track item.id) {
-        <app-game-template
-          [game]="item"
-          type="myGame"
-          (gameEvent)="controlGameEvent($event)"
-        ></app-game-template>
+        <app-game-template [game]="item" type="myGame" (deleteGameEvent)="deleteGame($event)"
+          (gameEvent)="controlGameEvent($event)"></app-game-template>
         } }@else {Nincsenek játékok}
       </div>
     </div>
@@ -67,23 +54,17 @@
             }
           </mat-select>
         </mat-form-field>
-        <mat-error
-          >@if(joinGameForm.get('joinID')?.hasError('whitespace') &&
+        <mat-error>@if(joinGameForm.get('joinID')?.hasError('whitespace') &&
           joinGameForm.get('joinID')?.value.length > 0){ Nem lehet üres a kód!
-          }@else{{{ joinError}}}</mat-error
-        >
+          }@else{{{ joinError}}}</mat-error>
         <button mat-flat-button type="submit">Csatlakozás</button>
       </form>
     </div>
     <div class="open-games">
-      <span class="menu-name">Publikus játékok</span>
+      <span class="menu-name">Elérhető játékok</span>
       <div id="public-games" class="games-container">
         @if(openGames.length > 0){ @for (item of openGames; track item.id) {
-        <app-game-template
-          [game]="item"
-          type="general"
-          (gameEvent)="controlGameEvent($event)"
-        ></app-game-template>
+        <app-game-template [game]="item" type="general" (gameEvent)="controlGameEvent($event)"></app-game-template>
         } }@else { Nincsenek játékok }
       </div>
     </div>

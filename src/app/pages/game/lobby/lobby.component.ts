@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { Game, Player, PlayerStatus } from '../../../shared/models/models';
-import { Subscription, take } from 'rxjs';
+import { firstValueFrom, Subscription, take } from 'rxjs';
 import {
   PlayerRole,
   GameService,
@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
 import { setBackground } from '../../../shared/functional/functions';
+import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-lobby',
   imports: [
@@ -23,6 +24,7 @@ import { setBackground } from '../../../shared/functional/functions';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatError,
+    MatIconModule
   ],
   templateUrl: './lobby.component.html',
   styleUrl: './lobby.component.scss',
@@ -62,7 +64,7 @@ export class LobbyComponent implements CanComponentDeactivate {
     private gameService: GameService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   async canDeactivate(): Promise<boolean> {
     if (this.dontWarnLeaving) return true;
@@ -80,12 +82,11 @@ export class LobbyComponent implements CanComponentDeactivate {
     return true;
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('#222', true);
     this.gameId = this.route.snapshot.paramMap.get('id') || '';
-    this.authService.currentUser.pipe(take(1)).subscribe((user) => {
-      this.currentUserId = user!.uid;
-    });
+    const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)))
+    this.currentUserId = user?.uid!;
     this.loadGameData();
   }
 

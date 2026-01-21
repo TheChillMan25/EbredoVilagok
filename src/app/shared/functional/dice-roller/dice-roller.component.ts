@@ -22,7 +22,7 @@ import { degToRad } from 'three/src/math/MathUtils.js';
 })
 export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('diceCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
-  @Output() rollFinished = new EventEmitter<number[]>();
+  @Output() rollFinished = new EventEmitter<number>();
   @Output() closeEvent = new EventEmitter<void>();
 
   @Input() diceTypes: string[] = ['d20'];
@@ -36,6 +36,21 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private debugArrow: THREE.ArrowHelper | null = null;
   private allStoppedSince: number | null = null;
   private readonly finalStableWindowMs = 600; // 0.6s
+
+  private _rollModifier: number = 0;
+  @Input() set rollModifier(value: number) {
+    this._rollModifier = value;
+  }
+  get rollModifier() {
+    return this._rollModifier;
+  }
+  private _diceCountModifier: 'adv' | 'disadv' | null = null;
+  @Input() set diceCountModifier(value: 'adv' | 'disadv' | null) {
+    this._diceCountModifier = value;
+  }
+  get diceCountModifier() {
+    return this._diceCountModifier;
+  }
 
   private diceObjects: {
     mesh: THREE.Mesh;
@@ -51,13 +66,13 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private diceConfig: {
     [key: string]: { scale: number; mass: number; radius: number };
   } = {
-    d4: { scale: 1, mass: 1, radius: 1.0 },
-    d6: { scale: 1, mass: 1.5, radius: 0.7 },
-    d8: { scale: 1, mass: 1.5, radius: 1.0 },
-    d10: { scale: 1, mass: 1.8, radius: 0.8 },
-    d12: { scale: 1, mass: 2, radius: 1.0 },
-    d20: { scale: 1, mass: 2.5, radius: 1.1 },
-  };
+      d4: { scale: 1, mass: 1, radius: 1.0 },
+      d6: { scale: 1, mass: 1.5, radius: 0.7 },
+      d8: { scale: 1, mass: 1.5, radius: 1.0 },
+      d10: { scale: 1, mass: 1.8, radius: 0.8 },
+      d12: { scale: 1, mass: 2, radius: 1.0 },
+      d20: { scale: 1, mass: 2.5, radius: 1.1 },
+    };
 
   private diceMaterial!: CANNON.Material;
   private floorMaterial!: CANNON.Material;
@@ -65,10 +80,10 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.initThree();
     this.initPhysics();
-    this.cannonDebugger = CannonDebugger(this.scene, this.world, {
+    /* this.cannonDebugger = CannonDebugger(this.scene, this.world, {
       color: 0xff0000,
       scale: 1.0,
-    });
+    }); */
     this.loadAndCreateDice();
     this.animate();
   }
@@ -80,6 +95,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       this.renderer.forceContextLoss();
     }
     this.diceObjects = [];
+    this.rollModifier = 0;
   }
 
   private initThree() {
@@ -164,17 +180,21 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
 
   private loadAndCreateDice() {
     this.diceObjects = [];
+    let typesToLoad = [...this.diceTypes];
+    if (this.diceCountModifier) {
+      typesToLoad = [...this.diceTypes, ...this.diceTypes];
+    }
+    const totalDiceCount = typesToLoad.length;
 
-    this.diceTypes.forEach((type, index) => {
+    typesToLoad.forEach((type, index) => {
       const typeKey = type.toLowerCase();
       const safeType = this.diceConfig[typeKey] ? typeKey : 'd6';
-      const xOffset = (index - (this.diceTypes.length - 1) / 2) * 3;
-
-      this.loadModel(safeType, xOffset);
+      const xOffset = (index - (totalDiceCount - 1) / 2) * 3;
+      this.loadModel(safeType, xOffset, totalDiceCount);
     });
   }
 
-  private loadModel(type: string, xOffset: number) {
+  private loadModel(type: string, xOffset: number, totalDiceCount: number) {
     const url = `assets/dices/${type}.glb`;
     const config = this.diceConfig[type];
 
@@ -190,9 +210,8 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
 
         const mesh = foundMesh as THREE.Mesh;
 
-        // 1. VIZUÁLIS MODELL BEÁLLÍTÁSA
         const visualGeometry = mesh.geometry.clone();
-        visualGeometry.center(); // Középre igazítás
+        visualGeometry.center();
         visualGeometry.scale(config.scale, config.scale, config.scale);
 
         const material = mesh.material as THREE.MeshStandardMaterial;
@@ -219,7 +238,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
         }
         this.scene.add(newMesh);
 
-        // 2. FIZIKAI TEST LÉTREHOZÁSA (Tiszta geometriából)
         const physicsShape = this.createPhysicsShape(type, config.radius);
 
         const body = new CANNON.Body({
@@ -247,7 +265,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
           stableCount: 0,
         });
 
-        if (this.diceObjects.length === this.diceTypes.length) {
+        if (this.diceObjects.length === totalDiceCount) {
           this.throwDice();
         }
       },
@@ -256,7 +274,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  // --- A TITOK NYITJA: Tiszta fizikai formák generálása ---
   private createPhysicsShape(type: string, radius: number): CANNON.Shape {
     let geometry: THREE.BufferGeometry;
 
@@ -319,14 +336,12 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     addWall(0, depth / 2, width, wallThickness);
   }
 
-  // D10 Speciális fizikai forma
-  // D10 Speciális fizikai forma - JAVÍTOTT WINDING ORDER
   private createD10Shape(radius: number): CANNON.ConvexPolyhedron {
     const height = radius;
-    const k = radius * 0.2; // Cikcakk
+    const k = radius * 0.2;
     const vertices = [];
-    vertices.push(0, height, 0); // 0. index: Top (Csúcs)
-    vertices.push(0, -height, 0); // 1. index: Bottom (Alja)
+    vertices.push(0, height, 0);
+    vertices.push(0, -height, 0);
 
     const segments = 10;
     for (let i = 0; i < segments; i++) {
@@ -340,14 +355,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     for (let i = 0; i < segments; i++) {
       const current = ringStart + i;
       const next = ringStart + ((i + 1) % segments);
-
-      // --- JAVÍTÁS ITT ---
-      // A felső kúpnál megcseréltük a 'next' és 'current' sorrendjét.
-      // Így a normálvektor kifelé fog mutatni (CCW - óramutatóval ellentétes).
       indices.push(0, next, current);
-
-      // Az alsó kúpnál maradt az eredeti sorrend, mert ott lefelé nézünk,
-      // így ott ez a sorrend adja a kifelé mutató irányt.
       indices.push(1, current, next);
     }
 
@@ -358,7 +366,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     return this.createConvexPolyhedron(geo);
   }
 
-  // --- Segédfüggvény: Three.js Geo -> Cannon Polyhedron ---
   private createConvexPolyhedron(
     geometry: THREE.BufferGeometry,
   ): CANNON.ConvexPolyhedron {
@@ -367,7 +374,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     const faces: number[][] = [];
     const keyToId: { [key: string]: number } = {};
 
-    // Vertex merging a biztonság kedvéért
     const getVertexId = (x: number, y: number, z: number) => {
       const key = `${x.toFixed(4)}_${y.toFixed(4)}_${z.toFixed(4)}`;
       if (keyToId[key] !== undefined) return keyToId[key];
@@ -572,14 +578,29 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private finishRoll() {
     if (!this.isRolling) return;
     this.isRolling = false;
-
     const results = this.diceObjects.map((obj) => {
       return this.calculateRealResult(obj);
     });
 
-    const sum = results.reduce((a, b) => a + b, 0);
-    this.resultText = `Eredmény: ${sum} (${results.join(', ')})`;
-    this.rollFinished.emit(results);
+    let finalRoll = 0;
+    let details = '';
+
+    if (this.diceCountModifier === 'adv') {
+      const maxVal = Math.max(...results);
+      finalRoll = maxVal + this.rollModifier;
+      details = `(Adv: [${results.join(', ')}])`;
+    } else if (this.diceCountModifier === 'disadv') {
+      const minVal = Math.min(...results);
+      finalRoll = minVal + this.rollModifier;
+      details = `(Disadv: [${results.join(', ')}])`;
+    } else {
+      const sum = results.reduce((a, b) => a + b, 0);
+      finalRoll = sum + this.rollModifier;
+      details = `[${results.join(' + ')}]`;
+    }
+
+    this.resultText = `${finalRoll} ${details} ${this.rollModifier ? '+ ' + this.rollModifier : ''}`;
+    this.rollFinished.emit(finalRoll);
   }
 
   private updateDebugArrow(position: CANNON.Vec3, direction: CANNON.Vec3) {
@@ -595,7 +616,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // --- A FIZIKAI EREDMÉNY KISZÁMÍTÁSA ---
   private calculateRealResult(obj: {
     body: CANNON.Body;
     type: string;
@@ -632,15 +652,15 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
         bestWorldNormal = worldNormal;
       }
     }
-    this.updateDebugArrow(body.position, bestWorldNormal);
+    //this.updateDebugArrow(body.position, bestWorldNormal);
 
     console.log(
-      `Kocka: ${
-        obj.type
+      `Kocka: ${obj.type
       }, FÖLDET ÉRŐ index: ${bestFaceIndex}, Egyezés: ${maxDot.toFixed(2)}`,
     );
     return this.getFaceMap(obj.type, bestFaceIndex);
   }
+
   private getFaceMap(type: string, faceIndex: number): number {
     const maps: { [key: string]: number[] } = {
       d4: [2, 3, 1, 4],

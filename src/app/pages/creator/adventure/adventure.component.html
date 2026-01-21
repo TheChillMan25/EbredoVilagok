@@ -138,6 +138,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Karakter</mat-label>
         <mat-select formControlName="character">
+          @if(myCharacters && myCharacters.length > 0){
           <mat-optgroup label="Saját karakterek">
             @for (character of myCharacters; track $index) {
             <mat-option [value]="character.id">
@@ -145,6 +146,7 @@
             </mat-option>
             }
           </mat-optgroup>
+          }
           @if(newNPCCharacters.length > 0){
           <mat-optgroup label="Új karakterek">
             @for (character of newNPCCharacters; track $index) {
@@ -204,8 +206,8 @@
       <div>
         @for (bonus of currentHome?.bonus; track $index) {
         <div class="home-bonus">
-          <span>bonus.name</span>
-          <span>bonus.mod</span>
+          <span>{{bonus.name}}</span>
+          <span>{{bonus.mod}}</span>
         </div>
         }
       </div>

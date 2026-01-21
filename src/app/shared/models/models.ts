@@ -149,6 +149,8 @@ export interface GameParticipant {
 
 export interface Player extends GameParticipant {
   status: PlayerStatus;
+  isVoting: boolean;
+  remainingCampActions: number;
 }
 
 export interface AdventureEvent {
@@ -186,6 +188,7 @@ export interface Game {
   isPublic: boolean;
   started: boolean;
   isCamping: boolean;
+  vote: { theme: string, starter: string, votes: { player: string, vote: boolean }[] };
 }
 
 export enum ActionType {
@@ -196,6 +199,20 @@ export enum ActionType {
   ATTACK = 'ATTACK',
   STEAL = 'STEAL',
   NONE = 'NONE',
+}
+
+export enum MandatoryCampActions {
+  START_FIRES = 'START_FIRES',
+  SET_UP_TENTS = 'SET_UP_TENTS',
+  SET_UP_TRAPS = 'SET_UP_TRAPS',
+  KEEP_WATCH = 'KEEP_WATCH',
+}
+
+export enum StandardCampActions {
+  TREAT_WOUNDS = 'TREAT_WOUNDS',
+  CALM_OTHERS = 'CALM_OTHERS',
+  GATHER_PLANTS = 'GATHER_PLANTS',
+  HUNT = 'HUNT',
 }
 
 export interface GameAction {

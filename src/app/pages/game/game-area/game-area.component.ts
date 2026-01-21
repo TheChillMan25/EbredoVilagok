@@ -12,10 +12,12 @@ import {
   Character,
   Game,
   GameAction,
+  MandatoryCampActions,
   NPC,
   Player,
+  StandardCampActions,
 } from '../../../shared/models/models';
-import { Subscription, take } from 'rxjs';
+import { firstValueFrom, Subscription, take } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { MapContainerComponent } from '../../../shared/functional/map-container/map-container.component';
 import { NgClass } from '@angular/common';
@@ -102,10 +104,12 @@ import { DiceRollerComponent } from '../../../shared/functional/dice-roller/dice
 export class GameAreaComponent implements CanComponentDeactivate {
   isLoading = false;
   @ViewChild('map') map!: MapContainerComponent;
+  @ViewChild('diceRoller') diceRoller!: DiceRollerComponent;
   @ViewChild('isPartyWideCheckbox') isPartyWideCheckbox!: MatCheckbox;
   @ViewChild('isPrimaryCheckbox') isPrimaryCheckbox!: MatCheckbox;
   snackBar = new MatSnackBar();
   isNewRound = false;
+  campingFirstWarn = true;
   actionForm!: FormGroup;
   addStatusForm!: FormGroup;
   addItemForm!: FormGroup;
@@ -122,6 +126,8 @@ export class GameAreaComponent implements CanComponentDeactivate {
   addStatusError = '';
   addItemError = '';
   addItemEffectError = '';
+  voting = false;
+  voted = false;
 
   activeInventory: 'f' | 's' | 'g' | 'e' = 's';
   currentInventory: (Food | SpecialItem | Item | Inventory)[] = [];
@@ -149,6 +155,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   myCharacterSpecs?: {
     speciesSpecial: { desc: string };
     home: { desc: string; bonus: { name: string; mod: string }[] };
+    stats: number[];
     equipment: {
       left: Weapon;
       right: Weapon;
@@ -186,7 +193,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   }
 
   hasHostileNPC = false;
-  onlyHostileNPC = false;
+  canTrade = false;
   currentEventIdx!: number;
   currentEvent?: AdventureEvent;
   myTurn = false;
@@ -209,14 +216,27 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
   PlayerRole = PlayerRole;
   ActionType = ActionType;
+  MandatoryCampActions = MandatoryCampActions;
+  StandardCampActions = StandardCampActions;
   ActionTypes = [
-    { value: ActionType.USEITEM, viewValue: 'Tárgy használata' },
-    { value: ActionType.CAMP, viewValue: 'Táborozás' },
-    { value: ActionType.TALK, viewValue: 'Beszéd' },
-    { value: ActionType.TRADE, viewValue: 'Kereskedés' },
-    { value: ActionType.ATTACK, viewValue: 'Támadás' },
-    { value: ActionType.STEAL, viewValue: 'Lopás' },
+    { value: ActionType.USEITEM, viewValue: 'Tárgy használata', icon: 'grocery' },
+    { value: ActionType.CAMP, viewValue: 'Táborozás', icon: 'camping' },
+    { value: ActionType.TRADE, viewValue: 'Kereskedés', icon: 'storefront' },
+    { value: ActionType.ATTACK, viewValue: 'Támadás', icon: 'swords' },
+    { value: ActionType.STEAL, viewValue: 'Lopás', icon: 'money_bag' },
   ];
+  MandatoryCampActionsArray = [
+    { value: MandatoryCampActions.START_FIRES, viewValue: 'Tűzgyújtás', icon: 'fireplace', cost: 3 },
+    { value: MandatoryCampActions.SET_UP_TENTS, viewValue: 'Sátrak felállítása', icon: 'camping', cost: 5 },
+    { value: MandatoryCampActions.SET_UP_TRAPS, viewValue: 'Csapdák felállítása', icon: 'webhook', cost: 5 },
+    { value: MandatoryCampActions.KEEP_WATCH, viewValue: 'Őrség', icon: 'visibility', cost: 8 },
+  ]
+  StandardCampActionsArray = [
+    { value: StandardCampActions.TREAT_WOUNDS, viewValue: 'Sérülések ápolása', icon: 'healing', cost: 1 },
+    { value: StandardCampActions.CALM_OTHERS, viewValue: 'Társak megnyugtatása', icon: 'diversity_3', cost: 2 },
+    { value: StandardCampActions.GATHER_PLANTS, viewValue: 'Növény gyűjtés', icon: 'spa', cost: 3 },
+    { value: StandardCampActions.HUNT, viewValue: 'Vadászat', icon: 'pets_control_rodent', cost: 4 },
+  ]
   StatusTypes = [
     { value: StatusType.BLEED },
     { value: StatusType.POISON },
@@ -278,6 +298,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
   showDiceRoller = false;
   diceToRoll: string[] = ['d20'];
+  rollModifier: number = 0;
+  diceCountModifier: 'adv' | 'disadv' | null = null;
+  latestRoll?: number;
 
   allItems: any[] = [];
 
@@ -290,8 +313,8 @@ export class GameAreaComponent implements CanComponentDeactivate {
     private route: ActivatedRoute,
     private gameService: GameService,
     private router: Router,
-    private itemService: ItemService
-  ) {}
+    private itemService: ItemService,
+  ) { }
 
   async ngOnInit() {
     setBackground('#222', true);
@@ -299,9 +322,8 @@ export class GameAreaComponent implements CanComponentDeactivate {
     await this.itemService.initItems();
     this.allItems = this.itemService.getAllItems();
     this.gameId = this.route.snapshot.paramMap.get('id')!;
-    this.authService.currentUser.pipe(take(1)).subscribe((user) => {
-      this.currentUserId = user!.uid;
-    });
+    const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)))
+    this.currentUserId = user?.uid!;
     this.loadData();
   }
 
@@ -392,7 +414,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         }
         const isPartyWide = this.actionForm.get('isPartyWide');
         isPartyWide?.patchValue(
-          'isPartyWide' in item ? item.isPartyWide : false
+          'isPartyWide' in item ? item.isPartyWide : false,
         );
         this.isPartyWideCheckbox.disabled = true;
         this.selectedItem = item;
@@ -467,7 +489,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           this.effectHasDuration = true;
           if (
             [StatusType.BLEED, StatusType.POISON, StatusType.BURN].includes(
-              this.newItemEffectForm.get('status')?.value
+              this.newItemEffectForm.get('status')?.value,
             ) &&
             value === EffectType.ADD_STATUS
           )
@@ -481,7 +503,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     this.newItemEffectForm.get('status')?.valueChanges.subscribe((value) => {
       if (
         [StatusType.BLEED, StatusType.POISON, StatusType.BURN].includes(
-          value
+          value,
         ) &&
         this.newItemEffectForm.get('type')?.value === EffectType.ADD_STATUS
       ) {
@@ -493,7 +515,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   }
 
   loadData() {
-    this.gameSub = this.gameService.getGame(this.gameId!).subscribe((game) => {
+    this.gameSub = this.gameService.getGame(this.gameId!).subscribe(async (game) => {
       if (!game) {
         this.dontWarnLeaving = true;
         this.router.navigateByUrl('/jatek');
@@ -509,7 +531,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         this.isNewRound = false;
       }
       game.players.sort(
-        (a: Player, b: Player) => b.initiative! - a.initiative!
+        (a: Player, b: Player) => b.initiative! - a.initiative!,
       );
 
       if (!this.game.started) {
@@ -521,9 +543,16 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.currentEventIdx = game.currentEvent;
       this.setCurrentEvent();
 
+      if (game.isCamping && this.campingFirstWarn) {
+        this.openSnackBar('Táborozás következik.')
+        this.campingFirstWarn = false;
+        
+      }
+      if (!game.isCamping && !this.campingFirstWarn) { this.openSnackBar('Vége a táborozásnak.'); this.campingFirstWarn = true; }
+
       if (this.role === PlayerRole.PLAYER) {
         const foundPlayer = this.game.players.find(
-          (p) => p.id === this.currentUserId
+          (p) => p.id === this.currentUserId,
         );
 
         if (!foundPlayer) {
@@ -534,7 +563,19 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
         this.player = foundPlayer;
         if (this.player.character) {
+          const adv = this.player?.character?.activeStatuses.find(s => s.type === StatusType.ADVANTAGE);
+          const disAdv = this.player?.character?.activeStatuses.find(s => s.type === StatusType.DISADVANTAGE);
+          this.diceCountModifier = adv ? 'adv' : disAdv ? 'disadv' : null;
           this.setUpCharacterSpecs(this.player.character);
+        }
+        if (game.vote.theme !== '') {
+          this.voting = true;
+          this.voted = game.vote.votes.find(v => v.player === this.player?.name)?.vote ?? false;
+          if (game.vote.votes.length === game.players.length) {
+            this.voting = false;
+          }
+        } else {
+          this.voting = false;
         }
         this.myTurn = this.player.id === game.currentPlayer;
       } else {
@@ -542,9 +583,26 @@ export class GameAreaComponent implements CanComponentDeactivate {
           this.currentEvent?.NPCs.some((n) => n.id === game.currentPlayer) ||
           false;
         this.currentPlayer = game.players.find(
-          (p) => p.id === game.currentPlayer
+          (p) => p.id === game.currentPlayer,
         );
-
+        if (game.vote.votes.length === game.players.length - 1) {
+          let result = this.evaluateVote();
+          this.game?.players.forEach(p => {
+            p.isVoting = false;
+          })
+          if (result) {
+            await this.gameService.updateGame(this.gameId!, {
+              isCamping: true,
+              vote: { theme: '', starter: '', votes: [] },
+              players: this.game?.players
+            });
+          } else {
+            await this.gameService.updateGame(this.gameId!, { players: this.game?.players });
+          }
+        }
+        const adv = this.player?.character?.activeStatuses.find(s => s.type === StatusType.ADVANTAGE);
+        const disAdv = this.player?.character?.activeStatuses.find(s => s.type === StatusType.DISADVANTAGE);
+        this.diceCountModifier = adv ? 'adv' : disAdv ? 'disadv' : null;
         this.setUpCharacterSpecs(this.currentPlayer?.character!);
         this.game.currentAction = {
           performer: {
@@ -564,21 +622,49 @@ export class GameAreaComponent implements CanComponentDeactivate {
     });
   }
 
+  evaluateVote(): boolean {
+    let y = 0, n = 0;
+    this.game?.vote.votes.forEach(v => {
+      if (v.vote) y += 1;
+      else n += 1;
+    })
+    return y > n;
+  }
+
   openDiceRoller(dice: string[] = ['d20']) {
     this.diceToRoll = dice;
     this.showDiceRoller = true;
+    setTimeout(() => {
+      this.showDiceRoller = false;
+      this.rollModifier = 0;
+    }, 4000);
   }
 
-  onDiceRollFinished(results: number[]) {
-    const sum = results.reduce((a, b) => a + b, 0);
-    const details = results.join(' + ');
-    this.openSnackBar(`Dobás eredménye: ${sum} (${details})`);
-
-    console.log('Dobott értékek:', results);
+  onDiceRollFinished(result: number) {
+    this.latestRoll = result;
+    /* this.openSnackBar(
+      `Dobás eredménye: ${this.latestRoll} (${this.latestRoll - this.rollModifier} + ${this.rollModifier})`,
+    ); */
   }
 
   closeDiceRoller() {
     this.showDiceRoller = false;
+  }
+
+  rollCheck(statMod: number) {
+    if (!this.myTurn || statMod === undefined) return;
+    this.rollModifier = statMod;
+    this.openDiceRoller(['d20']);
+  }
+
+  rollForAttack(diceCount: number | undefined, damage: string | undefined) {
+    if (!this.myTurn) return;
+    if (!diceCount || !damage) return;
+    let dices = [];
+    for (let i = 0; i < diceCount; i++) {
+      dices.push(damage);
+    }
+    this.openDiceRoller(dices);
   }
 
   resetSelectedItem() {
@@ -591,7 +677,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     this.myCharacterSpecs = {
       speciesSpecial: getSpeciesSpecial(
         character.species,
-        character.specialProperties.speciesProperty
+        character.specialProperties.speciesProperty,
       ),
       home: getHome(character.species, character.specialProperties.home),
       equipment: {
@@ -599,6 +685,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         right: character.equipment.right,
         armour: character.equipment.armour,
       },
+      stats: [],
       items: {
         food: [],
         specialItems: [],
@@ -612,12 +699,19 @@ export class GameAreaComponent implements CanComponentDeactivate {
       generalItems: character.items.generalItems,
       equipmentItems: character.items.equipmentItems,
     };
+    Object.entries(character?.stats!).forEach(([key, value]) => {
+      if (key !== 'main') {
+        Object.values(value).forEach((value) => {
+          this.myCharacterSpecs?.stats.push(value);
+        });
+      }
+    });
     this.selectInventory();
   }
 
   locateCurrentEventLocation() {
     const loc: Location | null = getLocationByName(
-      this.currentEvent?.location!
+      this.currentEvent?.location!,
     );
     if (loc && this.map) this.map.locatePoint(loc, false);
   }
@@ -638,20 +732,19 @@ export class GameAreaComponent implements CanComponentDeactivate {
       (this.currentEvent?.NPCs.some((npc) => npc.attitude === 'hostile') &&
         this.currentEvent.NPCs.length > 0) ||
       false;
-    this.onlyHostileNPC =
-      (this.currentEvent?.NPCs.every((npc) => npc.attitude === 'hostile') &&
-        this.currentEvent.NPCs.length > 0) ||
+    this.canTrade =
+      this.currentEvent?.NPCs.some(npc => npc.attitude === 'neutral') ||
       false;
     const loc: Location | null = getLocationByName(
-      this.currentEvent?.location!
+      this.currentEvent?.location!,
     );
     if (loc && this.map) this.map.locatePoint(loc, false);
   }
 
   showActionPanel(
     event: MouseEvent,
-    action?: ActionType,
-    show: boolean = true
+    action?: ActionType | MandatoryCampActions | StandardCampActions,
+    show: boolean = true,
   ) {
     const target = event.target as HTMLElement;
     if (target.id !== 'actionUI' && !show) return;
@@ -787,7 +880,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
     if (this.itemCheck(item)) {
       this.selectedItemIdx = idx;
       this.selectedItem = item;
-      console.log(this.selectedItem);
       this.actionForm.get('type')?.patchValue(ActionType.USEITEM);
       this.openSnackBar(`Tárgy kiválasztva: ${this.selectedItem?.name}`);
     }
@@ -854,10 +946,10 @@ export class GameAreaComponent implements CanComponentDeactivate {
         return;
       }
       const statusName = this.getStatusDetails(
-        this.selectedPlayerStatus?.type!
+        this.selectedPlayerStatus?.type!,
       ).name;
       let idx = this.currentPlayer?.character?.activeStatuses.findIndex(
-        (s) => s.type === this.selectedPlayerStatus?.type
+        (s) => s.type === this.selectedPlayerStatus?.type,
       );
       if (idx === undefined || idx === -1) {
         this.openSnackBar('Nincs ilyen hatás a játékoson!');
@@ -868,14 +960,14 @@ export class GameAreaComponent implements CanComponentDeactivate {
         players: this.game?.players,
       });
       this.openSnackBar(
-        'Hatás sikeresen eltávolítva a játékosról: ' + statusName
+        'Hatás sikeresen eltávolítva a játékosról: ' + statusName,
       );
       this.isLoadingStatus = false;
     } catch (error) {
       this.isLoadingStatus = false;
       console.error('Hiba a hatás eltávolításakor: ', error);
       this.openSnackBar(
-        'Hiba a hatás eltávolításakor! További információ a konzolon.'
+        'Hiba a hatás eltávolításakor! További információ a konzolon.',
       );
       return;
     }
@@ -905,7 +997,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
       };
       if (
         this.currentPlayer?.character?.activeStatuses.some(
-          (s) => s.type === newStatus.type
+          (s) => s.type === newStatus.type,
         )
       ) {
         this.addStatusError = 'Már van ilyen hatás a játékoson!';
@@ -932,7 +1024,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.addStatusPanelVisible = true;
       console.error('Hiba a státusz hozzáadásakor: ', error);
       this.openSnackBar(
-        'Hiba a státus hozzáadásakor! További információ a konzolon.'
+        'Hiba a státus hozzáadásakor! További információ a konzolon.',
       );
       return;
     }
@@ -1004,7 +1096,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
     if (this.newItemEffects.some((e) => e.type === effectValue.type)) {
       const existingEffect = this.newItemEffects.find(
-        (e) => e.type === newEffect.type
+        (e) => e.type === newEffect.type,
       );
       if (
         existingEffect?.stat !== newEffect.stat ||
@@ -1039,7 +1131,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         };
         if (newItem.type === ItemType.COMMON) {
           this.currentPlayer?.character?.items.generalItems.push(
-            newItem as Item
+            newItem as Item,
           );
         } else {
           const items: Food[] | SpecialItem[] | Item[] | (Weapon | Armour)[] =
@@ -1109,7 +1201,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         }
         if (newItem.type === ItemType.COMMON) {
           this.currentPlayer?.character?.items.generalItems.push(
-            newItem as Item
+            newItem as Item,
           );
         } else {
           const items: Food[] | SpecialItem[] | Item[] | (Weapon | Armour)[] =
@@ -1127,7 +1219,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           players: this.game?.players,
         });
         this.openSnackBar(
-          `Tárgy hozzáadva ${this.currentPlayer?.name}-hez: ${newItem.name}`
+          `Tárgy hozzáadva ${this.currentPlayer?.name}-hez: ${newItem.name}`,
         );
         this.addItemForm.reset({
           newItemName: '',
@@ -1154,6 +1246,10 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.actionError = 'Töltsd ki a kötelező mezőket!';
       return;
     }
+    if (this.player && this.noactionsLeft()) {
+      this.openSnackBar('Nincs több akciód!');
+      return;
+    }
     this.isPerformingAction = true;
     const formValue = this.actionForm.value;
     switch (formValue.type) {
@@ -1167,6 +1263,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         break;
       case ActionType.CAMP:
         this.askForCamp();
+        this.actionPanelVisible = false;
         break;
     }
     this.isPerformingAction = false;
@@ -1174,23 +1271,19 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
   async useItem(isPrimary: boolean) {
     if (this.player) {
-      if (this.noactionsLeft()) {
-        this.openSnackBar('Nincs több akciód!');
-        return;
-      }
       if (isPrimary && !this.player.actionsLeft.primary) {
         this.openSnackBar(
-          'Nem használhatod elsődleges akcióként! Nincs elsődleges akciód.'
+          'Nem használhatod elsődleges akcióként! Nincs elsődleges akciód.',
         );
         return;
       } else if (!isPrimary && !this.player.actionsLeft.secondary) {
         this.openSnackBar(
-          'Nem használhatod másodlagos akcióként! Nincs másodlagos akciód.'
+          'Nem használhatod másodlagos akcióként! Nincs másodlagos akciód.',
         );
         return;
       }
-      if (this.selectedItem?.category !== ItemCategory.CONSUMABLE) {
-        this.openSnackBar('Ez a tárgy még nem használható!');
+      if (this.selectedItem?.type === ItemType.FOOD && !this.game?.isCamping) {
+        this.openSnackBar('Ezt csak táborozáskor használhatod.')
         return;
       }
       switch (this.selectedItem?.category) {
@@ -1251,23 +1344,22 @@ export class GameAreaComponent implements CanComponentDeactivate {
           this.selectedItem.uses -= 1;
           if (this.selectedItem.uses === 0) {
             const index = this.currentInventory.findIndex(
-              (i) => i.id === this.selectedItem!.id
+              (i) => i.id === this.selectedItem!.id,
             );
             if (index > -1) {
               this.currentInventory.splice(index, 1);
-              console.log(this.currentInventory);
             }
           }
           if (this.role === PlayerRole.HOST) {
             this.currentEvent!.NPCs = this.currentEvent?.NPCs.map((p) =>
-              p.id === this.currentUserId ? (this.player! as NPC) : p
+              p.id === this.currentUserId ? (this.player! as NPC) : p,
             )!;
             await this.gameService.updateGame(this.gameId!, {
               adventure: this.game?.adventure,
             });
           } else {
             const updatedPlayers = this.game!.players.map((p) =>
-              p.id === this.currentUserId ? (this.player! as Player) : p
+              p.id === this.currentUserId ? (this.player! as Player) : p,
             );
             await this.gameService.updateGame(this.gameId!, {
               players: updatedPlayers,
@@ -1294,7 +1386,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           ) {
             target.character.stats.main.hp = Math.min(
               target.character.stats.main.hp + effect.value!,
-              target.character.stats.main.maxHP
+              target.character.stats.main.maxHP,
             );
             break;
           }
@@ -1307,7 +1399,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           ) {
             target.character.stats.main.sp = Math.min(
               target.character.stats.main.sp + effect.value!,
-              target.character.stats.main.maxSP
+              target.character.stats.main.maxSP,
             );
             break;
           }
@@ -1318,7 +1410,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           if (target.character.wounds.small > 0) {
             target.character.wounds.small = Math.max(
               0,
-              target.character.wounds.small - effect.value!
+              target.character.wounds.small - effect.value!,
             );
             break;
           }
@@ -1329,7 +1421,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           if (target.character.wounds.large > 0) {
             target.character.wounds.large = Math.max(
               0,
-              target.character.wounds.large - effect.value!
+              target.character.wounds.large - effect.value!,
             );
             break;
           }
@@ -1354,7 +1446,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
             'Nem lehetséges a stat erősítése! A stat nem létezik.',
             {
               cause: GameErrorCauses.NoStatToBuff,
-            }
+            },
           );
         case EffectType.ADD_STATUS:
           newStatus = {
@@ -1369,10 +1461,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
           }
           if (this.selectedItem?.effects?.length === 1) {
             throw new Error(
-              `Nem lehetséges a hatás hozzáadása. Már van ilyen hatás a karakteren: ${
-                this.getStatusDetails(effect.status!).name
+              `Nem lehetséges a hatás hozzáadása. Már van ilyen hatás a karakteren: ${this.getStatusDetails(effect.status!).name
               }`,
-              { cause: GameErrorCauses.NoStatusToAdd }
+              { cause: GameErrorCauses.NoStatusToAdd },
             );
           } else {
             Object.values(this.player?.character?.activeStatuses!).forEach(
@@ -1380,7 +1471,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
                 if (s.type === newStatus?.type) {
                   s.duration += newStatus.duration;
                 }
-              }
+              },
             );
           }
           break;
@@ -1388,7 +1479,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           newStatus = statusEffects.find((s) => s.type === effect.status);
           if (newStatus) {
             statusEffects = statusEffects.filter(
-              (s) => s.type !== newStatus?.type
+              (s) => s.type !== newStatus?.type,
             );
             target.character.activeStatuses = statusEffects;
             break;
@@ -1396,14 +1487,13 @@ export class GameAreaComponent implements CanComponentDeactivate {
           if (this.selectedItem?.effects?.length === 1) {
             throw new Error(
               'Nem lehetséges a hatás levétele. Nincs ilyen hatás: ' +
-                this.getStatusDetails(effect.status!).name,
-              { cause: GameErrorCauses.NoStatusToRemove }
+              this.getStatusDetails(effect.status!).name,
+              { cause: GameErrorCauses.NoStatusToRemove },
             );
           } else {
             this.openSnackBar(
-              `Nem lehetséges a hatás levétele. Nincs ilyen hatás: ${
-                this.getStatusDetails(effect.status!).name
-              }`
+              `Nem lehetséges a hatás levétele. Nincs ilyen hatás: ${this.getStatusDetails(effect.status!).name
+              }`,
             );
           }
           break;
@@ -1411,7 +1501,41 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
-  async askForCamp() {}
+  async vote(vote: boolean) {
+    try {
+      let playerVote = this.game?.vote.votes?.find(v => v.player === this.player?.name)
+      if (playerVote && (!playerVote.vote && playerVote.vote !== false)) {
+        playerVote.vote = vote;
+      } else {
+        this.game?.vote.votes.push({ player: this.player?.name!, vote: vote })
+      }
+      await this.gameService.updateGame(this.gameId!, { vote: this.game?.vote })
+    } catch (error) {
+      console.error('Hiba szavazáskor: ' + error);
+      this.openSnackBar('Hiba szavazáskor!');
+      return;
+    }
+  }
+
+  async askForCamp() {
+    try {
+      if (this.game?.players.length === 1) {
+        await this.gameService.updateGame(this.gameId!, { isCamping: true })
+        return;
+      }
+      this.game?.players.forEach(p => p.isVoting = true)
+      await this.gameService.updateGame(this.gameId!,
+        {
+          vote: { theme: 'Táborozás', starter: this.player?.name!, votes: [] },
+          players: this.game?.players
+        }
+      )
+    } catch (error) {
+      console.error('Hiba a táborozás kezdeményezésekor: ' + error);
+      this.openSnackBar('Hiba a táborozás kezdeményezésekor!');
+      return;
+    }
+  }
 
   async finishTurn() {
     try {
@@ -1423,15 +1547,15 @@ export class GameAreaComponent implements CanComponentDeactivate {
             p && s
               ? 'elsődleges és másodlagos'
               : p
-              ? 'elsődleges'
-              : 'másodlagos';
+                ? 'elsődleges'
+                : 'másodlagos';
           const text = `Van még ${actionType} akciód. Biztosan befejezed a körödet?`;
           if (!confirm(text)) {
             return;
           }
         }
         const current = this.game?.initiatives.find(
-          (i) => i.id === this.game?.currentPlayer
+          (i) => i.id === this.game?.currentPlayer,
         );
         if (current) {
           current.finished = true;
@@ -1440,7 +1564,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
             (i) =>
               i.id !== this.game?.currentPlayer &&
               i.initiative <= current?.initiative &&
-              !i.finished
+              !i.finished,
           );
           if (next)
             await this.gameService.updateGame(this.gameId!, {
@@ -1453,10 +1577,10 @@ export class GameAreaComponent implements CanComponentDeactivate {
               i.finished = false;
             });
             this.game?.players.forEach(
-              (p) => (p.actionsLeft = { primary: true, secondary: true })
+              (p) => (p.actionsLeft = { primary: true, secondary: true }),
             );
             let newCurrentPlayer = this.game?.initiatives.sort(
-              (a, b) => b!.initiative - a!.initiative
+              (a, b) => b!.initiative - a!.initiative,
             )[0].id;
             await this.gameService.updateGame(this.gameId!, {
               currentPlayer: newCurrentPlayer,

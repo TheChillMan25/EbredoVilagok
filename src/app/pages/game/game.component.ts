@@ -76,7 +76,7 @@ export class GameComponent {
     private advService: AdventureService,
     private charService: CharacterService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     setBackground('#222', true);
@@ -165,6 +165,7 @@ export class GameComponent {
           primary: {} as GameAction,
           secondary: {} as GameAction,
         },
+        vote: { theme: '', starter: '', votes: [], }
       };
       await this.gameService.createGame(newGame);
 
@@ -181,6 +182,13 @@ export class GameComponent {
       this.createError = 'Hiba a játék létrehozásakor!';
       return;
     }
+  }
+
+  async deleteGame(gameId: string) {
+    await this.gameService.deleteGame(gameId).catch(error => {
+      console.error(error);
+      this.createError = 'Nem sikerült törölni a játékot.'
+    })
   }
 
   controlGameEvent(value: { type: 'myGame' | 'general'; gameId: string }) {
@@ -246,6 +254,8 @@ export class GameComponent {
           secondary: {} as GameAction,
         },
         inCombat: false,
+        isVoting: false,
+        remainingCampActions: 8 + selectedCharacter.stats.physical.end,
       };
 
       let g = await this.gameService.joinGame(game, player);

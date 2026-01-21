@@ -10,6 +10,7 @@ import {
   where,
   documentId,
   updateDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import {
   firstValueFrom,
@@ -43,7 +44,7 @@ export function checkRole(userId: string, ownerId: string): PlayerRole {
 export class GameService {
   private _PlayerRole!: PlayerRole;
 
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService) { }
 
   set PlayerRole(value: PlayerRole) {
     this._PlayerRole = value;
@@ -280,6 +281,20 @@ export class GameService {
     } catch (error) {
       console.error('Hiba a játék elhagyásakor: ', error);
       throw error;
+    }
+  }
+
+  async deleteGame(gameId: string) {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+      if (!user) throw new Error('A felhasználó nem található!');
+      const gameDocRef = doc(this.firestore, 'Games', gameId);
+      await deleteDoc(gameDocRef);
+    } catch (error) {
+      console.error('Hiba a játék törlésekor: ', error);
+      return;
     }
   }
 }

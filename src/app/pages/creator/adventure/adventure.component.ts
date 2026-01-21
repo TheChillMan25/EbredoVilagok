@@ -27,7 +27,7 @@ import {
 } from '../../../shared/models/models';
 import { MatSelect, MatOption, MatOptgroup } from '@angular/material/select';
 import { CharacterService } from '../../../shared/services/character/character.service';
-import { Observable, Subscription, take } from 'rxjs';
+import { firstValueFrom, Observable, Subscription, take } from 'rxjs';
 import { MapContainerComponent } from '../../../shared/functional/map-container/map-container.component';
 import {
   cityLocations,
@@ -215,10 +215,9 @@ export class AdventureComponent implements CanComponentDeactivate {
 
   async ngOnInit() {
     setBackground('paper_bg');
-    this.authService.currentUser.pipe(take(1)).subscribe(user => {
-      this.userId = user?.uid ?? ''
-    })
     this.initForms();
+    const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)))
+    this.userId = user?.uid!;
     await this.itemService.initItems();
     this.weapons = this.itemService.getItemGroup('weapons') as Weapon[];
     this.armours = this.itemService.getItemGroup('armours') as Armour[];
@@ -430,7 +429,7 @@ export class AdventureComponent implements CanComponentDeactivate {
         this.npcForm.patchValue({
           name: npc?.name,
           attitude: npc?.attitude,
-          character: npc?.character,
+          character: npc?.character?.id!,
         });
     }
   }

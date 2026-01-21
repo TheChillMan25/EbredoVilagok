@@ -11,6 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 export class GameTemplateComponent {
   @Input() game!: Game;
   @Input() type!: 'myGame' | 'general';
+  @Output() deleteGameEvent = new EventEmitter<string>();
   @Output() gameEvent = new EventEmitter<{
     type: 'myGame' | 'general';
     gameId: string;
@@ -18,5 +19,9 @@ export class GameTemplateComponent {
 
   buttonClicked() {
     this.gameEvent.emit({ type: this.type, gameId: this.game.id });
+  }
+  deleteClicked() {
+    if (this.type === 'myGame')
+      this.deleteGameEvent.emit(this.game.id);
   }
 }

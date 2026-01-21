@@ -1,19 +1,24 @@
 #content {
+  app-dice-roller {
+    position: absolute;
+  }
+
   padding: 1rem;
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr 1.5fr 2fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 2fr;
-  grid-template-areas:
-    "players inventory current-event npcs"
-    "players inventory current-event npcs"
-    "players info current-event npcs"
-    "actions info current-event other";
+  grid-template-areas: "players inventory current-event npcs"
+  "players inventory current-event npcs"
+  "players info current-event npcs"
+  "actions info current-event other";
+
   &.loading {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "loading";
   }
+
   &.hostLayout {
     grid-template-rows: 1fr 1fr 1fr 2fr;
     grid-template-areas:
@@ -36,8 +41,10 @@
       }
     }
   }
+
   .ui-container {
     display: none;
+
     &.show {
       position: absolute;
       top: 0;
@@ -75,6 +82,7 @@
       button {
         align-self: center;
       }
+
       #action-target {
         font-size: large;
         text-align: center;
@@ -108,6 +116,7 @@
           align-items: center;
           gap: 0.25rem;
           cursor: default;
+
           mat-icon {
             color: #f2c480;
           }
@@ -118,7 +127,44 @@
         }
       }
     }
+
+    #voteArea {
+      padding: .5rem;
+      height: 50%;
+      width: 15rem;
+      display: grid;
+      grid-template-areas:
+        "theme theme"
+        "yes no"
+        "votes votes";
+      gap: .5rem;
+      grid-template-rows: 2rem 4rem calc(100% - 7rem);
+      align-items: center;
+      justify-items: center;
+      background-color: #333;
+      border-radius: .5rem;
+      border: .2rem solid #222;
+
+      .votes {
+        height: 100%;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+
+        .vote {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          mat-icon {
+            color: #f2c480;
+          }
+        }
+      }
+    }
   }
+
   .container {
     display: grid;
     grid-template-rows: 3rem calc(100% - 3rem);
@@ -128,6 +174,7 @@
     background-color: #333;
     border-radius: 0.5rem;
     height: 100%;
+
     .header {
       font-size: x-large;
       color: #f2c480;
@@ -135,6 +182,7 @@
       width: 100%;
       text-align: center;
       padding: 0.75rem;
+
       hr {
         margin: 0.2rem 0;
         border: none;
@@ -143,6 +191,7 @@
         background-color: #f2c480;
       }
     }
+
     .body {
       display: grid;
       padding: 0.5rem;
@@ -157,6 +206,7 @@
       }
     }
   }
+
   #inventory {
     .header {
       display: flex;
@@ -167,20 +217,24 @@
         flex: 1;
         justify-content: space-evenly;
         gap: 1rem;
+
         .page {
           position: relative;
           color: #bbb;
           cursor: pointer;
           z-index: 2;
+
           &:hover {
             color: whitesmoke;
           }
+
           &.active {
             color: whitesmoke;
           }
         }
       }
     }
+
     .body {
       display: flex;
       gap: 0.5rem;
@@ -190,11 +244,13 @@
       border-radius: 0 0 0.5rem 0.5rem;
     }
   }
+
   #current-event {
     .header {
       display: flex;
       align-items: center;
       justify-content: center;
+
       .fake-button {
         padding: 0.25rem;
 
@@ -204,6 +260,7 @@
         }
       }
     }
+
     .body {
       height: 100%;
       display: grid;
@@ -216,36 +273,45 @@
         "map";
       gap: 0.5rem;
       font-size: larger;
-      #event-name {
+
+      >.text-name {
         font-size: larger;
       }
+
       #event-desc,
       #event-story {
         overflow-y: auto;
-        > span {
+
+        >span {
           height: 100%;
         }
       }
-      > div:not(:last-child),
+
+      >div:not(:last-child),
       div:not(:nth-child(3)) {
         display: flex;
         align-items: center;
         padding-right: 0.5rem;
+
         #event-location-link {
           cursor: pointer;
+
           &:hover {
             text-decoration: underline;
           }
         }
       }
+
       #map-container {
         z-index: 5;
       }
     }
   }
+
   .text-name {
     color: #f2c480;
   }
+
   #players,
   #npcs {
     .body {
@@ -254,6 +320,7 @@
       gap: 1rem;
     }
   }
+
   #character {
     .body {
       align-items: center;
@@ -261,7 +328,7 @@
       grid-template-areas:
         "name . . class"
         "sSpec sSpec eq eq"
-        "home home . .";
+        "home home stats stats";
       grid-template-rows: 2rem 2fr 5fr;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       font-size: large;
@@ -272,6 +339,7 @@
         justify-self: left;
         color: #f2c480;
       }
+
       #character-class {
         font-size: larger;
         justify-self: right;
@@ -280,6 +348,7 @@
       #speciesSpecial {
         font-size: medium;
       }
+
       #home-bonuses {
         display: flex;
         flex-direction: column;
@@ -305,9 +374,11 @@
           "armour armour armour";
         align-items: center;
         justify-items: center;
+
         mat-icon {
           color: #f2c480;
         }
+
         cursor: default;
 
         .character-armour {
@@ -315,16 +386,63 @@
           align-items: center;
         }
       }
+
+      #stats {
+        padding: 1rem;
+        height: 100%;
+        width: 100%;
+        display: grid;
+        grid-template-areas:
+          "str int"
+          "dex cun"
+          "end wil";
+        gap: 0.5rem;
+        align-items: center;
+        justify-items: center;
+
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          &.canSelect {
+            cursor: pointer;
+          }
+
+          mat-icon {
+            color: #f2c480;
+          }
+        }
+      }
     }
   }
+
   #actions {
     .body {
       grid-template-areas:
-        "useItem camp"
-        "talk trade"
-        "attack steal";
+        "useItem camp" "trade steal"
+        "attack attack";
       align-items: center;
       justify-items: center;
+
+      &.camping {
+        grid-template-areas:
+          "mandatory"
+          "standard";
+
+        >div {
+          display: grid;
+          grid-template-areas:
+            "title title title title"
+            "action action action action";
+          gap: .5rem;
+
+          >span {
+            font-size: larger;
+            text-align: center;
+          }
+        }
+      }
 
       .disabled {
         user-select: none;
@@ -333,12 +451,14 @@
       }
     }
   }
+
   #other {
     .body {
       align-items: center;
       justify-items: center;
     }
   }
+
   #player-control {
     .body {
       grid-template-areas:
@@ -347,29 +467,34 @@
         "statuses";
       grid-template-rows: 22.5% calc(55% - 1rem) 22.5%;
       gap: 0.5rem;
+
       .host-info-title {
         text-align: center;
         font-size: larger;
         color: #f2c480;
       }
-      > div {
+
+      >div {
         gap: 0.5rem;
         padding: 0.5rem;
         background-color: #333;
         border-radius: 0.5rem;
       }
+
       .current-actions {
         display: grid;
         grid-template-areas: "primary secondary";
         gap: 0.5rem;
         padding: 0;
         background-color: transparent;
-        > span {
+
+        >span {
           font-size: x-large;
           color: #f2c480;
           align-self: center;
           justify-self: center;
         }
+
         .current-action {
           display: grid;
           grid-template-areas: "title";
@@ -378,6 +503,7 @@
           background-color: #333;
           border-radius: 0.5rem;
           padding: 0.5rem;
+
           &.target {
             grid-template-areas:
               "title"
@@ -385,6 +511,7 @@
               "target";
             grid-template-rows: 20% 40% 40%;
           }
+
           &.item {
             grid-template-areas:
               "title"
@@ -392,6 +519,7 @@
               "item";
             grid-template-rows: 20% 40% 40%;
           }
+
           &.dots {
             grid-template-rows: 1fr 2fr;
             grid-template-areas:
@@ -400,6 +528,7 @@
           }
         }
       }
+
       .status-container {
         display: grid;
         grid-template-areas:
@@ -415,6 +544,7 @@
           max-height: calc(100% - 1rem);
           overflow-y: auto;
           padding: 0.5rem;
+
           .active-status {
             display: flex;
             align-items: center;
@@ -423,9 +553,11 @@
             padding: 0.5rem;
             border-radius: 0.5rem;
             cursor: pointer;
+
             &:hover {
               border: 0.2rem dashed #666;
             }
+
             &.selected {
               color: #f2c480;
               background-color: #444;
@@ -434,6 +566,7 @@
           }
         }
       }
+
       #inventory {
         display: grid;
         gap: 0;
@@ -441,13 +574,16 @@
         padding: 0;
         background-color: transparent;
         grid-template-rows: 3rem calc(100% - 6rem) 3rem;
+
         .header {
           background-color: #333;
           border-radius: 0.5rem 0.5rem 0 0;
         }
+
         .body {
           background-color: #222;
         }
+
         .footer {
           display: flex;
           justify-content: center;

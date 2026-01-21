@@ -19,6 +19,7 @@ export class PlayerNpcComponent {
   @Input() object?: Player | NPC;
   @Input() selectedTargetId?: string;
   @Input() myTurn?: boolean;
+  @Input() isCamping?: boolean;
   @Input() currentPlayer?: string;
   @Input() role? = '';
   @Output() clickedEvent = new EventEmitter<void>();
