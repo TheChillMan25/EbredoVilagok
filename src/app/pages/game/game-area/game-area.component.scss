@@ -37,6 +37,10 @@
       #actions {
         .body {
           grid-template-areas: "useItem attack";
+
+          &.reaction {
+            grid-template-areas: "useItem attack react";
+          }
         }
       }
     }
@@ -66,7 +70,8 @@
       color: #f2c480;
     }
 
-    form {
+    >form,
+    >div {
       max-height: 90%;
       min-width: 15rem;
       width: 20rem;
@@ -78,14 +83,78 @@
       border: 0.2rem solid #222;
       border-radius: 0.5rem;
       overflow-y: auto;
+    }
 
+    >form {
       button {
         align-self: center;
       }
 
-      #action-target {
-        font-size: large;
-        text-align: center;
+      &#addRaiderForm {
+        >div {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .specialProperties {
+          display: grid;
+          gap: 1rem;
+          width: 100%;
+        }
+
+        .stats {
+          display: grid;
+          grid-template-areas:
+            "physical mental"
+            "main main";
+          grid-template-columns: calc(50% - .5rem) calc(50% - .5rem);
+          gap: .5rem;
+
+          .stat-container {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+
+            &#main {
+              flex-direction: row;
+            }
+          }
+        }
+      }
+
+      &#actionForm {
+        &.mandatory {
+          width: 25rem;
+          display: grid;
+          grid-template-columns: calc(70% - 1rem) 30%;
+          grid-template-areas:
+            "title title"
+            "subtitle subtitle"
+            "target target"
+            "mandatoryCA mandatoryCA"
+            "type customCA"
+            "button button"
+          ;
+        }
+
+        &.item {
+          grid-template-columns: auto;
+          grid-template-areas:
+            "title"
+            "subtitle"
+            "target"
+            "mandatoryCA"
+            "type"
+            "item"
+            "button"
+          ;
+        }
+
+        #action-target {
+          font-size: large;
+          text-align: center;
+        }
       }
 
       .host-info-title {
@@ -104,10 +173,36 @@
         pointer-events: none;
       }
 
-      #newItemEffect {
+      #newEffectsContainer {
         display: flex;
         flex-direction: column;
         gap: 1rem;
+
+        .item-effect {
+          cursor: default;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          span {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+
+            &:nth-child(2) {
+              margin-left: auto;
+            }
+
+            mat-icon {
+              color: #f2c480;
+              ;
+            }
+          }
+
+          .fake-button {
+            padding: .3rem;
+          }
+        }
       }
 
       #newEffectsContainer {
@@ -125,6 +220,29 @@
             margin-left: auto;
           }
         }
+      }
+
+      .doneCampActions {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    >#reactionContainer {
+      display: grid;
+      grid-template-areas:
+        "title title"
+        "noReact dodge"
+        "attackBack parry";
+      align-items: center;
+      justify-items: center;
+
+      &.host {
+        grid-template-areas:
+          "title title"
+          "noReact dodge"
+          "attackBack parry"
+          "random random";
       }
     }
 
@@ -160,6 +278,144 @@
           mat-icon {
             color: #f2c480;
           }
+        }
+      }
+    }
+
+    #loot,
+    #looted {
+      width: 35%;
+      height: 50%;
+
+      .item-container {
+        height: 100%;
+        width: 100%;
+        padding-right: .5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow-y: auto;
+      }
+
+      >.lootButtons {
+        width: 100%;
+        display: flex;
+        margin-top: auto;
+        align-self: center;
+        justify-content: space-evenly;
+      }
+    }
+
+    #tradePanel {
+      width: 60%;
+      height: 90%;
+      display: grid;
+      grid-template-columns: repeat(2, calc(50% - 0.5rem));
+      grid-template-rows:
+        3rem repeat(2, calc((100% - 6rem) / 2));
+
+      >.ui-title {
+        grid-column: span 2;
+        grid-row: 1;
+        font-size: xx-large;
+      }
+
+      >#tradeFoods {
+        grid-row: 2;
+        grid-column: 1;
+      }
+
+      >#tradeDrinks {
+        grid-row: 2;
+        grid-column: 2;
+      }
+
+      >#tradeMeds {
+        grid-row: 3;
+        grid-column: 1;
+      }
+
+      >#tradeCigars {
+        grid-row: 3;
+        grid-column: 2;
+      }
+
+      .fullHeight {
+        grid-row: span 2 !important;
+      }
+    }
+
+    #tradeAndSell {
+      height: 90%;
+      width: 30%;
+
+      >div:not(#tradeButtons):not(#tradeAndSellControl) {
+        display: none;
+      }
+
+      #tradeButtons {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        .fake-button {
+          padding: .5rem;
+        }
+
+        .prices {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+      }
+
+      #tradeAndSellControl {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        >mat-icon {
+          opacity: 0.5;
+          cursor: pointer;
+        }
+
+        .selected {
+          opacity: 1;
+        }
+      }
+
+      #myItems {
+        #itemsToSell {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+      }
+
+      .show {
+        display: flex !important;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    #tradePanel,
+    #tradeAndSell {
+      .tradeContainer {
+        height: 100%;
+
+        .ui-title {
+          align-self: flex-start;
+        }
+
+        .itemContainer {
+          padding: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: .5rem;
+          height: calc(100% - 1rem);
+          overflow-y: auto;
         }
       }
     }
@@ -274,6 +530,31 @@
       gap: 0.5rem;
       font-size: larger;
 
+      &.camping {
+        grid-template-areas:
+          "name checkCamp"
+          "done done"
+          ". ."
+          "loc loc"
+          "map map";
+
+        >.fake-button {
+          justify-self: right;
+          padding: .75rem;
+        }
+
+        #doneMandatoryActions {
+          display: flex;
+          justify-content: space-evenly;
+          padding-right: 0;
+        }
+
+        >.text-name {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
       >.text-name {
         font-size: larger;
       }
@@ -308,6 +589,11 @@
     }
   }
 
+
+  .notCompleted {
+    opacity: 0.5;
+  }
+
   .text-name {
     color: #f2c480;
   }
@@ -318,6 +604,12 @@
       display: flex;
       flex-direction: column;
       gap: 1rem;
+
+      #buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+      }
     }
   }
 
@@ -326,7 +618,7 @@
       align-items: center;
       justify-items: center;
       grid-template-areas:
-        "name . . class"
+        "name name money class"
         "sSpec sSpec eq eq"
         "home home stats stats";
       grid-template-rows: 2rem 2fr 5fr;
@@ -365,6 +657,16 @@
         }
       }
 
+      #characterMoney {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+
+        mat-icon {
+          color: #f2c480;
+        }
+      }
+
       #equipment {
         width: 100%;
         height: 100%;
@@ -380,6 +682,10 @@
         }
 
         cursor: default;
+
+        >span {
+          padding: .5rem;
+        }
 
         .character-armour {
           display: flex;
@@ -405,10 +711,6 @@
           align-items: center;
           gap: 1rem;
 
-          &.canSelect {
-            cursor: pointer;
-          }
-
           mat-icon {
             color: #f2c480;
           }
@@ -417,10 +719,14 @@
     }
   }
 
+  .canSelect {
+    cursor: pointer;
+  }
+
   #actions {
     .body {
       grid-template-areas:
-        "useItem camp" "trade steal"
+        "useItem camp" "trade loot"
         "attack attack";
       align-items: center;
       justify-items: center;
@@ -430,7 +736,7 @@
           "mandatory"
           "standard";
 
-        >div {
+        >div:not(.fake-button) {
           display: grid;
           grid-template-areas:
             "title title title title"
@@ -442,6 +748,14 @@
             text-align: center;
           }
         }
+      }
+
+      &.inCombat {
+        grid-template-areas: "useItem attack";
+      }
+
+      &.reaction {
+        grid-template-areas: "useItem attack react";
       }
 
       .disabled {
@@ -456,6 +770,14 @@
     .body {
       align-items: center;
       justify-items: center;
+      grid-template-areas: "leave";
+
+      &.myTurn {
+        grid-template-areas:
+          "finishTurn finishTurn"
+          "roll lastRoll"
+          "leave leave";
+      }
     }
   }
 
@@ -508,8 +830,21 @@
             grid-template-areas:
               "title"
               "type"
-              "target";
-            grid-template-rows: 20% 40% 40%;
+              "target"
+              "damage";
+            grid-template-rows: 20% 30% 30% 20%;
+
+            &.react {
+              grid-template-areas:
+                "title title"
+                "type type"
+                "target target"
+                "damage react";
+            }
+
+            .fake-button {
+              padding: .5rem;
+            }
           }
 
           &.item {

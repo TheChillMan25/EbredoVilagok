@@ -89,6 +89,7 @@ export class UserService {
             stats: characterData?.['stats'] ?? {},
             equipment: characterData?.['equipment'] ?? {},
             virtues: characterData?.['virtues'] ?? {},
+            coins: 200,
             items: characterData?.['items'] ?? {
               food: [],
               specialItems: [],

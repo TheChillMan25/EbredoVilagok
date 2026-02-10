@@ -10,6 +10,7 @@
   gap: 1rem;
   grid-template-rows: 1fr 1fr 1fr 15fr;
   grid-template-columns: 3fr 5.5fr;
+
   #lobby-header {
     width: 100%;
     display: grid;
@@ -29,14 +30,17 @@
       color: #f2c480;
       font-size: xx-large;
     }
-    .lobby-owner{
+
+    .lobby-owner {
       font-size: large;
     }
   }
+
   #players,
   #adventure {
     padding: 1rem;
   }
+
   .title {
     padding: 0.5rem;
     display: inline-block;
@@ -48,7 +52,8 @@
 
   .text-name {
     color: #f2c480;
-    > span {
+
+    >span {
       color: whitesmoke;
     }
   }
@@ -84,8 +89,8 @@
 
     .adventure-events {
       display: flex;
+      gap: .5rem;
       overflow-x: auto;
-      padding: 0.5rem;
     }
   }
 
@@ -94,7 +99,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    button{
+
+    button {
       font-size: large
     }
   }

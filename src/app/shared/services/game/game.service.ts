@@ -24,6 +24,7 @@ import {
 import { docData, Firestore, collectionData } from '@angular/fire/firestore';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
+import { GameErrorCauses } from '../../models/game_interfaces';
 
 export enum PlayerRole {
   HOST = 'HOST',
@@ -123,8 +124,9 @@ export class GameService {
                 const isJoined = game.players?.some(
                   (player) => player.id === user.uid
                 );
+                const hasSpace = (game.players?.length || 0) < game.maxPlayers;
 
-                return !isHost && !isJoined;
+                return !isHost && !isJoined && hasSpace;
               });
             }),
             catchError((error) => {
@@ -216,7 +218,7 @@ export class GameService {
       }
 
       const currentPlayers = gameData.players || [];
-      if (currentPlayers.length >= 6) {
+      if (currentPlayers.length >= gameData.maxPlayers) {
         throw new Error('Nem lehet csatlakozni! Megtelt a lobby.');
       }
       if (currentPlayers.some((p) => p.id === user.uid)) {
@@ -269,7 +271,8 @@ export class GameService {
         case PlayerRole.PLAYER:
           const gameData = gameDoc.data() as Game;
           const newPlayers = gameData.players.filter((p) => p.id !== user.uid);
-          updateData = { players: newPlayers };
+          const newPlayerOrder = gameData.playerOrder.filter((po) => po.id !== user.uid);
+          updateData = { players: newPlayers, playerOrder: newPlayerOrder };
           break;
         default:
           throw new Error('Nem lehet kezelni a szerepkört!');
@@ -278,8 +281,9 @@ export class GameService {
       if (updateData) {
         await updateDoc(gameDocRef, updateData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Hiba a játék elhagyásakor: ', error);
+      error.cause = GameErrorCauses.GameUpdateError;
       throw error;
     }
   }
@@ -290,8 +294,15 @@ export class GameService {
         this.authService.currentUser.pipe(take(1))
       );
       if (!user) throw new Error('A felhasználó nem található!');
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+      const userData = userSnap.data() as User;
+
+      const updatedGames = userData.games.filter(g => g !== gameId);
       const gameDocRef = doc(this.firestore, 'Games', gameId);
       await deleteDoc(gameDocRef);
+      return await updateDoc(userDocRef, { games: updatedGames });
     } catch (error) {
       console.error('Hiba a játék törlésekor: ', error);
       return;

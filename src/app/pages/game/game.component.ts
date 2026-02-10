@@ -153,19 +153,24 @@ export class GameComponent {
         ),
         maxPlayers: newGameValue.maxPlayers || 1,
         isPublic: newGameValue.isPublic || false,
+        prevPlayer: '',
         currentPlayer: '',
         currentEvent: 0,
         players: [],
-        initiatives: [],
+        playerOrder: [],
         isOpen: false,
         started: false,
-        isCamping: false,
+        camp: {
+          isCamping: false,
+          raid: [],
+          campActions: { fire: 0, tents: 0, traps: 0, guard: 0 },
+        },
         currentAction: {
           performer: { id: '', name: '' },
           primary: {} as GameAction,
           secondary: {} as GameAction,
         },
-        vote: { theme: '', starter: '', votes: [], }
+        vote: { theme: '', starter: '', votes: [], },
       };
       await this.gameService.createGame(newGame);
 
@@ -233,7 +238,7 @@ export class GameComponent {
         return;
       }
       this.isLoading = true;
-      const game = id ? id : this.joinGameForm.get('joinID')?.value;
+      const gameId: string = id ? id : this.joinGameForm.get('joinID')?.value;
       const selectedCharacter = this.myCharacters.find(
         (c) => c.id === characterId
       );
@@ -255,13 +260,13 @@ export class GameComponent {
         },
         inCombat: false,
         isVoting: false,
-        remainingCampActions: 8 + selectedCharacter.stats.physical.end,
+        campActionPoints: 0,
       };
 
-      let g = await this.gameService.joinGame(game, player);
+      let g = await this.gameService.joinGame(gameId, player);
       if (g) {
         this.gameService.PlayerRole = PlayerRole.PLAYER;
-        this.router.navigate(['/jatek', game, 'lobby']);
+        this.router.navigate(['/jatek', gameId, 'lobby']);
       }
     } catch (error) {
       this.isLoading = false;

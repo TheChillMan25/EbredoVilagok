@@ -43,6 +43,7 @@ export interface Item {
   category: ItemCategory;
   uses?: number;
   effects?: ItemEffect[];
+  price?: number;
 }
 
 export interface Inventory extends Item {
@@ -64,8 +65,10 @@ export interface Food extends Item {
 export interface Weapon extends Item {
   diceCount: number;
   damage: string;
+  weaponType: 'melee' | 'ranged';
   price: number;
   handed: 0 | 1 | 2;
+  reload?: boolean;
 }
 
 export interface Armour extends Item {
@@ -75,16 +78,16 @@ export interface Armour extends Item {
 }
 
 export interface Cigar extends Item {
-  color: string;
-  spice: string;
-  effectDesc: string;
-  effects: ItemEffect[];
+  color?: string;
+  spice?: string;
+  effectDesc?: string;
 }
 
 export enum StatusType {
   BLEED = 'BLEED',
   POISON = 'POISON',
   BURN = 'BURN',
+  LOST_LIMB = 'LOST_LIMB',
   PROSTHETIC = 'PROSTHETIC',
   FIRE_RES = 'FIRE_RES',
   POISON_RES = 'POISON_RES',
@@ -95,6 +98,8 @@ export enum StatusType {
   SLEEP = 'SLEEP',
   STRESS_RES = 'STRESS_RES',
   FULL_BELLY = 'FULL_BELLY',
+  DEAD = 'DEAD',
+  INSANE = 'INSANE',
 }
 
 export interface ActiveStatus {
@@ -132,8 +137,12 @@ export enum GameErrorCauses {
   NoStatToBuff,
   NoStatusToAdd,
   NoStatusToRemove,
+  NPCInCombat,
+  NoPermission,
+  NPCNotFound,
+  GameUpdateError
 }
 
-export enum CharacterCreationErrorCauses{
+export enum CharacterCreationErrorCauses {
   InvalidFormData
 }

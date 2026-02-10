@@ -22,6 +22,7 @@ export const foodRations: Food[] = [
     uses: 1,
     heal: 0,
     size: ItemSize.NORMAL,
+    price: 5,
     effects: [
       {
         type: EffectType.HEAL_HP,
@@ -38,6 +39,7 @@ export const foodRations: Food[] = [
     uses: 2,
     heal: 1,
     size: ItemSize.NORMAL,
+    price: 15,
     effects: [
       {
         type: EffectType.HEAL_HP,
@@ -54,6 +56,7 @@ export const foodRations: Food[] = [
     uses: 3,
     heal: 2,
     size: ItemSize.NORMAL,
+    price: 25,
     effects: [
       {
         type: EffectType.HEAL_HP,
@@ -70,6 +73,7 @@ export const foodRations: Food[] = [
     uses: 4,
     heal: 3,
     size: ItemSize.NORMAL,
+    price: 35,
     effects: [
       {
         type: EffectType.HEAL_HP,
@@ -91,6 +95,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: '1 kis sebet gyógyít be',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.HEAL_SMALL_WOUND,
@@ -109,6 +114,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: '2 kis sebet gyógyít be',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 20,
     effects: [
       {
         type: EffectType.HEAL_SMALL_WOUND,
@@ -127,6 +133,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: 'Gyógyulsz 1 stresszt',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.HEAL_SP,
@@ -146,6 +153,7 @@ export const medicalItems: SpecialItem[] = [
       'Gyógyulsz 2 stresszt és minden 1 mezőre lévő szövetséges karakter szintén gyógyul 1 stresszt',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 25,
     effects: [
       {
         type: EffectType.HEAL_SP,
@@ -165,6 +173,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: 'Elállítja a vérzést',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 30,
     effects: [
       {
         type: EffectType.REMOVE_STATUS,
@@ -184,6 +193,7 @@ export const medicalItems: SpecialItem[] = [
       'Tűzállóvá teszi és enyhíti az égett bőrt. Elállítja és megakadályozza az égést',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 35,
     effects: [
       {
         type: EffectType.REMOVE_STATUS,
@@ -208,6 +218,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: 'A legtöbb közönséges mérget hatástalanítja',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 20,
     effects: [
       {
         type: EffectType.REMOVE_STATUS,
@@ -226,6 +237,7 @@ export const medicalItems: SpecialItem[] = [
     effectDesc: 'Azonnal begyógyít 1 kis sebet. Függőséget tud okozni',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 20,
     effects: [
       {
         type: EffectType.HEAL_SMALL_WOUND,
@@ -245,6 +257,7 @@ export const medicalItems: SpecialItem[] = [
       'Azonnal begyógyít 2 kis sebet. Nagyobb eséllyel függőséget tud okozni',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 35,
     effects: [
       {
         type: EffectType.HEAL_SMALL_WOUND,
@@ -264,6 +277,7 @@ export const medicalItems: SpecialItem[] = [
       'Egy nagy sebet semlegesít, de a végtaggal kapcsolatos próbákra hátrányt kapsz',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 50,
     effects: [
       {
         type: EffectType.HEAL_LARGE_WOUND,
@@ -285,6 +299,7 @@ export const specialDrinks: SpecialItem[] = [
     effectDesc: '10 percig előnyt kapsz minden erőpróbábra.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 15,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -305,6 +320,7 @@ export const specialDrinks: SpecialItem[] = [
       '5 percig a következő varázslatod ár megfizetése nélkül tudod használni.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 15,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -325,6 +341,7 @@ export const specialDrinks: SpecialItem[] = [
       'Erős altató hatása van, akár egy napon keresztül is alszik az elfogyasztója, ha meg nem zavarják.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 20,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -345,6 +362,7 @@ export const specialDrinks: SpecialItem[] = [
       'Egy óráig nem tud idegösszeroppanást kapni az elfogyasztója, a hatás lejárta után viszont az összes elszenvedett stressz sebzést megkapja.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 35,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -364,6 +382,7 @@ export const specialDrinks: SpecialItem[] = [
     effectDesc: '10 percig beszélni tudsz az állatok nyelvén a környezetedben.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 20,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -383,6 +402,7 @@ export const specialDrinks: SpecialItem[] = [
     effectDesc: 'A táborozásnál felér egy elégséges étkezéssel.',
     size: ItemSize.NORMAL,
     uses: 1,
+    price: 25,
     effects: [
       {
         type: EffectType.ADD_STATUS,
@@ -482,6 +502,7 @@ export const weapons: Weapon[] = [
     price: 10,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Pálca',
@@ -493,6 +514,7 @@ export const weapons: Weapon[] = [
     price: 12,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Ostor',
@@ -504,6 +526,7 @@ export const weapons: Weapon[] = [
     price: 15,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Kard',
@@ -515,6 +538,7 @@ export const weapons: Weapon[] = [
     price: 20,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Hosszúkard',
@@ -526,6 +550,7 @@ export const weapons: Weapon[] = [
     price: 30,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Rapír',
@@ -537,6 +562,7 @@ export const weapons: Weapon[] = [
     price: 25,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Szablya',
@@ -548,6 +574,7 @@ export const weapons: Weapon[] = [
     price: 22,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Fejsze',
@@ -559,6 +586,7 @@ export const weapons: Weapon[] = [
     price: 18,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Csatabárd',
@@ -570,6 +598,7 @@ export const weapons: Weapon[] = [
     price: 35,
     handed: 2,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Buzogány',
@@ -581,6 +610,7 @@ export const weapons: Weapon[] = [
     price: 20,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Lándzsa',
@@ -592,6 +622,7 @@ export const weapons: Weapon[] = [
     price: 24,
     handed: 2,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Acél öklök',
@@ -603,6 +634,7 @@ export const weapons: Weapon[] = [
     price: 28,
     handed: 2,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Kalapács',
@@ -614,6 +646,7 @@ export const weapons: Weapon[] = [
     price: 20,
     handed: 2,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Pöröly',
@@ -624,7 +657,7 @@ export const weapons: Weapon[] = [
     damage: 'd8',
     price: 32,
     handed: 1,
-    size: ItemSize.NORMAL,
+    size: ItemSize.NORMAL, weaponType: 'melee',
   },
   {
     name: 'Fokos',
@@ -636,6 +669,7 @@ export const weapons: Weapon[] = [
     price: 26,
     handed: 1,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
   {
     name: 'Íj',
@@ -647,6 +681,8 @@ export const weapons: Weapon[] = [
     price: 40,
     handed: 2,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Számszeríj',
@@ -658,6 +694,8 @@ export const weapons: Weapon[] = [
     price: 50,
     handed: 2,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Pisztoly',
@@ -669,6 +707,8 @@ export const weapons: Weapon[] = [
     price: 60,
     handed: 1,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Karabély',
@@ -680,6 +720,8 @@ export const weapons: Weapon[] = [
     price: 75,
     handed: 2,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Kézi ágyú',
@@ -691,6 +733,8 @@ export const weapons: Weapon[] = [
     price: 100,
     handed: 2,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Kézi balliszta',
@@ -702,6 +746,8 @@ export const weapons: Weapon[] = [
     price: 120,
     handed: 2,
     size: ItemSize.NORMAL,
+    reload: true,
+    weaponType: 'ranged',
   },
   {
     name: 'Üres',
@@ -713,6 +759,7 @@ export const weapons: Weapon[] = [
     price: 0,
     handed: 0,
     size: ItemSize.NORMAL,
+    weaponType: 'melee',
   },
 ];
 
@@ -777,6 +824,8 @@ export const cigars: Cigar[] = [
     spice: 'Paprika és bors',
     effectDesc: '+1 erő 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,
@@ -796,6 +845,8 @@ export const cigars: Cigar[] = [
     spice: 'Alma és menta',
     effectDesc: '+1 ügyesség 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,
@@ -815,6 +866,8 @@ export const cigars: Cigar[] = [
     spice: 'Dió és fahéj',
     effectDesc: '+1 kitartás 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,
@@ -834,6 +887,8 @@ export const cigars: Cigar[] = [
     spice: 'Leander és rózsa',
     effectDesc: '+1 ész 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,
@@ -853,6 +908,8 @@ export const cigars: Cigar[] = [
     spice: 'Citrus és vadvirágok',
     effectDesc: '+1 fortély 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,
@@ -872,6 +929,8 @@ export const cigars: Cigar[] = [
     spice: 'Búzavirág és kamilla',
     effectDesc: '+1 akaraterő 10 percig',
     size: ItemSize.NORMAL,
+    uses: 1,
+    price: 10,
     effects: [
       {
         type: EffectType.BUFF_STAT,

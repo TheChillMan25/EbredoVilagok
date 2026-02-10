@@ -73,7 +73,7 @@
       </div>
     </div>
   </form>
-  <div id="add-event-ui" class="ui-container" [ngClass]="{ show: showEvents }">
+  <div id="add-event-ui" class="ui-container" [ngClass]="{ show: eventsPanelVisible }">
     <div class="header">
       <div class="header-text">Új esemény</div>
       <div class="fake-button" (click)="hideUIs('events')">
@@ -109,7 +109,7 @@
       </button>
     </form>
   </div>
-  <div id="add-npc-ui" class="ui-container" [ngClass]="{ show: showNPCs }">
+  <div id="add-npc-ui" class="ui-container" [ngClass]="{ show: npcPanelVisible }">
     <div class="header">
       <div class="header-text">Új NPC</div>
       <div class="fake-button" (click)="hideUIs('npcs')">
@@ -128,12 +128,26 @@
         <mat-radio-button (click)="setAttitude('hostile')" aria-labelledby="attitude" value="hostile"
           labelPosition="before">Ellenséges</mat-radio-button>
       </mat-radio-group>
+      <span style="display: flex; align-items: center;">
+        <mat-icon fontSet="material-symbols-outlined" matTooltip="Az NPC megjelenik az esemény elejétől fogva"
+          matTooltipPosition="before">
+          visibility
+        </mat-icon>
+        <mat-checkbox formControlName="isVisible">
+          Látható
+        </mat-checkbox>
+      </span>
       @if(attitude === 'neutral'){
       <span style="display: flex; align-items: center;">
-        <mat-icon fontSet="material-symbols-outlined" matTooltip="Az NPC-vel lehet kereskedni">
+        <mat-icon fontSet="material-symbols-outlined" matTooltip="Az NPC-vel lehet kereskedni"
+          matTooltipPosition="before">
           help
         </mat-icon>
-        <mat-checkbox formControlName="isTrader">Kereskedő</mat-checkbox></span>
+        <mat-checkbox formControlName="isTrader">Kereskedő</mat-checkbox>
+        <div style="margin-left: auto;" class="fake-button" (click)="traderPanelVisible = true">
+          <mat-icon fontSet="material-symbols-outlined">visibility</mat-icon>
+        </div>
+      </span>
       }
       <mat-form-field appearance="outline">
         <mat-label>Karakter</mat-label>
@@ -345,6 +359,297 @@
     </form>
     }
   </div>
+  @if(traderPanelVisible){
+  <div id="traderUIContainer">
+    <div id="traderUI" class="ui-container" [ngClass]="{show: true}">
+      <div class="header">
+        <div class="header-text">Kereskedő beállítások</div>
+        <div class="fake-button" (click)="hideUIs('trader')"><mat-icon>close</mat-icon></div>
+      </div>
+      <form class="body" [formGroup]="traderForm" (ngSubmit)="setTraderSettings()">
+        <span class="group-title" style="grid-area: foodTitle;">
+          Ételek
+          <mat-checkbox [checked]="AllItemsInGroupAreSelected('foods')"
+            (change)="toggleAllInGroup($event.checked,'foods')" style="margin-right: auto;"></mat-checkbox>
+          <div class="fake-button" (click)="showUIs('newItem', ItemType.FOOD)">
+            <mat-icon>add</mat-icon>
+          </div>
+        </span>
+        <div id="foods" class="item-container" style="grid-area: foodItems;">
+          @for (item of foods; track item.id) {
+          <div class="item">
+            <span class="item-name" style="grid-area: name;">{{ item.name }}</span>
+            <mat-checkbox style="grid-area: checkbox;" [checked]="itemIsInTrades(item.id!, 'foods')"
+              (change)="addItemToTrades(item, 'foods')">
+            </mat-checkbox>
+            @if (itemIsInTrades(item.id!, 'foods')) {
+            <input style="width: 3rem;" type="number" min="1" max="999"
+              [formControl]="getItemControl(item.id!, 'foods')!" matTooltip="Egyedi darabszám"
+              matTooltipPosition="above" />
+            }
+          </div>
+          }
+        </div>
+        <span class="group-title" style="grid-area: cigarTitle;">
+          Dohányáruk
+          <mat-checkbox [checked]="AllItemsInGroupAreSelected('cigars')"
+            (change)="toggleAllInGroup($event.checked,'cigars')" style="margin-right: auto;"></mat-checkbox>
+          <div class="fake-button" (click)="showUIs('newItem', ItemType.CIGAR)">
+            <mat-icon>add</mat-icon>
+          </div>
+        </span>
+        <div id="cigars" class="item-container" style="grid-area: cigarItems;">
+          @for (item of cigars; track item.id) {
+          <div class="item">
+            <span class="item-name" style="grid-area: name;">{{ item.name }} - {{item.spice}}</span>
+            <mat-checkbox style="grid-area: checkbox;" [checked]="itemIsInTrades(item.id!, 'cigars')"
+              (change)="addItemToTrades(item, 'cigars')">
+            </mat-checkbox>
+            @if (itemIsInTrades(item.id!, 'cigars')) {
+            <input style="width: 3rem;" type="number" min="1" max="999"
+              [formControl]="getItemControl(item.id!, 'cigars')!" matTooltip="Egyedi darabszám"
+              matTooltipPosition="above" />
+            }
+          </div>
+          }
+        </div>
+        <span id="medTitle" class="group-title" style="grid-area: medTitle;">
+          Gyógyszerek
+          <mat-checkbox [checked]="AllItemsInGroupAreSelected('medicalItems')"
+            (change)="toggleAllInGroup($event.checked,'medicalItems')" style="margin-right: auto;"></mat-checkbox>
+          <div class="fake-button" (click)="showUIs('newItem', ItemType.MEDICAL)">
+            <mat-icon>add</mat-icon>
+          </div>
+        </span>
+        <span id="specTitle" class="group-title" style="grid-area: specTitle;">
+          Különleges italok
+          <mat-checkbox [checked]="AllItemsInGroupAreSelected('specialDrinks')"
+            (change)="toggleAllInGroup($event.checked,'specialDrinks')" style="margin-right: auto;"></mat-checkbox>
+          <div class="fake-button" (click)="showUIs('newItem', ItemType.SPECIAL)">
+            <mat-icon>add</mat-icon>
+          </div>
+        </span>
+        <div id="medicalItems" class="item-container" style="grid-area: medItems;">
+          @for (item of medicalItems; track item.id) {
+          <div class="item">
+            <span class="item-name" style="grid-area: name;">{{ item.name }}</span>
+            <mat-checkbox style="grid-area: checkbox;" [checked]="itemIsInTrades(item.id!, 'medicalItems')"
+              (change)="addItemToTrades(item, 'medicalItems')">
+            </mat-checkbox>
+            @if (itemIsInTrades(item.id!, 'medicalItems')) {
+            <input style="width: 3rem;" type="number" min="1" max="999"
+              [formControl]="getItemControl(item.id!, 'medicalItems')!" matTooltip="Egyedi darabszám"
+              matTooltipPosition="above" />
+            }
+          </div>
+          }
+        </div>
+        <div id="specDrinks" class="item-container" style="grid-area: specDrinks;">
+          @for (item of specialDrinks; track item.id) {
+          <div class="item">
+            <span class="item-name" style="grid-area: name;">{{ item.name }}</span>
+            <mat-checkbox style="grid-area: checkbox;" [checked]="itemIsInTrades(item.id!, 'specialDrinks')"
+              (change)="addItemToTrades(item, 'specialDrinks')">
+            </mat-checkbox>
+            @if (itemIsInTrades(item.id!, 'specialDrinks')) {
+            <input style="width: 3rem;" type="number" min="1" max="999"
+              [formControl]="getItemControl(item.id!, 'specialDrinks')!" matTooltip="Egyedi darabszám"
+              matTooltipPosition="above" />
+            }
+          </div>
+          }
+        </div>
+        <button mat-flat-button [disabled]="!canSetTrades()" type="submit"
+          style="grid-area: button;">Megerősítés</button>
+      </form>
+    </div>
+    @if(newItemPanelVisible){
+    <div id="newItemUI" class="ui-container" [ngClass]="{show: true}">
+      <div class="header">
+        <div class="header-text">Új tárgy hozzáadása</div>
+        <div class="fake-button" (click)="hideUIs('newItem')"><mat-icon>close</mat-icon></div>
+      </div>
+      <form [formGroup]="newItemForm" (ngSubmit)="addNewItemToTradableItems()">
+        <mat-form-field appearance="outline">
+          <mat-label>Név (min. 3) {{newItemForm.get('name')?.value.length}}/30</mat-label>
+          <input matInput type="text" formControlName="name" minlength="3" maxlength="30">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Leírás (min. 3) {{newItemForm.get('desc')?.value.length}}/200</mat-label>
+          <textarea matInput formControlName="desc" cdkTextareaAutosize cdkAutosizeMaxRows="10"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Típus</mat-label>
+          <mat-select formControlName="type">
+            @for (type of ItemTypes; track $index) {
+            <mat-option [value]="type.value">
+              {{type.viewValue}}
+              <mat-icon fontSet="material-symbols-outlined">{{type.icon}}</mat-icon>
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Használatok száma</mat-label>
+          <input matInput type="number" formControlName="uses" min="1" max="100">
+        </mat-form-field>
+        @if(['MEDICAL', 'SPECIAL'].includes(newItemForm.get('type')?.value)){
+        <mat-checkbox formControlName="isPartyWide">Csapat szintű hatás</mat-checkbox>
+        <mat-checkbox formControlName="combat">Harc közben is használható</mat-checkbox>
+        }
+        @if(newItemForm.get('type')?.value === 'CIGAR'){
+        <mat-form-field appearance="outline">
+          <mat-label>Szín</mat-label>
+          <input matInput type="text" formControlName="color" minlength="3" maxlength="15">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Fűszerezés</mat-label>
+          <input matInput type="text" formControlName="spice" minlength="3" maxlength="15">
+        </mat-form-field>
+        }
+        @if(['SPECIAL', 'CIGAR'].includes(newItemForm.get('type')?.value)){
+        <mat-form-field appearance="outline">
+          <mat-label>Hatás leírás (min. 3) {{newItemForm.get('effectDesc')?.value.length}}/200</mat-label>
+          <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="10" formControlName="effectDesc"></textarea>
+        </mat-form-field>
+        }
+        <mat-form-field appearance="outline">
+          <mat-label>Ár</mat-label>
+          <input matInput type="number" formControlName="price" min="1" max="10000">
+        </mat-form-field>
+        @if(newItemError !== '' || newItemForm.get('name')?.hasError('whitespace') &&
+        newItemForm.get('name')?.value.length > 0 ||
+        newItemForm.get('desc')?.hasError('whitespace') && newItemForm.get('desc')?.value.length > 0 ||
+        newItemForm.get('effectDesc')?.hasError('whitespace') && newItemForm.get('effectDesc')?.value.length
+        > 0){
+        <mat-error>
+          @if(newItemForm.get('name')?.hasError('whitespace') && newItemForm.get('name')?.value.length > 0){
+          A név nem lehet üres.
+          }
+          @else if(newItemForm.get('desc')?.hasError('whitespace') && newItemForm.get('desc')?.value.length > 0){
+          A leírás nem lehet üres.
+          }
+          @else if(newItemForm.get('effectDesc')?.hasError('whitespace') && newItemForm.get('effectDesc')?.value.length
+          > 0){
+          A hatás leírás nem lehet üres.
+          }
+          @else{{{newItemError}}}
+        </mat-error>
+        }
+        <button mat-flat-button type="submit">Létrehoz</button>
+        <span class="header-text" style="display: flex; align-items: center; cursor: default"
+          (click)="toggleEffectForm()">
+          Hatás hozzáadása
+          <mat-icon>
+            @if(newItemEffectPanelVisible){
+            arrow_drop_down
+            }
+            @else{
+            arrow_right
+            }
+          </mat-icon>
+        </span>
+        @if(newItemEffectPanelVisible){
+        <form [formGroup]="newItemEffectForm" (ngSubmit)="addEffectToItem()">
+          <mat-form-field appearance="outline">
+            <mat-label>Típus</mat-label>
+            <mat-select formControlName="type">
+              @for (item of EffectTypes; track $index) {
+              <mat-option [value]="item.value">
+                {{item.name}}
+                <mat-icon fontSet="material-symbols-outlined">{{item.icon}}</mat-icon>
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if(['BUFF_STAT', 'ADD_STATUS', 'REMOVE_STATUS'].includes(newItemEffectForm.get('type')?.value)){
+          @if(newItemEffectForm.get('type')?.value === 'BUFF_STAT'){
+          <mat-form-field appearance="outline">
+            <mat-label>Stat</mat-label>
+            <mat-select formControlName="stat">
+              @for (stat of Stats; track $index) {
+              <mat-option [value]="stat.value">
+                {{stat.name}}
+                <mat-icon fontSet="material-symbols-outlined">
+                  {{stat.icon}}
+                </mat-icon>
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          }
+          @else {
+          <mat-form-field appearance="outline">
+            <mat-label>Státusz</mat-label>
+            <mat-select formControlName="status">
+              @for (status of StatusTypes; track $index) {
+              <mat-option [value]="status.value">
+                {{getStatusDetails(status.value).name}}
+                <mat-icon fontSet="material-symbols-outlined">{{getStatusDetails(status.value).icon}}</mat-icon>
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          }
+          }
+          @if(!['REMOVE_STATUS', 'BUFF_STAT'].includes(newItemEffectForm.get('type')?.value) ||
+          ['BLEED', 'POISION', 'BURN'].includes(newItemEffectForm.get('status')?.value)){
+          <mat-form-field appearance="outline">
+            <mat-label>Érték</mat-label>
+            <input matInput type="number" formControlName="value" min="1" max="50" step="1">
+          </mat-form-field>
+          }
+          <mat-form-field appearance="outline">
+            <mat-label>Időtartam (kör)</mat-label>
+            <input matInput type="number" formControlName="duration" min="1" max="1000">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Célpont</mat-label>
+            <mat-select formControlName="target">
+              <mat-option value="self">Játékos</mat-option>
+              <mat-option value="target">Választott célpont</mat-option>
+              <mat-option value="party">Csapat</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-flat-button type="submit">Hozzáad</button>
+        </form>
+        }
+      </form>
+      <div id="itemEffects">
+        @for (item of newItemForm.get('effects')?.value; track $index) {
+        <div class="item-effect">
+          <span [matTooltip]="`${item.duration} kör`">
+            <mat-icon fontSet="material-symbols-outlined">{{getEffectDetails(item.type).icon}}</mat-icon>
+            {{getEffectDetails(item.type).name}}
+          </span>
+          @if(['BUFF_STAT', 'ADD_STATUS', 'REMOVE_STATUS'].includes(item.type)){
+          <span [matTooltip]=" item.value ? `-${item.value} HP sebzés` : ''">
+            @if(item.type ==='BUFF_STAT'){
+            {{getStatDetails(item.stat).name}}
+            }@else{
+            {{getStatusDetails(item.status).name}}
+            }
+            <mat-icon fontSet="material-symbols-outlined">
+              @if(item.type ==='BUFF_STAT'){
+              {{getStatDetails(item.stat).icon}}
+              }@else{
+              {{getStatusDetails(item.status).icon}}
+              }
+            </mat-icon>
+          </span>
+          }
+          <div class="fake-button"
+            [style.margin-left]="['BUFF_STAT', 'ADD_STATUS', 'REMOVE_STATUS'].includes(item.type) ? '0' : 'auto'"
+            (click)="removeEffectFromItem($index)">
+            <mat-icon>delete</mat-icon>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
   <div id="user-manual" [ngClass]="{ show: this.showUseManual }">
     <mat-card appearance="outlined">
       <mat-card-header><mat-card-title>Használati útmutató</mat-card-title><mat-card-subtitle>Hogyan készíthetsz

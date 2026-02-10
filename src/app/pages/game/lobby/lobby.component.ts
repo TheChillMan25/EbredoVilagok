@@ -178,6 +178,7 @@ export class LobbyComponent implements CanComponentDeactivate {
         if (player.id === this.currentUserId) {
           return {
             ...player,
+            inCombat: this.game?.camp?.raid?.length > 0,
             status:
               player.status === PlayerStatus.READY
                 ? PlayerStatus.NOTREADY
@@ -206,25 +207,26 @@ export class LobbyComponent implements CanComponentDeactivate {
           'Nem indítható el a játék, mert még nem mindenki áll készen!';
         return;
       }
-      let initiatives: { id: string; initiative: number; finished: boolean }[] =
+      let playerOrder: { id: string; initiative: number; finished: boolean }[] =
         [];
-
+      const ca = Math.ceil(21 / this.game.players.length) + 4;
       this.game.players.forEach((p) => {
+        p.campActionPoints = ca + p.character?.stats?.physical?.end!;
         p.initiative = Math.ceil(Math.random() * 20);
-        initiatives.push({
+        playerOrder.push({
           id: p.id,
           initiative: p.initiative,
           finished: false,
         });
       });
-      initiatives.sort((a, b) => b.initiative - a.initiative);
-      const firstPlayer = initiatives[0].id;
+      playerOrder.sort((a, b) => b.initiative - a.initiative);
+      const firstPlayer = playerOrder[0].id;
 
       const updateData = {
         started: true,
         isOpen: false,
         players: this.game.players,
-        initiatives: initiatives,
+        playerOrder: playerOrder,
         currentPlayer: firstPlayer,
       };
 

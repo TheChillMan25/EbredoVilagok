@@ -36,6 +36,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private debugArrow: THREE.ArrowHelper | null = null;
   private allStoppedSince: number | null = null;
   private readonly finalStableWindowMs = 600; // 0.6s
+  private lastTime = 0;
 
   private _rollModifier: number = 0;
   @Input() set rollModifier(value: number) {
@@ -67,11 +68,11 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     [key: string]: { scale: number; mass: number; radius: number };
   } = {
       d4: { scale: 1, mass: 1, radius: 1.0 },
-      d6: { scale: 1, mass: 1.5, radius: 0.7 },
-      d8: { scale: 1, mass: 1.5, radius: 1.0 },
-      d10: { scale: 1, mass: 1.8, radius: 0.8 },
-      d12: { scale: 1, mass: 2, radius: 1.0 },
-      d20: { scale: 1, mass: 2.5, radius: 1.1 },
+      d6: { scale: 1, mass: 1, radius: 0.7 },
+      d8: { scale: 1, mass: 1, radius: 1.0 },
+      d10: { scale: 1, mass: 1, radius: 0.8 },
+      d12: { scale: 1, mass: 1, radius: 1.0 },
+      d20: { scale: 1, mass: 1, radius: 1.1 },
     };
 
   private diceMaterial!: CANNON.Material;
@@ -85,6 +86,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       scale: 1.0,
     }); */
     this.loadAndCreateDice();
+    this.lastTime = performance.now();
     this.animate();
   }
 
@@ -143,7 +145,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private initPhysics() {
     this.world = new CANNON.World();
     //this.world.gravity.set(0, 0, 0);
-    this.world.gravity.set(0, -7 * 10, 0);
+    this.world.gravity.set(0, -3 * 10, 0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
     (this.world.solver as CANNON.GSSolver).iterations = 20;
     this.world.allowSleep = true;
@@ -443,7 +445,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     const visibleWidth = visibleHeight * aspect;
     const minDimension = Math.min(visibleWidth, visibleHeight);
     const throwRadius = minDimension * 0.4;
-    const throwHeight = 5; // Ilyen magasról
+    const throwHeight = 3; // Ilyen magasról
 
     this.diceObjects.forEach((obj, i) => {
       // --- RESET ---
@@ -568,11 +570,10 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       }
     }, 50);
 
-    // Biztonsági kényszerzárás 10mp után
     setTimeout(() => {
       clearInterval(checkInterval);
       if (this.isRolling) this.finishRoll();
-    }, 2000);
+    }, 5000);
   }
 
   private finishRoll() {
@@ -603,18 +604,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     this.rollFinished.emit(finalRoll);
   }
 
-  private updateDebugArrow(position: CANNON.Vec3, direction: CANNON.Vec3) {
-    const pos = new THREE.Vector3(position.x, position.y, position.z);
-    const dir = new THREE.Vector3(direction.x, direction.y, direction.z);
-
-    if (!this.debugArrow) {
-      this.debugArrow = new THREE.ArrowHelper(dir, pos, 5, 0xff0000);
-      this.scene.add(this.debugArrow);
-    } else {
-      this.debugArrow.position.copy(pos);
-      this.debugArrow.setDirection(dir);
-    }
-  }
 
   private calculateRealResult(obj: {
     body: CANNON.Body;
@@ -658,7 +647,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       `Kocka: ${obj.type
       }, FÖLDET ÉRŐ index: ${bestFaceIndex}, Egyezés: ${maxDot.toFixed(2)}`,
     );
-    return this.getFaceMap(obj.type, bestFaceIndex);
+    return this.getFaceMap(obj.type, bestFaceIndex) > 1 ? this.getFaceMap(obj.type, bestFaceIndex) : 1;
   }
 
   private getFaceMap(type: string, faceIndex: number): number {
@@ -668,8 +657,8 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       d8: [5, 6, 1, 7, 3, 4, 2, 8],
       d10: [4, 9, 4, 3, 10, 6, 4, 7, 2, 5, 2, 5, 8, 7, 6, 1, 4, 10, 6, 9],
       d12: [
-        12, 1, 1, 2, 2, 8, 7, 3, 10, 10, 10, 4, 5, 5, 5, 4, 4, 6, 7, 7, 2, 8, 6,
-        8, 1, 9, 9, 3, 3, 6, 11, 11, 11, 9, 12, 9,
+        12, 1, 1, 2, 2, 8, 7, 3, 10, 10, 10, 10, 5, 5, 5, 4, 4, 6, 7, 7, 2, 8, 6,
+        8, 1, 9, 1, 3, 3, 6, 11, 11, 11, 9, 12, 9,
       ],
       d20: [
         6, 13, 2, 10, 3, 9, 15, 12, 14, 11, 4, 19, 16, 18, 8, 17, 7, 1, 5, 20,
@@ -682,9 +671,15 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
 
   animate = () => {
     this.animationId = requestAnimationFrame(this.animate);
+    const time = performance.now();
+    const dt = (time - this.lastTime) / 1000;
+
+    this.lastTime = time;
     const fixedTimeStep = 1 / 60;
-    const maxSubSteps = 3;
-    this.world.step(fixedTimeStep, undefined as any, maxSubSteps);
+    const maxSubSteps = 10;
+
+    const safeDt = Math.min(dt, 0.1);
+    this.world.step(fixedTimeStep, safeDt, maxSubSteps);
 
     this.diceObjects.forEach((obj) => {
       obj.mesh.position.copy(obj.body.position as any);

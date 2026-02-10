@@ -17,12 +17,16 @@ import { getStatusDetails } from '../../../../shared/functional/functions';
 })
 export class PlayerNpcComponent {
   @Input() object?: Player | NPC;
+  @Input() isRaid = false;
   @Input() selectedTargetId?: string;
   @Input() myTurn?: boolean;
   @Input() isCamping?: boolean;
   @Input() currentPlayer?: string;
+  @Input() prevPlayer?: string;
   @Input() role? = '';
   @Output() clickedEvent = new EventEmitter<void>();
+  @Output() removeRaiderEvent = new EventEmitter<string>();
+  @Output() toggleVisibilityEvent = new EventEmitter<string>();
 
   get hasPrimaryAction(): boolean {
     const actionsLeft = this.object?.actionsLeft;
@@ -35,7 +39,6 @@ export class PlayerNpcComponent {
     }
     return false;
   }
-
   get hasSecondaryAction(): boolean {
     const actionsLeft = this.object?.actionsLeft;
     if (
@@ -47,12 +50,20 @@ export class PlayerNpcComponent {
     }
     return false;
   }
-
   getStatusDetails(statusType: StatusType) {
     return getStatusDetails(statusType);
   }
-
   clicked() {
     this.clickedEvent.emit();
+  }
+  removeRaider(event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.removeRaiderEvent.emit(this.object?.id)
+  }
+  toggleVisibility(event: MouseEvent){
+    event.stopPropagation();
+    event.preventDefault();
+    this.toggleVisibilityEvent.emit(this.object?.id);
   }
 }

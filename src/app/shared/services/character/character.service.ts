@@ -21,10 +21,10 @@ import {
   providedIn: 'root',
 })
 export class CharacterService {
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService) { }
 
   async addCharacter(
-    character: Omit<Character, 'id' | 'userId'>
+    character: Character
   ): Promise<Character> {
     try {
       const user = await firstValueFrom(

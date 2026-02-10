@@ -183,21 +183,22 @@ export function getStat(stats: number[]) {
 
 function createRandomEquipment(itemService: ItemService) {
   while (true) {
-    const equipment = {
-      left: itemService.getItemByIndex(
-        'weapons',
-        Math.floor(Math.random() * itemService.getItemGroup('weapons').length)
-      ) as Weapon,
-      right: itemService.getItemByIndex(
-        'weapons',
-        Math.floor(Math.random() * itemService.getItemGroup('weapons').length)
-      ) as Weapon,
-      armour: itemService.getItemByIndex(
-        'armours',
-        Math.floor(Math.random() * itemService.getItemGroup('armours').length)
-      ) as Armour,
-    };
-    if (checkEquipment(equipment.left, equipment.right)) return equipment;
+    const left = itemService.getItemByIndex(
+      'weapons',
+      Math.floor(Math.random() * itemService.getItemGroup('weapons').length)) as Weapon;
+    const right = itemService.getItemByIndex(
+      'weapons',
+      Math.floor(Math.random() * itemService.getItemGroup('weapons').length)) as Weapon;
+    const armour = itemService.getItemByIndex(
+      'armours',
+      Math.floor(Math.random() * itemService.getItemGroup('armours').length)) as Armour
+    if (checkEquipment(left, right)) {
+      return {
+        left: { ...left },
+        right: { ...right },
+        armour: { ...armour }
+      };
+    }
   }
 }
 
@@ -298,6 +299,7 @@ export function createRandomCharacter(
       ],
       disadv: [Math.floor(Math.random() * disadvantages.length)],
     },
+    coins: 200,
     items: {
       food: food,
       specialItems: specItems,
@@ -313,34 +315,45 @@ export function createRandomCharacter(
   return randomCharacter;
 }
 
-export function createCharacter(form: FormGroup, itemService: ItemService): Omit<Character, 'id' | 'userId'> {
+export function createCharacter(
+  form: FormGroup, itemService: ItemService, id: string | null = null, userId: string | null = null
+): Character {
   if (form.invalid) {
     throw new Error('Karakter nem készíthető el, tölts ki minden kötelező mezőt!');
   }
   const formValue = form.value;
 
   let food: Food[] = [];
-  formValue.items.food.forEach((c: number | null) => {
-    if (c) {
-      food.push(itemService.getItemById('food', c) as Food);
-    }
-  });
+  if (formValue.items?.food) {
+    formValue.items.food.forEach((c: number | null) => {
+      if (c) {
+        const item = itemService.getItemById('food', c) as Food
+        food.push({ ...item });
+      }
+    });
+  }
   let special: SpecialItem[] = [];
-  formValue.items.specialItems.forEach((c: number | null) => {
-    if (c) {
-      special.push(
-        itemService.getItemById('allSpecial', c) as SpecialItem
-      );
-    }
-  });
+  if (formValue.items?.specialItems) {
+    formValue.items.specialItems.forEach((c: number | null) => {
+      if (c) {
+        const item = itemService.getItemById('allSpecial', c) as SpecialItem
+        special.push({ ...item });
+      }
+    });
+  }
   let general: (Item | Inventory)[] = [];
-  formValue.items.generalItems.forEach((c: number | null) => {
-    if (c) {
-      general.push(itemService.getItemById('allGeneral', c));
-    }
-  });
+  if (formValue.items?.generalItems) {
+    formValue.items.generalItems.forEach((c: number | null) => {
+      if (c) {
+        const item = itemService.getItemById('allGeneral', c) as Item | Inventory
+        general.push({ ...item });
+      }
+    });
+  }
 
-  let newCharacter: Omit<Character, 'id' | 'userId'> = {
+  let newCharacter: Character = {
+    id: id ?? '',
+    userId: userId ?? '',
     currentAdventure: '',
     name: formValue.name || '',
     species: formValue.species || '',
@@ -373,22 +386,23 @@ export function createCharacter(form: FormGroup, itemService: ItemService): Omit
         (itemService.getItemById(
           'weapons',
           formValue.equipment.left
-        ) as Weapon) ?? '',
+        ) as Weapon) ?? { ...itemService.getItemGroup('weapons')[21] },
       right:
         (itemService.getItemById(
           'weapons',
           formValue.equipment.right
-        ) as Weapon) ?? '',
+        ) as Weapon) ?? { ...itemService.getItemGroup('weapons')[21] },
       armour:
         (itemService.getItemById(
           'armours',
           formValue.equipment.armour
-        ) as Armour) ?? '',
+        ) as Armour) ?? { ...itemService.getItemGroup('armours')[0] },
     },
     virtues: {
-      virtues: formValue.virtues.virtues ?? [],
-      disadv: formValue.virtues.disadvantage ?? [],
+      virtues: formValue.virtues?.virtues ?? [],
+      disadv: formValue.virtues?.disadvantage ?? [],
     },
+    coins: 200,
     items: {
       food: food ?? [],
       specialItems: special ?? [],
@@ -435,30 +449,33 @@ export function getStatusDetails(statusType: StatusType): {
       return { icon: 'pets', name: 'Állatok nyelve' };
     case StatusType.SLEEP:
       return { icon: 'moon_stars', name: 'Alvás' };
+    case StatusType.LOST_LIMB:
+      return { icon: 'disabled_by_default', name: 'Elvesztett végtag' };
+    case StatusType.DEAD:
+      return { icon: 'sentiment_very_dissatisfied', name: 'Halott' };
+    case StatusType.INSANE:
+      return { icon: 'sentiment_extremely_dissatisfied', name: 'Őrült' };
     default:
       return { icon: '', name: '' };
   }
 }
 
-export function getEffectDetails(effectType: EffectType): {
-  icon: string;
-  name: string;
-} {
+export function getEffectDetails(effectType: EffectType): { icon: string; name: string; } {
   switch (effectType) {
     case EffectType.ADD_STATUS:
-      return { icon: 'add', name: 'Státusz' };
+      return { icon: 'add', name: 'Státusz adás' };
     case EffectType.REMOVE_STATUS:
-      return { icon: 'remove', name: 'Státusz' };
+      return { icon: 'remove', name: 'Státusz elvétel' };
     case EffectType.BUFF_STAT:
-      return { icon: 'trending_up', name: 'Stat' };
+      return { icon: 'trending_up', name: 'Stat erősítés' };
     case EffectType.HEAL_HP:
-      return { icon: 'health_metrics', name: 'Gyógyítás' };
+      return { icon: 'health_metrics', name: 'HP gyógyítás' };
     case EffectType.HEAL_SP:
-      return { icon: 'mindfulness', name: 'Gyógyítás' };
+      return { icon: 'mindfulness', name: 'SP gyógyítás' };
     case EffectType.HEAL_SMALL_WOUND:
-      return { icon: 'healing', name: 'Gyógyítás' };
+      return { icon: 'healing', name: 'Kis seb gyógyítás' };
     case EffectType.HEAL_LARGE_WOUND:
-      return { icon: 'femur', name: 'Gyógyítás' };
+      return { icon: 'femur', name: 'Nagy seb gyógyítás' };
     default:
       return { icon: '', name: '' };
   }

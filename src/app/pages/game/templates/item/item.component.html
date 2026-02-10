@@ -1,25 +1,59 @@
-<div class="item" (click)="selectItem()" [ngClass]="{ canUse: canUse }">
-  <span class="item-name">
+<div class="item" (click)="selectItem()"
+  [ngClass]="{ canUse: canUse, loot: lootable || looted, trade: trade || sell || inCart }">
+  <span class="item-name" style="grid-area: name;">
     <span style="grid-area: text">
       {{ item.name }} {{ $any(item).combat ? "(HK)" : "" }}
+      @if(pieces && pieces > 0){
+      ({{pieces}})x
+      }@else if($any(item).heal === undefined){
+      ({{item.uses}})
+      }@else if(trade || sell || inCart) {
+      ({{$any(item).buyAmount ? $any(item).buyAmount : $any(item).sellAmount ? $any(item).sellAmount : 1}})
+      }
     </span>
     @if($any(item).effectDesc){
-    <mat-icon
-      fontSet="material-symbols-outlined"
-      [matTooltip]="$any(item).effectDesc"
-    >
+    <mat-icon fontSet="material-symbols-outlined" [matTooltip]="$any(item).effectDesc">
       help
     </mat-icon>
-    } @if($any(item).heal !== undefined){
-    <span> ( {{ $any(item).uses }} fejadag ) </span>
-    <mat-icon
-      fontSet="material-symbols-outlined"
-      [matTooltip]="'Gyógyítás: ' + $any(item).heal + ' HP'"
-      style="grid-area: icon"
-    >
+    }
+    @if($any(item).heal !== undefined){
+    <span style="white-space: nowrap;"> {{ $any(item).uses }} fejadag </span>
+    <mat-icon fontSet="material-symbols-outlined" [matTooltip]="'Gyógyítás: ' + $any(item).heal + ' HP'"
+      style="grid-area: icon">
       help
     </mat-icon>
     }
   </span>
-  <span class="item-desc" matTooltip="{{ item.desc }}">{{ item.desc }}</span>
+  <span class="item-desc" style="grid-area: desc;" matTooltip="{{ item.desc }}">{{ item.desc }}</span>
+  @if(lootable){
+  <div class="fake-button" (click)="lootItem()" style="grid-area: lootButton;" fontSet="material-symbols-outlined">
+    <mat-icon>back_hand</mat-icon>
+  </div>
+  }@else if(looted || inCart) {
+  @if(inCart){
+  <span style="display: flex; align-items: center; gap:0.25rem">
+    {{ $any(item).buyAmount ? $any(item).buyAmount * item.price! : $any(item).sellAmount ? $any(item).sellAmount *
+    item.price! : item.price}}
+    <mat-icon fontSet="material-symbols-outlined">toll</mat-icon>
+  </span>
+  }
+  <div class="fake-button" (click)="putBack()" [style.grid-area]="looted ? 'lootButton' : 'tradeButton'"
+    fontSet="material-symbols-outlined">
+    <mat-icon>undo</mat-icon>
+  </div>
+  }@else if(trade) {
+  <span style="display: flex; align-items: center; gap:0.25rem">{{item.price}} <mat-icon
+      fontSet="material-symbols-outlined">toll</mat-icon></span>
+  <div class="fake-button" (click)="buyItem()" style="grid-area: tradeButton;" fontSet="material-symbols-outlined"
+    matTooltip="Vásárlás">
+    <mat-icon>shopping_cart</mat-icon>
+  </div>
+  }@else if(sell){
+  <span style="display: flex; align-items: center; gap:0.25rem">{{item.price}} <mat-icon
+      fontSet="material-symbols-outlined">toll</mat-icon></span>
+  <div class="fake-button" (click)="sellItem()" style="grid-area: tradeButton;" fontSet="material-symbols-outlined"
+    matTooltip="Eladás">
+    <mat-icon>sell</mat-icon>
+  </div>
+  }
 </div>

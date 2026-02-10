@@ -1,34 +1,66 @@
 .player {
+  position: relative;
   display: grid;
   grid-template-areas:
-    "name name actionsLeft hp sp"
-    "statEf statEf cIcon sW lW";
+    "name name tV actionsLeft hp sp"
+    "statEf statEf statEf cIcon sW lW";
   gap: 0.5rem;
   border-radius: 0.5rem;
   background-color: #333;
   padding: 1rem;
+  align-items: center;
+
+  mat-icon {
+    justify-self: center;
+  }
 
   &.selected {
     border: 0.2rem dashed #666;
     border-radius: 0.5rem;
   }
+
+  &.prevPlayer {
+    border: 0.2rem dotted #999;
+    border-radius: 0.5rem;
+  }
+
   &.canSelect {
     cursor: pointer;
   }
+
   &.current {
     border: 0.2rem solid #f2c480;
   }
+
   .player-name {
     font-size: large;
     color: #f2c480;
   }
+
   .player-stats {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+
     mat-icon {
       color: #f2c480;
     }
+  }
+
+  .fake-button {
+    padding: .3rem;
+  }
+
+  #toggleVisibility {
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+  }
+
+  .fake-button.remove {
+    position: absolute;
+    bottom: .5rem;
+    left: .5rem;
   }
 
   .action-indicator {
@@ -37,6 +69,13 @@
     height: 1.5rem;
     display: inline-block;
     vertical-align: middle;
+
+    &.camping {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+    }
 
     .action-line {
       position: absolute;

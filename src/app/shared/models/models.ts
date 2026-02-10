@@ -2,6 +2,7 @@ import { FieldValue, Timestamp } from 'firebase/firestore';
 import {
   ActiveStatus,
   Armour,
+  Cigar,
   Food,
   Inventory,
   Item,
@@ -37,6 +38,7 @@ export interface Character {
   species: string;
   class: string;
   level: number;
+  coins: number;
   specialProperties: {
     speciesProperty: number;
     home: number;
@@ -116,6 +118,17 @@ export interface ForumPostComment {
   createdAt: Timestamp | FieldValue;
 }
 
+export interface AdventureEvent {
+  id: number;
+  name: string;
+  desc: string;
+  story: string;
+  location: string;
+  NPCs: NPC[];
+  completed: boolean;
+  finished: boolean;
+}
+
 export interface Adventure {
   id: string;
   userId: string;
@@ -150,22 +163,14 @@ export interface GameParticipant {
 export interface Player extends GameParticipant {
   status: PlayerStatus;
   isVoting: boolean;
-  remainingCampActions: number;
-}
-
-export interface AdventureEvent {
-  id: number;
-  name: string;
-  desc: string;
-  story: string;
-  location: string;
-  NPCs: NPC[];
-  completed: boolean;
+  campActionPoints: number;
 }
 
 export interface NPC extends GameParticipant {
   attitude: 'neutral' | 'hostile';
   isTrader: boolean;
+  trades?: Record<string, { pieces: number; item: Food | SpecialItem | Cigar }[]> | null;
+  isVisible: boolean;
 }
 
 export interface Game {
@@ -174,8 +179,9 @@ export interface Game {
   ownerId: string;
   name: string;
   maxPlayers: number;
-  initiatives: { id: string; initiative: number; finished: boolean }[];
+  playerOrder: { id: string; initiative: number; finished: boolean }[];
   players: Player[];
+  prevPlayer: string;
   currentPlayer: string;
   currentAction: {
     performer: { id: string; name: string };
@@ -187,8 +193,17 @@ export interface Game {
   isOpen: boolean;
   isPublic: boolean;
   started: boolean;
-  isCamping: boolean;
   vote: { theme: string, starter: string, votes: { player: string, vote: boolean }[] };
+  camp: {
+    isCamping: boolean;
+    raid: NPC[];
+    campActions: {
+      fire: number;
+      tents: number;
+      traps: number;
+      guard: number;
+    }
+  }
 }
 
 export enum ActionType {
@@ -197,7 +212,7 @@ export enum ActionType {
   TALK = 'TALK',
   TRADE = 'TRADE',
   ATTACK = 'ATTACK',
-  STEAL = 'STEAL',
+  LOOT = 'LOOT',
   NONE = 'NONE',
 }
 
@@ -205,7 +220,7 @@ export enum MandatoryCampActions {
   START_FIRES = 'START_FIRES',
   SET_UP_TENTS = 'SET_UP_TENTS',
   SET_UP_TRAPS = 'SET_UP_TRAPS',
-  KEEP_WATCH = 'KEEP_WATCH',
+  GUARD = 'GUARD',
 }
 
 export enum StandardCampActions {
@@ -216,7 +231,21 @@ export enum StandardCampActions {
 }
 
 export interface GameAction {
-  type: ActionType;
+  type: ActionType | MandatoryCampActions | StandardCampActions;
   target?: string;
   item?: string;
+  value?: number;
+  reaction?: {
+    reacted: boolean,
+    reactionType?: Reaction,
+    success?: boolean | null,
+    counterDamage?: number,
+  };
+}
+
+export enum Reaction {
+  NO_REACTION = 'NO_REACTION',
+  DODGE = 'DODGE',
+  ATTACK_BACK = 'ATTACK_BACK',
+  PARRY = 'PARRY',
 }
