@@ -1,0 +1,84 @@
+<div class="player" (click)="clicked()" [ngClass]="{
+    current: object?.id === currentPlayer,
+    prevPlayer: object?.id === prevPlayer,
+    selected: selectedTargetId === object?.id,
+    canSelect: myTurn || role === 'host'
+  }">
+  @if(role === "host" && $any(object).isVisible !== undefined){
+  @if(($any(object)).isVisible){
+  <div class="fake-button" id="toggleVisibility" (click)="toggleVisibility($event)" style="grid-area: tV;">
+    <mat-icon>visibility</mat-icon>
+  </div>
+  }@else{
+  <div class="fake-button" id="toggleVisibility" (click)="toggleVisibility($event)" style="grid-area: tV;">
+    <mat-icon>visibility_off</mat-icon>
+  </div>
+  }
+
+  }
+  <span class="player-name" style="grid-area: name" [matTooltip]="object?.character?.name" matTooltipPosition="below">
+    {{ object?.name }}
+  </span>
+  <mat-icon fontSet="material-symbols-outlined" style="grid-area: cIcon"
+    [matTooltip]="$any(object).isVoting?'Szavazás' : object?.inCombat ? 'Harcban' : isCamping ? 'Táborozás' : ''"
+    matTooltipPosition="below">
+    @if(object?.inCombat){
+    swords
+    }
+    @else if ($any(object).isVoting) {
+    table_edit
+    }
+    @else if(isCamping){
+    camping
+    }
+  </mat-icon>
+  <span class="player-stats" matTooltip="{{ object?.character?.stats?.main?.hp }}/{{
+      object?.character?.stats?.main?.maxHP
+    }}" matTooltipPosition="above" style="grid-area: hp">
+    {{ object?.character?.stats?.main?.hp }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Hárítási pont" matTooltipPosition="above">
+      health_metrics
+    </mat-icon>
+  </span>
+  <span class="player-stats" matTooltip="{{ object?.character?.stats?.main?.sp }}/{{
+      object?.character?.stats?.main?.maxSP
+    }}" matTooltipPosition="above" style="grid-area: sp">
+    {{ object?.character?.stats?.main?.sp }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Stressz pont" matTooltipPosition="above">
+      mindfulness
+    </mat-icon>
+  </span>
+  <span class="player-stats" style="grid-area: sW">
+    {{ object?.character?.wounds?.small }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Kis seb(ek)" matTooltipPosition="below">
+      healing
+    </mat-icon>
+  </span>
+  <span class="player-stats" style="grid-area: lW">
+    {{ object?.character?.wounds?.large }}
+    <mat-icon fontSet="material-symbols-outlined" matTooltip="Nagy seb(ek)" matTooltipPosition="below">
+      femur
+    </mat-icon>
+  </span>
+  <div class="status-effects" style="grid-area: statEf">
+    @for (status of object?.character?.activeStatuses; track $index) {
+    <mat-icon fontSet="material-symbols-outlined"
+      [matTooltip]="`${getStatusDetails(status.type).name} (${status.duration} kör)`" matTooltipPosition="above">
+      {{ getStatusDetails(status.type).icon }}
+    </mat-icon>
+    }
+  </div>
+  @if(isRaid && role === "host"){
+  <button class="fake-button remove" (click)="removeRaider($event)"
+    matTooltip="Törlés"><mat-icon>delete</mat-icon></button>
+  }
+  <div class="action-indicator" style="grid-area: actionsLeft" [ngClass]="{camping: isCamping && !object?.inCombat}"
+    [matTooltip]="isCamping ? 'Tábori akciók' : 'Akciók'" matTooltipPosition="above">
+    @if(!isCamping || object?.inCombat){
+    <div class="action-line primary" matTooltip="Elsődleges" [ngClass]="{ available: hasPrimaryAction }"></div>
+    <div class="action-line secondary" matTooltip="Másodlagos" [ngClass]="{ available: hasSecondaryAction }"></div>
+    }@else {
+    {{$any(object)?.campActionPoints}} TA
+    }
+  </div>
+</div>

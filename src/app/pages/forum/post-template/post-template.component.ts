@@ -1,7 +1,5 @@
 import { Component, Input } from '@angular/core';
 import {
-  Adventure,
-  Character,
   ForumPost,
   ForumPostComment,
   ForumTopic,
@@ -32,6 +30,7 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 export function noWhitespaceValidator(
   control: AbstractControl
 ): ValidationErrors | null {
+  if (control.value === '') return null;
   const isWhitespace = (control.value || '').trim().length === 0;
   return isWhitespace ? { whitespace: true } : null;
 }
@@ -75,9 +74,7 @@ export class PostTemplateComponent {
 
   private commentsSub: Subscription | null = null;
 
-  constructor(
-    private forumService: ForumService
-  ) {}
+  constructor(private forumService: ForumService) {}
 
   ngOnInit() {
     this.initCommentForm();

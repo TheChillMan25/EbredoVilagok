@@ -1,0 +1,1013 @@
+#content {
+  app-dice-roller {
+    position: absolute;
+  }
+
+  .fake-button {
+    padding: clamp(0.25rem, 0.75rem, 1rem);
+  }
+
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1.5fr 2fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 2fr;
+  grid-template-areas: "players inventory current-event npcs"
+  "players inventory current-event npcs"
+  "players info current-event npcs"
+  "actions info current-event other";
+
+  &.loading {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "loading";
+  }
+
+  &.hostLayout {
+    grid-template-rows: 1fr 1fr 1fr 2fr;
+    grid-template-areas:
+      "players pControl current-event npcs"
+      "players pControl current-event npcs"
+      "players pControl current-event npcs"
+      "players pControl current-event other";
+
+    &.inspectNPC {
+      grid-template-areas:
+        "players inventory current-event npcs"
+        "players inventory current-event npcs"
+        "players info current-event npcs"
+        "actions info current-event other";
+
+      #actions {
+        .body {
+          grid-template-areas: "useItem attack";
+
+          &.reaction {
+            grid-template-areas: "useItem attack react";
+          }
+        }
+      }
+    }
+  }
+
+  .ui-container {
+    display: none;
+
+    &.show {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 10;
+    }
+
+    .ui-title {
+      align-self: center;
+      justify-self: center;
+      font-size: x-large;
+      color: #f2c480;
+    }
+
+    >form,
+    >div {
+      max-height: 90%;
+      min-width: 15rem;
+      width: 20rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: #333;
+      border: 0.2rem solid #222;
+      border-radius: 0.5rem;
+      overflow-y: auto;
+    }
+
+    >form {
+      button {
+        align-self: center;
+      }
+
+      &#addRaiderForm {
+        >div {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .specialProperties {
+          display: grid;
+          gap: 1rem;
+          width: 100%;
+        }
+
+        .stats {
+          display: grid;
+          grid-template-areas:
+            "physical mental"
+            "main main";
+          grid-template-columns: calc(50% - .5rem) calc(50% - .5rem);
+          gap: .5rem;
+
+          .stat-container {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+
+            &#main {
+              flex-direction: row;
+            }
+          }
+        }
+      }
+
+      &#actionForm {
+        &.mandatory {
+          width: 25rem;
+          display: grid;
+          grid-template-columns: calc(70% - 1rem) 30%;
+          grid-template-areas:
+            "title title"
+            "subtitle subtitle"
+            "target target"
+            "mandatoryCA mandatoryCA"
+            "type customCA"
+            "button button"
+          ;
+        }
+
+        &.item {
+          grid-template-columns: auto;
+          grid-template-areas:
+            "title"
+            "subtitle"
+            "target"
+            "mandatoryCA"
+            "type"
+            "item"
+            "button"
+          ;
+        }
+
+        #action-target {
+          font-size: large;
+          text-align: center;
+        }
+      }
+
+      .host-info-title {
+        font-size: x-large;
+        color: #f2c480;
+        text-align: center;
+      }
+
+      mat-error {
+        align-self: center;
+      }
+
+      .disabled {
+        opacity: 0.75;
+        user-select: none;
+        pointer-events: none;
+      }
+
+      #newEffectsContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .item-effect {
+          cursor: default;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          span {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+
+            &:nth-child(2) {
+              margin-left: auto;
+            }
+
+            mat-icon {
+              color: #f2c480;
+              ;
+            }
+          }
+
+          .fake-button {
+            padding: .3rem;
+          }
+        }
+      }
+
+      #newEffectsContainer {
+        .effect {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          cursor: default;
+
+          mat-icon {
+            color: #f2c480;
+          }
+
+          span:nth-child(2) {
+            margin-left: auto;
+          }
+        }
+      }
+
+      .doneCampActions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      &#soundForm{
+        .soundSetting{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+    }
+
+    >#reactionContainer {
+      display: grid;
+      grid-template-areas:
+        "title title"
+        "noReact dodge"
+        "attackBack parry";
+      align-items: center;
+      justify-items: center;
+
+      &.host {
+        grid-template-areas:
+          "title title"
+          "noReact dodge"
+          "attackBack parry"
+          "random random";
+      }
+
+      &.cantReact {
+        grid-template-areas:
+          "title"
+          "noReact";
+      }
+    }
+
+    #voteArea {
+      padding: .5rem;
+      height: 50%;
+      width: 15rem;
+      display: grid;
+      grid-template-areas:
+        "theme theme"
+        "yes no"
+        "votes votes";
+      gap: .5rem;
+      grid-template-rows: 2rem 4rem calc(100% - 7rem);
+      align-items: center;
+      justify-items: center;
+      background-color: #333;
+      border-radius: .5rem;
+      border: .2rem solid #222;
+
+      .votes {
+        height: 100%;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+
+        .vote {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          mat-icon {
+            color: #f2c480;
+          }
+        }
+      }
+    }
+
+    #loot,
+    #looted {
+      width: 35%;
+      height: 50%;
+
+      .item-container {
+        height: 100%;
+        width: 100%;
+        padding-right: .5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow-y: auto;
+      }
+
+      >.lootButtons {
+        width: 100%;
+        display: flex;
+        margin-top: auto;
+        align-self: center;
+        justify-content: space-evenly;
+      }
+    }
+
+    #tradePanel {
+      width: 60%;
+      height: 90%;
+      display: grid;
+      grid-template-columns: repeat(2, calc(50% - 0.5rem));
+      grid-template-rows:
+        3rem repeat(2, calc((100% - 6rem) / 2));
+
+      >.ui-title {
+        grid-column: span 2;
+        grid-row: 1;
+        font-size: xx-large;
+      }
+
+      >#tradeFoods {
+        grid-row: 2;
+        grid-column: 1;
+      }
+
+      >#tradeDrinks {
+        grid-row: 2;
+        grid-column: 2;
+      }
+
+      >#tradeMeds {
+        grid-row: 3;
+        grid-column: 1;
+      }
+
+      >#tradeCigars {
+        grid-row: 3;
+        grid-column: 2;
+      }
+
+      .fullHeight {
+        grid-row: span 2 !important;
+      }
+    }
+
+    #tradeAndSell {
+      height: 90%;
+      width: 30%;
+
+      >div:not(#tradeButtons):not(#tradeAndSellControl) {
+        display: none;
+      }
+
+      #tradeButtons {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        .fake-button {
+          padding: .5rem;
+        }
+
+        .prices {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+      }
+
+      #tradeAndSellControl {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+
+        >mat-icon {
+          opacity: 0.5;
+          cursor: pointer;
+        }
+
+        .selected {
+          opacity: 1;
+        }
+      }
+
+      #myItems {
+        #itemsToSell {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+      }
+
+      .show {
+        display: flex !important;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    #tradePanel,
+    #tradeAndSell {
+      .tradeContainer {
+        height: 100%;
+
+        .ui-title {
+          align-self: flex-start;
+        }
+
+        .itemContainer {
+          padding: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: .5rem;
+          height: calc(100% - 1rem);
+          overflow-y: auto;
+        }
+      }
+    }
+  }
+
+  .container {
+    display: grid;
+    grid-template-rows: 3rem calc(100% - 3rem);
+    grid-template-areas:
+      "header"
+      "body";
+    background-color: #333;
+    border-radius: 0.5rem;
+    height: 100%;
+
+    .header {
+      font-size: x-large;
+      color: #f2c480;
+      justify-self: center;
+      width: 100%;
+      text-align: center;
+      padding: 0.75rem;
+
+      hr {
+        margin: 0.2rem 0;
+        border: none;
+        height: 0.2rem;
+        width: 100%;
+        background-color: #f2c480;
+      }
+    }
+
+    .body {
+      display: grid;
+      padding: 0.5rem;
+      background-color: #292929;
+      border-radius: 0 0 0.5rem 0.5rem;
+      cursor: default;
+
+      .selected {
+        color: #f2c480;
+        border: 0.2rem dashed #666;
+        border-radius: 0.5rem;
+      }
+    }
+  }
+
+  #inventory {
+    .header {
+      display: flex;
+      gap: 0.5rem;
+
+      #inventory-pages {
+        display: flex;
+        flex: 1;
+        justify-content: space-evenly;
+        gap: 1rem;
+
+        .page {
+          position: relative;
+          color: #bbb;
+          cursor: pointer;
+          z-index: 2;
+
+          &:hover {
+            color: whitesmoke;
+          }
+
+          &.active {
+            color: whitesmoke;
+          }
+        }
+      }
+    }
+
+    .body {
+      display: flex;
+      gap: 0.5rem;
+      flex-direction: column;
+      overflow-y: auto;
+      background-color: #292929;
+      border-radius: 0 0 0.5rem 0.5rem;
+    }
+  }
+
+  #current-event {
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .fake-button {
+        padding: 0.25rem;
+
+        &.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
+    }
+
+    .body {
+      height: 100%;
+      display: grid;
+      grid-template-rows: 1fr 2fr 5fr 1fr 8fr;
+      grid-template-areas:
+        "name"
+        "desc"
+        "story"
+        "loc"
+        "map";
+      gap: 0.5rem;
+      font-size: larger;
+
+      &.camping {
+        grid-template-areas:
+          "name checkCamp"
+          "done done"
+          ". ."
+          "loc loc"
+          "map map";
+
+        >.fake-button {
+          justify-self: right;
+          padding: .75rem;
+        }
+
+        #doneMandatoryActions {
+          display: flex;
+          justify-content: space-evenly;
+          padding-right: 0;
+        }
+
+        >.text-name {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
+      >.text-name {
+        font-size: larger;
+      }
+
+      #event-desc,
+      #event-story {
+        overflow-y: auto;
+
+        >span {
+          height: 100%;
+        }
+      }
+
+      >div:not(:last-child),
+      div:not(:nth-child(3)) {
+        display: flex;
+        align-items: center;
+        padding-right: 0.5rem;
+
+        #event-location-link {
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      #map-container {
+        z-index: 5;
+      }
+    }
+  }
+
+
+  .notCompleted {
+    opacity: 0.5;
+  }
+
+  .text-name {
+    color: #f2c480;
+  }
+
+  #players,
+  #npcs {
+    .body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      #buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+      }
+    }
+  }
+
+  #character {
+    .body {
+      align-items: center;
+      justify-items: center;
+      grid-template-areas:
+        "name name money class"
+        "sSpec sSpec eq eq"
+        "home home stats stats";
+      grid-template-rows: 2rem 2fr 5fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      font-size: large;
+      gap: clamp(.25rem, 1vw, 0.5rem);
+
+      #character-name {
+        font-size: larger;
+        justify-self: left;
+        color: #f2c480;
+      }
+
+      #character-class {
+        font-size: larger;
+        justify-self: right;
+      }
+
+      #speciesSpecial {
+        font-size: medium;
+        display: -webkit-box;
+        -webkit-line-clamp: clamp(1, 3, 4);
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #home-bonuses {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: 100%;
+        width: 100%;
+
+        #bonus-title {
+          color: #f2c480;
+        }
+
+        .bonus {
+          font-size: medium;
+        }
+      }
+
+      #characterMoney {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+
+        mat-icon {
+          color: #f2c480;
+        }
+      }
+
+      #equipment {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-areas:
+          "left wIcon right"
+          "armour armour armour";
+        align-items: center;
+        justify-items: center;
+
+        mat-icon {
+          color: #f2c480;
+        }
+
+        cursor: default;
+
+        >span {
+          padding: .5rem;
+        }
+
+        .character-armour {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      #stats {
+        padding: clamp(.25rem, 1vw, .5rem);
+        height: 100%;
+        width: 100%;
+        display: grid;
+        grid-template-areas:
+          "str int"
+          "dex cun"
+          "end wil";
+        gap: clamp(.25rem, 1vw, 1rem);
+        align-items: center;
+        justify-items: center;
+
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: clamp(.25rem, 1vw, 1rem);
+
+          mat-icon {
+            color: #f2c480;
+          }
+        }
+      }
+    }
+  }
+
+  .canSelect {
+    cursor: pointer;
+  }
+
+  #actions {
+    .body {
+      grid-template-areas:
+        "useItem camp" "trade loot"
+        "attack attack";
+      align-items: center;
+      justify-items: center;
+
+      &.camping {
+        grid-template-areas:
+          "mandatory"
+          "standard";
+
+        >div:not(.fake-button) {
+          display: grid;
+          grid-template-areas:
+            "title title title title"
+            "action action action action";
+          gap: .5rem;
+
+          >span {
+            font-size: larger;
+            text-align: center;
+          }
+        }
+      }
+
+      &.inCombat {
+        grid-template-areas: "useItem attack";
+      }
+
+      &.reaction {
+        grid-template-areas: "useItem attack react";
+      }
+
+      .disabled {
+        user-select: none;
+        pointer-events: none;
+        opacity: 0.75;
+      }
+    }
+  }
+
+  #other {
+    .body {
+      align-items: center;
+      justify-items: center;
+      grid-template-areas:
+        "leave"
+        "voiceControls";
+
+      #voiceControls {
+        display: flex;
+        gap: 1rem;
+
+        .fake-button {
+          padding: .5rem;
+        }
+      }
+
+      &.myTurn {
+        grid-template-areas:
+          "finishTurn finishTurn"
+          "roll lastRoll"
+          "leave leave"
+          "voiceControls voiceControls";
+      }
+    }
+  }
+
+  #player-control {
+    .body {
+      grid-template-areas:
+        "actions"
+        "items"
+        "statuses";
+      grid-template-rows: 22.5% calc(55% - 1rem) 22.5%;
+      gap: 0.5rem;
+
+      .host-info-title {
+        text-align: center;
+        font-size: larger;
+        color: #f2c480;
+      }
+
+      >div {
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background-color: #333;
+        border-radius: 0.5rem;
+      }
+
+      .current-actions {
+        display: grid;
+        grid-template-areas: "primary secondary";
+        gap: 0.5rem;
+        padding: 0;
+        background-color: transparent;
+
+        >span {
+          font-size: x-large;
+          color: #f2c480;
+          align-self: center;
+          justify-self: center;
+        }
+
+        .current-action {
+          display: grid;
+          grid-template-areas: "title";
+          justify-items: center;
+          align-items: center;
+          background-color: #333;
+          border-radius: 0.5rem;
+          padding: 0.5rem;
+
+          &.target {
+            grid-template-areas:
+              "title"
+              "type"
+              "target"
+              "damage";
+            grid-template-rows: 20% 30% 30% 20%;
+
+            &.react {
+              grid-template-areas:
+                "title title"
+                "type type"
+                "target target"
+                "damage react";
+            }
+
+            .fake-button {
+              padding: .5rem;
+            }
+          }
+
+          &.item {
+            grid-template-areas:
+              "title"
+              "type"
+              "item";
+            grid-template-rows: 20% 40% 40%;
+          }
+
+          &.dots {
+            grid-template-rows: 1fr 2fr;
+            grid-template-areas:
+              "title"
+              "dots";
+          }
+        }
+      }
+
+      .status-container {
+        display: grid;
+        grid-template-areas:
+          "title title title title"
+          "add statuses statuses remove";
+        grid-template-rows: 3rem calc(100% - 3rem);
+        align-items: center;
+        justify-items: center;
+
+        .statuses {
+          display: grid;
+          gap: 0.5rem;
+          max-height: calc(100% - 1rem);
+          overflow-y: auto;
+          padding: 0.5rem;
+
+          .active-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+
+            &:hover {
+              border: 0.2rem dashed #666;
+            }
+
+            &.selected {
+              color: #f2c480;
+              background-color: #444;
+              border: none;
+            }
+          }
+        }
+      }
+
+      #inventory {
+        display: grid;
+        gap: 0;
+        grid-template-areas: "header" "body" "footer";
+        padding: 0;
+        background-color: transparent;
+        grid-template-rows: 3rem calc(100% - 6rem) 3rem;
+
+        .header {
+          background-color: #333;
+          border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .body {
+          background-color: #222;
+        }
+
+        .footer {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.fake-button.disabled {
+  user-select: none;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+@media(max-width: 1300px) {
+  #content {
+    #character {
+      .body {
+        grid-template-areas:
+          "name name class class"
+          "sSpec sSpec eq eq"
+          "home home stats stats"
+          "money money stats stats";
+
+        #speciesSpecial {
+          font-size: smaller;
+        }
+      }
+    }
+
+    #inventory {
+      .header {
+        #inventory-pages {
+          .page {
+            #medIcon {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+app-small-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

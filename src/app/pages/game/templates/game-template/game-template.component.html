@@ -1,0 +1,33 @@
+<div class="game">
+  <span class="game-name">{{ game.name }}</span>
+  @if(game.isPublic && type === 'myGame'){
+  <mat-icon matTooltip="Publikus">public</mat-icon>
+  }
+  @else if(!game.isPublic && type === 'myGame'){
+  <mat-icon matTooltip="Privát">lock</mat-icon>
+  }
+  <span class="game-players"><span class="current-players">
+      {{ game.players.length }}
+    </span>
+    /
+    <span class="max-players">
+      {{ game.maxPlayers }}
+    </span>
+    <mat-icon>person</mat-icon>
+  </span>
+  <div class="fake-button" (click)="buttonClicked()">
+    <mat-icon>
+      @if(type === 'general'){
+      login
+      }
+      @if(type === 'myGame'){
+      play_arrow
+      }
+    </mat-icon>
+  </div>
+  @if(type === 'myGame'){
+  <div class="fake-button" (click)="deleteClicked()">
+    <mat-icon>delete</mat-icon>
+  </div>
+  }
+</div>

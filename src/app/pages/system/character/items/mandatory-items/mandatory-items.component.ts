@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { foodRations, medicalItems } from '../../../../../shared/models/items';
+import { ItemService } from '../../../../../shared/services/item/item.service';
+import {
+  Food,
+  SpecialItem,
+} from '../../../../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-mandatory-items',
@@ -12,8 +16,21 @@ import { foodRations, medicalItems } from '../../../../../shared/models/items';
   ],
 })
 export class MandatoryItemsComponent {
-  foodRations = foodRations;
-  medicalItems = medicalItems;
-  foodRationDataSource = new MatTableDataSource<any>(foodRations);
+  foodRations: Food[] = [];
+  medicalItems: SpecialItem[] = [];
+  foodRationDataSource?: MatTableDataSource<Food>;
   displayedColumns = ['silany', 'szereny', 'elegseges', 'boseges'];
+  @Input() set foodItems(value: Food[] | undefined) {
+    if (value && value.length > 0) {
+      this.foodRations = value;
+      this.foodRationDataSource = new MatTableDataSource<Food>(
+        this.foodRations
+      );
+    }
+  }
+  @Input() set healItems(value: SpecialItem[] | undefined) {
+    if (value && value.length > 0) {
+      this.medicalItems = value;
+    }
+  }
 }

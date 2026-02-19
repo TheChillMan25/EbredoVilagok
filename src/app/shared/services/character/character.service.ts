@@ -21,10 +21,10 @@ import {
   providedIn: 'root',
 })
 export class CharacterService {
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService) { }
 
   async addCharacter(
-    character: Omit<Character, 'id' | 'userId'>
+    character: Character
   ): Promise<Character> {
     try {
       const user = await firstValueFrom(
@@ -94,7 +94,7 @@ export class CharacterService {
 
           return characters;
         } catch (error) {
-          console.error('Error fetching characters:', error);
+          console.error('Error fetching characters: ', error);
           return [];
         }
       }),

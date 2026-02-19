@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import {
   convertSpeciesNameToKey,
+  createCharacter,
   createRandomCharacter,
-  getItem,
   setBackground,
 } from '../../../shared/functional/functions';
 import {
@@ -19,25 +19,27 @@ import { MatSelectModule } from '@angular/material/select';
 import { NationData } from '../../../shared/models/NationData';
 import { species } from '../../world/species/species_desc_data';
 import { MatIcon } from '@angular/material/icon';
-import { armours, getWeapon, weapons } from '../../../shared/models/equipment';
-import { Armour } from '../../../shared/models/character_interfaces';
+import {
+  Armour,
+  CharacterCreationErrorCauses,
+  Food,
+  Inventory,
+  Item,
+  SpecialItem,
+  Weapon,
+} from '../../../shared/models/game_interfaces';
 import {
   CharacterDisadvantages,
   CharacterVirtues,
-  getCharacterVirDisAdv,
 } from '../../../shared/models/virtues_disadvantages';
-import {
-  foodRations,
-  items,
-  medicalItems,
-  specialDrinks,
-} from '../../../shared/models/items';
 import { Character } from '../../../shared/models/models';
 import { CharacterService } from '../../../shared/services/character/character.service';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Observable } from 'rxjs';
+import { ItemService } from '../../../shared/services/item/item.service';
+import { noWhitespaceValidator } from '../../forum/post-template/post-template.component';
 
 export interface CanComponentDeactivate {
   canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
@@ -60,6 +62,7 @@ export interface CanComponentDeactivate {
 })
 export class KarakterComponent implements CanComponentDeactivate {
   isLoading: boolean = false;
+  dontWarnBeforeLeave = false;
 
   errorMessage: string = '';
   mainForm!: FormGroup;
@@ -72,8 +75,8 @@ export class KarakterComponent implements CanComponentDeactivate {
   currentHome: { desc: string; bonus: { name: string; mod: string }[] } | null =
     null;
 
-  weapons = weapons.map((weapon) => weapon.name);
-  armours: Armour[] = armours;
+  weapons = [] as Weapon[];
+  armours = [] as Armour[];
 
   virtues = CharacterVirtues.map((virtue) => virtue.name);
   disadvantages = CharacterDisadvantages.map((disadv) => disadv.name);
@@ -82,53 +85,51 @@ export class KarakterComponent implements CanComponentDeactivate {
     {
       controlName: 'physical',
       fields: [
-        { groupName: 'ero', labelText: 'Erő' },
-        { groupName: 'ugyesseg', labelText: 'Ügyesség' },
-        { groupName: 'kitartas', labelText: 'Kitartás' },
+        { groupName: 'str', labelText: 'Erő', icon: 'fitness_center' },
+        {
+          groupName: 'dex',
+          labelText: 'Ügyesség',
+          icon: 'sports_martial_arts',
+        },
+        { groupName: 'end', labelText: 'Kitartás', icon: 'directions_run' },
       ],
       interval: { min: -3, max: 3 },
     },
     {
       controlName: 'mental',
       fields: [
-        { groupName: 'esz', labelText: 'Ész' },
-        { groupName: 'fortely', labelText: 'Fortély' },
-        { groupName: 'akaratero', labelText: 'Akaraterő' },
+        { groupName: 'int', labelText: 'Ész', icon: 'auto_stories' },
+        { groupName: 'cun', labelText: 'Fortély', icon: 'psychology' },
+        { groupName: 'wil', labelText: 'Akaraterő', icon: 'diamond' },
       ],
       interval: { min: -3, max: 3 },
     },
     {
       controlName: 'main',
       fields: [
-        { groupName: 'hp', labelText: 'HP' },
-        { groupName: 'sp', labelText: 'SP' },
+        { groupName: 'hp', labelText: 'HP', icon: 'health_metrics' },
+        { groupName: 'sp', labelText: 'SP', icon: 'mindfulness' },
       ],
       interval: { min: 1, max: 20 },
     },
   ];
 
-  foods = foodRations.map((food) => ({
-    name: food.name,
-    portion: food.portion,
-  }));
+  foods = [] as Food[];
   specialIndex = 0;
-  specialItems = medicalItems
-    .map((item) => item.name)
-    .concat(specialDrinks.map((drink) => drink.name));
-
-  medicalItems = medicalItems.map((item) => item.name);
-  specialDrinks = specialDrinks.map((drink) => drink.name);
-  otherItems = items.map((item) => item.name);
+  specialItems = [] as SpecialItem[];
+  generalItems = [] as (Item | Inventory)[];
 
   showDiceMenu: boolean = false;
 
   constructor(
     private fb: FormBuilder,
+    private itemService: ItemService,
     private charService: CharacterService,
     private router: Router
-  ) {}
+  ) { }
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.dontWarnBeforeLeave) return true;
     if (this.mainForm.dirty) {
       return confirm(
         'Nem mentett változásaid vannak! Biztosan elhagyod az oldalt?'
@@ -144,14 +145,25 @@ export class KarakterComponent implements CanComponentDeactivate {
     }
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('paper_bg');
     this.initForm();
+    await this.itemService.initItems();
+    this.weapons = this.itemService.getItemGroup('weapons') as Weapon[];
+    this.armours = this.itemService.getItemGroup('armours') as Armour[];
+    this.foods = this.itemService.getItemGroup('food') as Food[];
+    this.specialItems = this.itemService.getItemGroup(
+      'allSpecial'
+    ) as SpecialItem[];
+    this.generalItems = this.itemService.getItemGroup('general') as (
+      | Item
+      | Inventory
+    )[];
   }
 
   initForm() {
     this.mainForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [noWhitespaceValidator, Validators.required, Validators.minLength(3)]],
       species: ['', Validators.required],
       class: ['', Validators.required],
       specialProperties: this.fb.group({
@@ -160,30 +172,30 @@ export class KarakterComponent implements CanComponentDeactivate {
       }),
       stats: this.fb.group({
         physical: this.fb.group({
-          ero: [
-            '',
+          str: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          ugyesseg: [
-            '',
+          dex: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          kitartas: [
-            '',
+          end: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
         mental: this.fb.group({
-          esz: [
-            '',
+          int: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          fortely: [
-            '',
+          cun: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
-          akaratero: [
-            '',
+          wil: [
+            0,
             [Validators.required, Validators.min(-3), Validators.max(3)],
           ],
         }),
@@ -211,7 +223,7 @@ export class KarakterComponent implements CanComponentDeactivate {
           new FormControl(),
           new FormControl(),
         ]),
-        otherItems: this.fb.array<FormControl<number>>([
+        generalItems: this.fb.array<FormControl<number>>([
           new FormControl(),
           new FormControl(),
           new FormControl(),
@@ -222,89 +234,24 @@ export class KarakterComponent implements CanComponentDeactivate {
     });
   }
 
-  createCharacter() {
-    if (!this.mainForm.valid) {
-      this.errorMessage =
-        'Karakter nem készíthető el, tölts ki minden kötelező mezőt!';
+  async createCharacter() {
+    try {
+      this.isLoading = true;
+      const newCharacter = createCharacter(this.mainForm, this.itemService)
+      await this.charService
+        .addCharacter(newCharacter)
+      console.log('Karakter létrehozva: ', newCharacter);
+      this.dontWarnBeforeLeave = true;
+      localStorage.setItem('visibleContainerOnProfile', 'characters');
+      this.router.navigateByUrl('/profil');
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error('Hiba a karakter létrehozása során: ', error);
+      if (error.cause === CharacterCreationErrorCauses.InvalidFormData) {
+        this.errorMessage = error.message;
+      }
       return;
     }
-    const formValue = this.mainForm.value;
-
-    let newCharacter: Omit<Character, 'id' | 'userId'> = {
-      currentAdventure: '',
-      name: formValue.name || '',
-      species: formValue.species || '',
-      class: formValue.class || '',
-      level: 1,
-      specialProperties: formValue.specialProperties || {
-        speciesProperty: 0,
-        home: 0,
-      },
-      stats: formValue.stats || {
-        physical: {
-          ero: 1,
-          ugyesseg: 1,
-          kitartas: 1,
-        },
-        mental: {
-          esz: 1,
-          fortely: 1,
-          akaratero: 1,
-        },
-        main: {
-          hp: 1,
-          sp: 1,
-        },
-      },
-      equipment: formValue.equipment || {
-        left: '',
-        right: '',
-        armour: '',
-      },
-      virtues: formValue.virtues || {
-        virtues: [],
-        disadvantage: [],
-      },
-      items: formValue.items || {
-        food: [],
-        specialItems: [],
-        otherItems: [],
-        weaponItems: [],
-      },
-      wounds: {
-        small: 0,
-        large: 0,
-      },
-    };
-
-    if (
-      getWeapon(newCharacter.equipment.left).handed === 2 &&
-      getWeapon(newCharacter.equipment.right).handed !== 0
-    ) {
-      this.errorMessage =
-        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
-      return;
-    } else if (
-      getWeapon(newCharacter.equipment.right).handed === 2 &&
-      getWeapon(newCharacter.equipment.left).handed !== 0
-    ) {
-      this.errorMessage =
-        'Két kezes fegyver mellé nem lehet egy másik fegyvered.';
-      return;
-    }
-
-    this.charService
-      .addCharacter(newCharacter)
-      .then(() => {
-        this.mainForm.reset();
-      })
-      .catch((error) => {
-        console.error('Hiba a karakter létrehozása során: ', error);
-      })
-      .finally(() => {
-        console.log('Karakter létrehozva: ', newCharacter);
-        this.router.navigateByUrl('/profil');
-      });
   }
 
   createRandomCharacter() {
@@ -313,7 +260,23 @@ export class KarakterComponent implements CanComponentDeactivate {
       this.errorMessage = 'Töltsd ki a név mezőt!';
       return;
     }
-    const random = createRandomCharacter(charName);
+    const random = createRandomCharacter(charName, this.itemService);
+    const foodArray = this.mainForm.get('items.food') as FormArray;
+    foodArray.clear();
+    random.items.food.forEach((item) => {
+      if (item?.id) foodArray.push(new FormControl(item.id));
+    });
+    const specialArray = this.mainForm.get('items.specialItems') as FormArray;
+    specialArray.clear();
+    random.items.specialItems.forEach((item) => {
+      if (item?.id) specialArray.push(new FormControl(item.id));
+    });
+    const generalArray = this.mainForm.get('items.generalItems') as FormArray;
+    generalArray.clear();
+    random.items.generalItems.forEach((item) => {
+      if (item?.id) generalArray.push(new FormControl(item.id));
+    });
+    console.log(random);
 
     this.mainForm.get('species')?.setValue(random.species);
     this.setRelevantSpeciesData(random.species);
@@ -325,12 +288,15 @@ export class KarakterComponent implements CanComponentDeactivate {
         speciesProperty: random.specialProperties.speciesProperty,
       },
       stats: random.stats,
-      equipment: random.equipment,
+      equipment: {
+        left: random.equipment.left.id,
+        right: random.equipment.right.id,
+        armour: random.equipment.armour.id,
+      },
       virtues: {
         virtues: random.virtues.virtues,
         disadvantage: random.virtues.disadv,
       },
-      items: random.items,
     });
 
     this.mainForm

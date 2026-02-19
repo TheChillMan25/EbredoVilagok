@@ -16,19 +16,15 @@
           } @case (2){
           <app-character-stats></app-character-stats>
           } @case (3) {
-          <app-character-items></app-character-items>
+          <app-character-items [items]="items?.generalItems"></app-character-items>
           } @case (4) {
-          <app-special-items></app-special-items>
+          <app-special-items [specialDrinks]="items?.specialDrinks"></app-special-items>
           } @case (5){
           <app-adventure-main></app-adventure-main>
           } @case (6){
-          <app-adventure-npc
-            (showEquipmentEvent)="setActivePage($event)"
-          ></app-adventure-npc>
+          <app-adventure-npc (showEquipmentEvent)="setActivePage($event)"></app-adventure-npc>
           } @case (7) {
-          <app-actions-camp2
-            (showEvent)="setActivePage($event)"
-          ></app-actions-camp2>
+          <app-actions-camp></app-actions-camp>
           } @case (8){
           <app-actions-fight></app-actions-fight>
           } @case (9){
@@ -41,17 +37,17 @@
           } @case (1){
           <app-character-disadvantages></app-character-disadvantages>
           } @case (2){
-          <app-character-equipment></app-character-equipment>
+          <app-character-equipment [weapons]="items?.weapons" [armours]="items?.armours"></app-character-equipment>
           } @case (3) {
-          <app-mandatory-items></app-mandatory-items>
+          <app-mandatory-items [foodItems]="items?.foodRations" [healItems]="items?.medicalItems"></app-mandatory-items>
           } @case (4) {
-          <app-cigar-items></app-cigar-items>
+          <app-cigar-items [cigars]="items?.cigars"></app-cigar-items>
           } @case (5) {
           <app-adventure-event></app-adventure-event>
           } @case (6){
-          <app-actions-camp></app-actions-camp>
-          } @case (7) {
           <app-actions-main></app-actions-main>
+          } @case (7) {
+          <app-actions-camp2 (showEvent)="setActivePage($event)"></app-actions-camp2>
           } @case (8) {
           <app-actions-loot></app-actions-loot>
           } @case (9){
@@ -60,46 +56,30 @@
         </div>
       </div>
       <div id="markers" [ngClass]="{ visibleMarker: visibleMarkers }">
-        <div
-          id="character"
-          class="marker"
-          (click)="setActiveSegment('character')"
-        >
+        <div id="character" class="marker" [ngClass]="{selectedMarker: activeSegmentName === 'character'}"
+          (click)="setActiveSegment('character')">
           Karakter
         </div>
-        <div
-          id="adventure"
-          class="marker"
-          (click)="setActiveSegment('adventure')"
-        >
+        <div id="adventure" class="marker" [ngClass]="{selectedMarker: activeSegmentName === 'adventure'}"
+          (click)="setActiveSegment('adventure')">
           Kaland
         </div>
-        <div id="actions" class="marker" (click)="setActiveSegment('actions')">
+        <div id="actions" class="marker" [ngClass]="{selectedMarker: activeSegmentName === 'actions'}"
+          (click)="setActiveSegment('actions')">
           Akciók
         </div>
       </div>
     </div>
   </div>
   <div id="buttons">
-    <div
-      id="prev"
-      class="fake-button"
-      (click)="prev()"
-      title="Előző"
-      [ngClass]="{ hide: this.activePageIndex === 0 }"
-    >
+    <div id="prev" class="fake-button" (click)="prev()" title="Előző" [ngClass]="{ hide: this.activePageIndex === 0 }">
       <mat-icon>arrow_back_ios_new</mat-icon>
     </div>
     <div id="marker-toggle" (click)="toggleMarkers()">
       <mat-icon>article</mat-icon>
     </div>
-    <div
-      id="next"
-      class="fake-button"
-      (click)="next()"
-      title="Következő"
-      [ngClass]="{ hide: this.activePageIndex === maxPageIndex }"
-    >
+    <div id="next" class="fake-button" (click)="next()" title="Következő"
+      [ngClass]="{ hide: this.activePageIndex === maxPageIndex }">
       <mat-icon>arrow_forward_ios_new</mat-icon>
     </div>
   </div>

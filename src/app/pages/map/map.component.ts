@@ -22,7 +22,7 @@ interface SearchResult {
 }
 
 export function isMobileView(): boolean {
-  return window.innerWidth <= 768;
+  return window.innerWidth <= 768 || window.innerHeight <= 575;
 }
 
 @Component({

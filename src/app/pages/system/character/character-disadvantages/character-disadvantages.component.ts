@@ -4,7 +4,7 @@ import { CharacterDisadvantages } from '../../../../shared/models/virtues_disadv
 import {
   CombinedVirtueDisadvRow,
   VirtueDisadvBase,
-} from '../../../../shared/models/character_interfaces';
+} from '../../../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-character-disadvantages',

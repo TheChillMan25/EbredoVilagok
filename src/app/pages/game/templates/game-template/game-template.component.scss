@@ -1,0 +1,28 @@
+.game {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: large;
+
+  .game-name {
+    color: #f2c480;
+  }
+
+  .game-players {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .current-players {
+      color: whitesmoke;
+    }
+  }
+
+  .fake-button {
+    padding: 0.3rem;
+  }
+}

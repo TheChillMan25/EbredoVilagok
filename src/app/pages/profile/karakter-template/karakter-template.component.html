@@ -8,7 +8,7 @@
       <div class="fake-button" (click)="showSpecielDescs('special')">
         Népi tul.
       </div>
-      <div class="fake-button" (click)="showSpecielDescs('home')">Otthon</div>
+      <button class="fake-button" (click)="showSpecielDescs('home')">Otthon</button>
     </div>
     <div class="bonus-container">
       <span>Bónusz ismeretek</span>
@@ -24,10 +24,7 @@
       <mat-icon>delete</mat-icon>
     </div>
     <div class="warning" [ngClass]="{ show: showWarning }">
-      <app-delete-warning
-        (deleteEvent)="deleteCharacter()"
-        (closeEvent)="closeWarning()"
-      ></app-delete-warning>
+      <app-delete-warning (deleteEvent)="deleteCharacter()" (closeEvent)="closeWarning()"></app-delete-warning>
     </div>
     }
   </div>

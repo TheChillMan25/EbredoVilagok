@@ -14,7 +14,7 @@
       mennyiségéhez képest gyógyul kis sebeket. A nagy sebeket nem lehet
       egyszerű pihenéssel és étellel begyógyítani.
     </p>
-    <div class="table-container">
+    <div id="foods-table" class="table-container">
       <table style="text-align: center">
         <tr>
           @for (item of foodRations; track $index) {
@@ -23,7 +23,7 @@
         </tr>
         <tr>
           @for (item of foodRations; track $index) {
-          <td>( {{ item.portion }} ) fejadag</td>
+          <td>( {{ item.uses }} ) fejadag</td>
           }
         </tr>
         <tr>
@@ -50,8 +50,12 @@
     </p>
   </article>
   @for (item of medicalItems; track $index) {
-  <strong>{{ item.name }}:</strong>
-  <p class="italic-text">{{ item.desc }}</p>
-  <p>{{ item.effect }}</p>
+  <div class="item">
+    <strong class="item-name"
+      >{{ item.name }} {{ item.combat ? "(HK)" : "" }}:</strong
+    >
+    <p class="italic-text item-desc">{{ item.desc }}</p>
+    <p class="item-effect">{{ item.effectDesc }}</p>
+  </div>
   }
 </div>

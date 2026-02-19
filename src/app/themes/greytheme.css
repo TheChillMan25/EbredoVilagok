@@ -300,13 +300,19 @@ html {
   --mat-list-active-indicator-shape: 0;
   --mdc-outlined-text-field-focus-label-text-color: #f2c480;
   --mdc-filled-button-label-text-color: #333;
+  --mat-snack-bar-button-color: #f2c480;
+  --mdc-snackbar-supporting-text-size: medium;
 
+  /* MatTooltip*/
+  --mdc-plain-tooltip-supporting-text-size: medium;
+  --mdc-plain-tooltip-container-color: #222;
   /*Mat-select*/
   /*--mat-select-panel-background-color: #555;*/
   --mdc-list-list-item-hover-label-text-color: #f2c480;
   --mat-option-focus-state-layer-color: #555;
   --mat-option-hover-state-layer-color: #555;
   --mat-option-selected-state-layer-color: #f2c480;
+  --mat-optgroup-label-text-color: #f2c480;
 
   /*Mat-card*/
   --mdc-outlined-card-container-color: #333;

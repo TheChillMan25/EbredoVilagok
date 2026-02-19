@@ -1,4 +1,14 @@
 import { FieldValue, Timestamp } from 'firebase/firestore';
+import {
+  ActiveStatus,
+  Armour,
+  Cigar,
+  Food,
+  Inventory,
+  Item,
+  SpecialItem,
+  Weapon,
+} from './game_interfaces';
 
 export interface User {
   id: string | null | undefined;
@@ -6,6 +16,8 @@ export interface User {
   email: string | null | undefined;
   characters: string[];
   adventures: string[];
+  games: string[];
+  inGame: boolean;
 }
 
 export interface ForumUser {
@@ -15,8 +27,8 @@ export interface ForumUser {
 }
 
 export enum ForumTopic {
-  CHARACTER,
-  ADVENTURE,
+  CHARACTER = 'CHARACTER',
+  ADVENTURE = 'ADVENTURE',
 }
 
 export interface Character {
@@ -27,45 +39,49 @@ export interface Character {
   species: string;
   class: string;
   level: number;
+  coins: number;
   specialProperties: {
     speciesProperty: number;
     home: number;
   };
   stats: {
     physical: {
-      ero: number;
-      ugyesseg: number;
-      kitartas: number;
+      str: number;
+      dex: number;
+      end: number;
     };
     mental: {
-      esz: number;
-      fortely: number;
-      akaratero: number;
+      int: number;
+      cun: number;
+      wil: number;
     };
     main: {
       hp: number;
+      maxHP: number;
       sp: number;
+      maxSP: number;
     };
   };
   equipment: {
-    left: number;
-    right: number;
-    armour: number;
+    left: Weapon;
+    right: Weapon;
+    armour: Armour;
   };
   virtues: {
     virtues: number[];
     disadv: number[];
   };
   items: {
-    food: number[];
-    specialItems: number[];
-    otherItems: number[];
-    weaponItems: string[];
+    food: Food[];
+    specialItems: SpecialItem[];
+    generalItems: (Item | Inventory)[];
+    equipmentItems: (Weapon | Armour)[];
   };
   wounds: {
     small: number;
     large: number;
   };
+  activeStatuses: ActiveStatus[];
 }
 
 export type PublicCharacter = Omit<
@@ -103,27 +119,6 @@ export interface ForumPostComment {
   createdAt: Timestamp | FieldValue;
 }
 
-export interface Adventure {
-  id: string;
-  userId: string;
-  name: string | null;
-  events: AdventureEvent[];
-  players: Player[];
-  currentPlayer: string;
-}
-
-export type PublicAdventure = Omit<
-  Adventure,
-  'id' | 'players' | 'currentPlayer' | 'userId'
->;
-
-export interface Player {
-  id: string;
-  userId: string;
-  character: Character;
-  currentAction: string;
-}
-
 export interface AdventureEvent {
   id: number;
   name: string;
@@ -131,12 +126,127 @@ export interface AdventureEvent {
   story: string;
   location: string;
   NPCs: NPC[];
+  completed: boolean;
+  finished: boolean;
 }
 
-export interface NPC {
+export interface Adventure {
+  id: string;
+  userId: string;
+  name: string | null;
+  events: AdventureEvent[];
+}
+
+export type PublicAdventure = Omit<
+  Adventure,
+  'id' | 'players' | 'currentPlayer' | 'userId'
+>;
+
+export enum PlayerStatus {
+  READY = 'READY',
+  NOTREADY = 'NOTREADY',
+}
+
+export interface GameParticipant {
   id: string;
   name: string;
-  character: Character | null;
+  character?: Character;
+  lastAction: {
+    performer: { id: string; name: string };
+    primary: GameAction;
+    secondary: GameAction;
+  };
+  actionsLeft: { primary: boolean; secondary: boolean };
+  initiative: number | null;
+  inCombat: boolean;
+}
+
+export interface Player extends GameParticipant {
+  status: PlayerStatus;
+  isVoting: boolean;
+  campActionPoints: number;
+}
+
+export interface NPC extends GameParticipant {
   attitude: 'neutral' | 'hostile';
-  actions: boolean[];
+  isTrader: boolean;
+  trades?: Record<string, { pieces: number; item: Food | SpecialItem | Cigar }[]> | null;
+  isVisible: boolean;
+}
+
+export interface Game {
+  id: string;
+  ownerName: string;
+  ownerId: string;
+  name: string;
+  maxPlayers: number;
+  playerOrder: { id: string; initiative: number; finished: boolean }[];
+  players: Player[];
+  prevPlayer: string;
+  currentPlayer: string;
+  currentAction: {
+    performer: { id: string; name: string };
+    primary: GameAction;
+    secondary: GameAction;
+  };
+  currentEvent: number;
+  adventure?: Adventure;
+  isOpen: boolean;
+  isPublic: boolean;
+  started: boolean;
+  vote: { theme: string, starter: string, votes: { player: string, vote: boolean }[] };
+  camp: {
+    isCamping: boolean;
+    raid: NPC[];
+    campActions: {
+      fire: number;
+      tents: number;
+      traps: number;
+      guard: number;
+    }
+  }
+}
+
+export enum ActionType {
+  USEITEM = 'USEITEM',
+  CAMP = 'CAMP',
+  TALK = 'TALK',
+  TRADE = 'TRADE',
+  ATTACK = 'ATTACK',
+  LOOT = 'LOOT',
+  NONE = 'NONE',
+}
+
+export enum MandatoryCampActions {
+  START_FIRES = 'START_FIRES',
+  SET_UP_TENTS = 'SET_UP_TENTS',
+  SET_UP_TRAPS = 'SET_UP_TRAPS',
+  GUARD = 'GUARD',
+}
+
+export enum StandardCampActions {
+  TREAT_WOUNDS = 'TREAT_WOUNDS',
+  CALM_OTHERS = 'CALM_OTHERS',
+  GATHER_PLANTS = 'GATHER_PLANTS',
+  HUNT = 'HUNT',
+}
+
+export interface GameAction {
+  type: ActionType | MandatoryCampActions | StandardCampActions;
+  target?: string;
+  item?: string;
+  value?: number;
+  reaction?: {
+    reacted: boolean,
+    reactionType?: Reaction,
+    success?: boolean | null,
+    counterDamage?: number,
+  };
+}
+
+export enum Reaction {
+  NO_REACTION = 'NO_REACTION',
+  DODGE = 'DODGE',
+  ATTACK_BACK = 'ATTACK_BACK',
+  PARRY = 'PARRY',
 }

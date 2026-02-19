@@ -1,0 +1,54 @@
+.item {
+  display: grid;
+  grid-template-areas: "name desc";
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: #333;
+  cursor: default;
+
+  &.loot,
+  &.trade {
+    grid-template-columns: 2fr 3fr 1fr;
+    background-color: #292929;
+
+    >.fake-button {
+      justify-self: right;
+      padding: .5rem;
+    }
+  }
+
+  &.loot {
+    grid-template-areas: "name desc lootButton";
+  }
+
+  &.trade {
+    grid-template-areas: "name desc tradeButton";
+  }
+
+  .item-name {
+    display: grid;
+    grid-template-areas: "text icon";
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f2c480;
+  }
+
+  .item-desc {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: right;
+  }
+
+  &.canUse {
+    cursor: pointer;
+  }
+
+  .mat-tootlip {
+    font-size: large;
+  }
+}

@@ -8,10 +8,18 @@ td:first-child {
 
 .table-container {
   padding: 0.5rem;
+  &#foods-table {
+    overflow-x: auto;
+  }
 }
 
-@media (max-width: 450px) {
-  .table-container {
-    overflow-x: auto;
+.item {
+  margin: 1rem 0;
+
+  .item-name {
+    font-size: large;
+  }
+  .item-effect {
+    text-align: right;
   }
 }

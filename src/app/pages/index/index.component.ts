@@ -3,6 +3,7 @@ import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CardContainerComponent } from '../../shared/functional/card-container/card-container.component';
 import { setBackground } from '../../shared/functional/functions';
+import { ItemService } from '../../shared/services/item/item.service';
 
 @Component({
   selector: 'app-index',
@@ -20,8 +21,27 @@ export class IndexComponent {
       id: 'rendszer',
     },
   ];
+  constructor(private itemsService: ItemService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     setBackground('bg');
+    await this.uploadItems();
+    await this.initItems();
+  }
+
+  async uploadItems() {
+    try {
+      await this.itemsService.uploadItems();
+    } catch (error) {
+      console.error('Hiba a tárgyak feltöltésekor: ', error);
+    }
+  }
+
+  async initItems() {
+    try {
+      await this.itemsService.initItems();
+    } catch (error) {
+      console.error('Hiba a tárgyak betöltésekor: ', error);
+    }
   }
 }
