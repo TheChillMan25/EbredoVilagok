@@ -84,6 +84,7 @@ export class AuthService {
           characters: [],
           adventures: [],
           games: [],
+          inGame: false,
         } as User);
       } catch (error) {
         await userCredential.user.delete();

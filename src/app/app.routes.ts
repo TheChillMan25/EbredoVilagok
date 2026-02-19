@@ -7,6 +7,7 @@ import {
   publicGuard,
 } from './shared/guards/auth/auth.guard';
 import { deactivateGuard } from './shared/guards/deactivate/deactivate.guard';
+import { screenGuard } from './shared/guards/screen/screen.guard';
 
 export const routes: Routes = [
   {
@@ -125,7 +126,7 @@ export const routes: Routes = [
       import('./pages/game/lobby/lobby.component').then(
         (m) => m.LobbyComponent
       ),
-    canActivate: [authGuard, gameGuard],
+    canActivate: [authGuard, gameGuard, screenGuard],
     canDeactivate: [deactivateGuard],
   },
   {
@@ -134,7 +135,7 @@ export const routes: Routes = [
       import('./pages/game/game-area/game-area.component').then(
         (m) => m.GameAreaComponent
       ),
-    canActivate: [authGuard, gameGuard],
+    canActivate: [authGuard, gameGuard, screenGuard],
     canDeactivate: [deactivateGuard],
   },
   {

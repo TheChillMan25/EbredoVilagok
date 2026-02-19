@@ -82,6 +82,11 @@ import { DiceRollerComponent } from '../../../shared/functional/dice-roller/dice
 import { NationData } from '../../../shared/models/NationData';
 import { CharacterVirtues, CharacterDisadvantages } from '../../../shared/models/virtues_disadvantages';
 import { species } from '../../world/species/species_desc_data';
+import { VoiceService } from '../../../shared/services/voice/voice.service';
+import { MatSliderModule } from '@angular/material/slider';
+import { SmallScreenComponent } from '../../../shared/functional/small-screen/small-screen.component';
+import { isMobileView } from '../../map/map.component';
+import { UserService } from '../../../shared/services/user/user.service';
 
 @Component({
   selector: 'app-game-area',
@@ -106,6 +111,8 @@ import { species } from '../../world/species/species_desc_data';
     MatButtonModule,
     MatProgressSpinnerModule,
     DiceRollerComponent,
+    MatSliderModule,
+    SmallScreenComponent,
   ],
   templateUrl: './game-area.component.html',
   styleUrl: './game-area.component.scss',
@@ -116,6 +123,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   @ViewChild('diceRoller') diceRoller!: DiceRollerComponent;
   @ViewChild('isPartyWideCheckbox') isPartyWideCheckbox!: MatCheckbox;
   snackBar = new MatSnackBar();
+  smallScreen = false;
   isNewRound = false;
   campingFirstWarn = true;
   raidFirstWarnd = false;
@@ -140,6 +148,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
   tradePanelVisible = false;
   attackReaction = false;
   isLoadingRaiders = false;
+  soundControlVisible = false;
   addStatusError = '';
   addItemError = '';
   addItemEffectError = '';
@@ -287,6 +296,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     { value: StatusType.FREE_MAGIC },
     { value: StatusType.FULL_BELLY },
     { value: StatusType.SLEEP },
+    { value: StatusType.LOST_LIMB },
     { value: StatusType.DEAD },
     { value: StatusType.INSANE },
   ];
@@ -416,7 +426,12 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
   dontWarnLeaving = false;
 
+  voiceStream?: MediaStream;
+  voiceInitialized = false;
+  connectedPeers: string[] = [];
+
   gameSub!: Subscription;
+  voiceSub!: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -424,16 +439,23 @@ export class GameAreaComponent implements CanComponentDeactivate {
     private gameService: GameService,
     private router: Router,
     private itemService: ItemService,
+    private voiceService: VoiceService,
+    private userService: UserService
   ) { }
 
   async ngOnInit() {
     setBackground('#222', true);
+    this.smallScreen = isMobileView();
     this.gameId = this.route.snapshot.paramMap.get('id')!;
     if (!this.gameId) {
       this.dontWarnLeaving = true;
       this.router.navigateByUrl('/jatek')
     }
     this.initForm();
+    this.voiceStream = this.voiceService.getStream();
+    this.voiceSub = this.voiceService.activePeers.subscribe(peers => {
+      this.connectedPeers = peers;
+    });
     await this.itemService.initItems();
     this.weapons = this.itemService.getItemGroup('weapons') as Weapon[];
     this.armours = this.itemService.getItemGroup('armours') as Armour[];
@@ -448,11 +470,13 @@ export class GameAreaComponent implements CanComponentDeactivate {
     this.allItems = this.itemService.getAllItems();
     const user = await firstValueFrom(this.authService.currentUser.pipe(take(1)))
     this.currentUserId = user?.uid!;
-    this.loadData();
+    await this.loadData();
   }
 
   ngOnDestroy() {
     if (this.gameSub) this.gameSub.unsubscribe();
+    if (this.voiceSub) this.voiceSub.unsubscribe();
+    this.voiceService.destroy();
   }
 
   async canDeactivate(): Promise<boolean> {
@@ -467,6 +491,17 @@ export class GameAreaComponent implements CanComponentDeactivate {
   @HostListener('window:beforeunload', ['$event'])
   async unloadNotification($event: any) {
     //$event.returnValue = true;
+    //await this.leaveGame();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.smallScreen = isMobileView();
+  }
+
+  goHome() {
+    this.dontWarnLeaving = true;
+    this.router.navigateByUrl('/jatek');
   }
 
   /* GENERAL FUNCTIONS */
@@ -484,9 +519,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       type: [StatusType.BLEED, [Validators.required]],
       duration: [
         1,
-        [Validators.required, Validators.min(1), Validators.max(100)],
+        [Validators.required, Validators.min(1), Validators.max(99999)],
       ],
-      value: [1, [Validators.min(1), Validators.max(1000)]],
+      value: [1, [Validators.min(1), Validators.max(99999)]],
     });
     this.addItemForm = this.fb.group({
       existingItem: [''],
@@ -630,15 +665,19 @@ export class GameAreaComponent implements CanComponentDeactivate {
       }
 
       this.game = game;
-      game.players.sort(
-        (a: Player, b: Player) => b.initiative! - a.initiative!,
-      );
 
       if (!this.game.started) {
         this.dontWarnLeaving = true;
+        await this.userService.updateUser(this.currentUserId, { inGame: false });
         this.router.navigateByUrl('/jatek');
         return;
       }
+
+      this.voiceInitialized = this.voiceService.getStream() !== undefined;
+
+      game.players.sort(
+        (a: Player, b: Player) => b.initiative! - a.initiative!,
+      );
       this.role = checkRole(this.currentUserId, this.game.ownerId);
       this.currentEventIdx = game.currentEvent;
       this.setCurrentEvent();
@@ -659,6 +698,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
 
         if (!foundPlayer) {
           this.dontWarnLeaving = true;
+          await this.userService.updateUser(this.currentUserId, { inGame: false });
           this.router.navigateByUrl('/jatek');
           return;
         }
@@ -689,6 +729,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
               this.selectedWeapon = this.myCharacterSpecs?.equipment.right;
             else this.selectedWeapon = null;
           }
+        }
+        if (!this.player.inCombat && localStorage.getItem('selectedCombatTarget')) {
+          localStorage.removeItem('selectedCombatTarget');
         }
         if (this.isReacting()) {
           if (!this.attackReaction) {
@@ -802,9 +845,88 @@ export class GameAreaComponent implements CanComponentDeactivate {
         this.selectedTarget = null;
         this.selectedNPC = null;
       } else {
-        if (!this.isReacting()) this.checkReaction()
+        if (!this.isReacting()) this.checkReaction();
+        const savedTargetId = localStorage.getItem('selectedCombatTarget');
+        if (savedTargetId) {
+          const target = this.game.players.find(p => p.id === savedTargetId) ??
+            this.game.camp.raid.find(r => r.id === savedTargetId) ??
+            this.currentEvent?.NPCs.find(n => n.id === savedTargetId) ?? null;
+          if (target) this.selectedTarget = target;
+        }
       }
     });
+  }
+
+  async joinVoiceChat() {
+    try {
+      if (this.voiceService.getStream()) {
+        this.voiceStream = this.voiceService.getStream();
+      } else {
+        this.voiceStream = await this.voiceService.getMicrophone();
+      }
+      this.voiceService.initPeer(this.currentUserId);
+      setTimeout(() => {
+        if (!this.voiceService.hasActiveConnection()) {
+          console.warn('Nincs aktív Peer kapcsolat, nem lehet hívni a többieket.');
+          return;
+        }
+        if (this.game?.ownerId! !== this.currentUserId) this.voiceService.connectToPeer(this.game?.ownerId!);
+        this.game?.players!.forEach((p) => {
+          if (p.id !== this.currentUserId) {
+            this.voiceService.connectToPeer(p.id);
+          }
+        });
+      }, 1000);
+    } catch (error: any) {
+      console.error('Hiba a csatlakozáskor:', error);
+      alert('Nem sikerült csatlakozni. Engedélyezd a mikrofon használatát, és próbáld újra!');
+    }
+  }
+
+  toggleMute() {
+    switch (this.voiceService.muted()) {
+      case true:
+        this.voiceService.unMute();
+        break;
+      case false:
+        this.voiceService.mute();
+        break;
+    }
+  }
+
+  isPhone(): boolean {
+    return window.innerWidth <= 768 || window.innerHeight <= 605;
+  }
+
+  isMuted(): boolean {
+    return this.voiceService.muted();
+  }
+
+  toggleDeafen() {
+    this.voiceService.toggleDeafen(!this.voiceService.deafened());
+  }
+
+  isDeafened(): boolean {
+    return this.voiceService.deafened();
+  }
+
+  leaveCall() {
+    this.voiceStream = undefined;
+    this.voiceService.destroy();
+  }
+
+  showSoundSettings(visible: boolean = true) {
+    this.soundControlVisible = visible;
+  }
+
+  setVolume(id: string, volume: number) {
+    console.log(volume);
+    if (volume < 0 || volume > 1) return;
+    this.voiceService.setPeerVolume(id, volume);
+  }
+
+  getVolume(id: string): number {
+    return this.voiceService.getPeerVolume(id);
   }
 
   evaluateVote(): boolean {
@@ -968,7 +1090,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
     this.actionPanelVisible = show;
   }
-  showPanel(type: 'status' | 'item' | 'raider' | 'reaction' | 'loot' | 'trade', event: MouseEvent | null, show: boolean = true) {
+  showPanel(type: 'status' | 'item' | 'raider' | 'reaction' | 'loot' | 'trade' | 'sound', event: MouseEvent | null, show: boolean = true) {
     const target = event?.target as HTMLElement;
     switch (type) {
       case 'status':
@@ -1009,6 +1131,10 @@ export class GameAreaComponent implements CanComponentDeactivate {
           this.totalSell = 0;
         }
         this.tradePanelVisible = show;
+        break;
+      case 'sound':
+        if (target.id !== 'soundUI' && !show) return;
+        this.soundControlVisible = show;
         break;
     }
   }
@@ -1099,12 +1225,22 @@ export class GameAreaComponent implements CanComponentDeactivate {
   getInputs(which: string): FormArray<FormControl<number>> {
     return this.addRaiderForm.get(which) as FormArray<FormControl<number>>;
   }
+  cantReact(): boolean {
+    return this.player?.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length === 2
+  }
+  /**
+   * Ellenőrzi, hogy a játékosokon rajtaütöttek-e táborozáskor.
+   * @returns A játékosokon rajtaütöttek-e táborozáskor.
+   */
   isRaid(): boolean {
     return this.game?.camp.raid.length! > 0 && this.game?.camp.isCamping === true;
   }
   isWaitingForGM(): boolean {
     return (this.game?.players.every(p => p.campActionPoints === 0) && this.game?.camp?.isCamping && !this.isRaid()) ?? false;
   }
+  /**
+   * Ellenőrzi, hogy a játékos reagál-e egy támadásra.
+   */
   isReacting(): boolean {
     let a = [this.game?.currentAction.primary, this.game?.currentAction.secondary];
     return a.some(a => a?.target === this.player?.id && a?.type === ActionType.ATTACK && !a?.reaction!.reacted) && this.myTurn;
@@ -1708,7 +1844,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
-
+  /**
+   * Ellenőrzi, hogy a játékosnak van-e még akciója, figyelembe véve a táborozás mechanikáját és a rajtaütést.
+   */
   noActionsLeft(): boolean {
     if (this.game?.camp.isCamping && 'campActionPoints' in this.player! && !this.isRaid()) {
       return this.player.campActionPoints <= 0;
@@ -2394,7 +2532,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
       if (!character) return;
       if (this.itemsToSell.length > 0) {
         this.itemsToSell.forEach(item => {
-          character.coins += item.price!;
+          character.coins += item.price! * (item as any).sellAmount!;
         })
         this.totalSell = 0
         this.itemsToSell = [];
@@ -2414,14 +2552,14 @@ export class GameAreaComponent implements CanComponentDeactivate {
           itemsArray?.push({ ...item } as Omit<Item, 'buyAmount' | 'sellAmount'> as any);
         }
       });
+      this.totalPrice = 0;
+      this.itemsToBuy = [];
+      this.manageActions(isPrimary, ActionType.TRADE);
       await this.gameService.updateGame(this.gameId, {
         players: this.game?.players,
         currentAction: this.game?.currentAction,
         adventure: this.game?.adventure,
       });
-      this.totalPrice = 0;
-      this.itemsToBuy = [];
-      this.manageActions(isPrimary, ActionType.TRADE);
       localStorage.removeItem('actionIsPrimary');
       this.showPanel('trade', null, false);
     } catch (error: any) {
@@ -2434,31 +2572,33 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
-  manageDeathAndInsane(character: Character, type: 'death' | 'insane', target: Player | NPC) {
+  manageDeathAndInsane(type: 'death' | 'insane', target: Player | NPC) {
     let status!: ActiveStatus;
     if (type === 'death') {
-      character.stats.main.hp = 0;
-      character.wounds.large += 1;
-      character.activeStatuses = [];
+      target.character!.stats.main.hp = 0;
+      target.character!.wounds.large += 1;
+      target.character!.activeStatuses = [];
       status = {
         type: StatusType.DEAD,
         duration: 9999,
       };
     } else if (type === 'insane') {
-      character.stats.main.sp = 0;
+      target.character!.stats.main.sp = 0;
       status = {
         type: StatusType.INSANE,
         duration: 9999,
       };
     }
     if (status)
-      character.activeStatuses.push(status);
+      target.character!.activeStatuses.push(status);
     target.inCombat = false;
-    if (target.id.includes('-')) this.game!.playerOrder = this.game?.playerOrder.filter(po => po.id !== target.id) ?? [];
+    this.game!.playerOrder = this.game?.playerOrder.filter(po => po.id !== target.id) ?? [];
     let combatEnded = true;
     this.game!.playerOrder.forEach(po => {
-      const npc = this.currentEvent?.NPCs.find(p => p.id === po.id) ?? this.game?.camp.raid.find(r => r.id === po.id) ?? null;
-      if (npc && npc.inCombat) combatEnded = false;
+      const gameMember = this.currentEvent?.NPCs.find(p => p.id === po.id) ??
+        this.game?.camp.raid.find(r => r.id === po.id) ??
+        this.game?.players.find(p => p.id === po.id) ?? null;
+      if (gameMember && gameMember.inCombat) combatEnded = false;
     })
     if (combatEnded) {
       this.game?.players.forEach(p => p.inCombat = false);
@@ -2485,10 +2625,16 @@ export class GameAreaComponent implements CanComponentDeactivate {
         character?.activeStatuses.push(wound);
         character.wounds.large += 1;
         character.stats.main.hp = character.stats.main.maxHP;
+        const limbsLost = character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
+        if (limbsLost === 1) {
+          target.actionsLeft = { primary: target.actionsLeft.primary, secondary: false };
+        } else if (limbsLost >= 2) {
+          target.actionsLeft = { primary: false, secondary: false };
+        }
         return;
       } else {
         this.openSnackBar(`${target.name} túl sok sérülést szenvedett el, ezért meghalt.`);
-        this.manageDeathAndInsane(character, 'death', target);
+        this.manageDeathAndInsane('death', target);
         return;
       }
     }
@@ -2633,6 +2779,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       if (!this.selectedTarget) {
         throw new Error('Válassz ki egy célpontot.');
       }
+      if (!localStorage.getItem('selectedCombatTarget')) {
+        localStorage.setItem('selectedCombatTarget', this.selectedTarget.id!);
+      }
       const target = this.game?.players.find(p => p.id === this.selectedTarget!.id) ??
         this.game?.camp.raid.find(r => r.id === this.selectedTarget!.id) ??
         this.currentEvent?.NPCs.find(n => n.id === this.selectedTarget!.id);
@@ -2680,7 +2829,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         if (!confirm('A karaktered a megőrülés szélén áll. Biztosan folytatod?')) {
           return;
         }
-        this.manageDeathAndInsane(this.player.character, 'insane', this.player);
+        this.manageDeathAndInsane('insane', this.player);
         await this.gameService.updateGame(this.gameId, {
           players: this.game?.players,
           camp: this.game?.camp,
@@ -3220,7 +3369,11 @@ export class GameAreaComponent implements CanComponentDeactivate {
       }
       this.game?.players.forEach(
         (p) => {
-          p.actionsLeft = { primary: true, secondary: true };
+          const limbsLost = p.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
+          console.log(limbsLost);
+          if (limbsLost === 0) p.actionsLeft = { primary: true, secondary: true };
+          else if (limbsLost === 1) p.actionsLeft = { primary: true, secondary: false };
+          else p.actionsLeft = { primary: false, secondary: false };
           p.lastAction = {
             performer: { id: '', name: '' },
             primary: {} as GameAction,
@@ -3232,7 +3385,11 @@ export class GameAreaComponent implements CanComponentDeactivate {
       );
       if (this.isRaid()) {
         this.game?.camp.raid.forEach(r => {
-          r.actionsLeft = { primary: true, secondary: true };
+          const limbsLost = r.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
+          console.log(limbsLost);
+          if (limbsLost === 0) r.actionsLeft = { primary: true, secondary: true };
+          else if (limbsLost === 1) r.actionsLeft = { primary: true, secondary: false };
+          else r.actionsLeft = { primary: false, secondary: false };
           r.lastAction = {
             performer: { id: '', name: '' },
             primary: {} as GameAction,
@@ -3242,7 +3399,11 @@ export class GameAreaComponent implements CanComponentDeactivate {
       } else {
         this.currentEvent?.NPCs.forEach(
           (n) => {
-            n.actionsLeft = { primary: true, secondary: true };
+            const limbsLost = n.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
+            console.log(limbsLost);
+            if (limbsLost === 0) n.actionsLeft = { primary: true, secondary: true };
+            else if (limbsLost === 1) n.actionsLeft = { primary: true, secondary: false };
+            else n.actionsLeft = { primary: false, secondary: false };
             n.lastAction = {
               performer: { id: '', name: '' },
               primary: {} as GameAction,
@@ -3276,6 +3437,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.isLoading = true;
       this.dontWarnLeaving = true;
       await this.gameService.leaveGame(this.gameId, this.role);
+      localStorage.removeItem('selectedCombatTarget');
+      localStorage.removeItem('selectedWeapon' + this.player?.id);
+      localStorage.removeItem('checkedReaction' + this.player?.id);
       this.router.navigateByUrl('/jatek');
     } catch (error) {
       this.isLoading = false;

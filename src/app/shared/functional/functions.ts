@@ -253,7 +253,10 @@ export function createRandomCharacter(
   if (typeof charName !== 'string')
     throw new Error('Nem megfelelő névérték: ' + charName);
   let stats = createStats();
-  const hp = Math.ceil(Math.random() * 6),
+  const hp =
+    Math.ceil(Math.random() * 4) +
+    Math.ceil(Math.random() * 4) +
+    Math.ceil(Math.random() * 4),
     sp =
       Math.ceil(Math.random() * 4) +
       Math.ceil(Math.random() * 4) +

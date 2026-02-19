@@ -1,5 +1,7 @@
 <div id="content">
-  @if(!isLoading){ @if(game){
+  @if(!smallScreen){
+  @if(!isLoading){
+  @if(game){
   <div id="lobby-header" style="grid-area: header">
     <span style="grid-area: connection" class="text-name">Csatlakozási kód: <span id="code">{{ game.id }}</span></span>
     <span class="lobby-name" style="grid-area: name">{{ game.name }}</span>
@@ -13,7 +15,8 @@
     <hr />
     <div id="player-container">
       @for (item of game.players; track $index) {
-      <app-player-template [player]="item" [role]="role" (kickPlayerEvent)="kickPlayer($event)"></app-player-template>
+      <app-player-template [player]="item" [role]="role" (kickPlayerEvent)="kickPlayer($event)"
+        (volumeEvent)="setVolume($event)"></app-player-template>
       }
     </div>
   </div>
@@ -34,7 +37,7 @@
   </div>
   <div id="actions" style="grid-area: actions">
     @if(player && role === PlayerRole.PLAYER){
-    <button mat-flat-button (click)="ready()">
+    <button mat-flat-button (click)="ready()" [disabled]="performingReady">
       {{ player.status === PlayerStatus.NOTREADY ? 'Készen állok!' : 'Nem állok készen.' }}
 
       <mat-icon matPrefix fontSet="material-symbols-outlined">
@@ -42,15 +45,65 @@
       </mat-icon>
     </button>
     } @if(role === PlayerRole.HOST){
-    <button mat-flat-button [disabled]="!allReady || game.players.length === 0" (click)="startGame()">
+    <button mat-flat-button [disabled]="!allReady || game.players.length === 0 || starting" (click)="startGame()">
       Játék indítása
     </button>
     }
     <button mat-flat-button (click)="leaveGame()">Játék elhagyása</button>
   </div>
+  <div id="voiceActions" style="grid-area:voiceActions">
+    @if(voiceStream){
+    @if(!ownerVolumeSettingVisible){
+    <button class="fake-button" (click)="toggleMute()">
+      <mat-icon>
+        @if(isMuted()){mic_off}
+        @else{mic}
+      </mat-icon>
+    </button>
+    <button class="fake-button" (click)="toggleDeafen()">
+      <mat-icon>
+        @if(isDeafened()){volume_off}
+        @else{volume_up}
+      </mat-icon>
+    </button>
+    @if(role === PlayerRole.PLAYER && ownerConnected){
+    <button class="fake-button" style="position: relative;" (click)="ownerVolumeSettingVisible=true"
+      matTooltip="Játékmester hangerő">
+      <mat-icon fontSet="material-symbols-outlined">
+        discover_tune
+      </mat-icon>
+    </button>
+    }
+    <button class="fake-button" (click)="leaveCall()">
+      <mat-icon>call_end</mat-icon>
+    </button>
+    }
+    @else {
+    <button class="fake-button" style="position: relative;" (click)="ownerVolumeSettingVisible=false">
+      <mat-icon fontSet="material-symbols-outlined">
+        discover_tune
+      </mat-icon>
+    </button>
+    <form class="volumeSetting" [formGroup]="volumeForm">
+      <mat-label>Hangerő</mat-label>
+      <mat-slider min="0" max="1" step="0.01">
+        <input matSliderThumb formControlName="volume"
+          (valueChange)="setVolume({ id: this.game.ownerId, value: $event });">
+      </mat-slider>
+    </form>
+    }
+    }@else {
+    <button class="fake-button" (click)="joinVoiceChat()">
+      <mat-icon>
+        call
+      </mat-icon>
+    </button>
+    }
+  </div>
   } }@else {
   <mat-progress-spinner [mode]="'indeterminate'"></mat-progress-spinner>
-  } @if(error !== ''){
-  <mat-error class="error-message">{{ error }}</mat-error>
+  }}
+  @else {
+  <app-small-screen (goBackToIndexEvent)="goHome()"></app-small-screen>
   }
 </div>

@@ -17,6 +17,7 @@ export interface User {
   characters: string[];
   adventures: string[];
   games: string[];
+  inGame: boolean;
 }
 
 export interface ForumUser {

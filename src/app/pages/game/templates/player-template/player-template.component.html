@@ -1,21 +1,42 @@
 <div class="player" [ngClass]="{ showCharacter: showCharacter }">
   <div class="player-header">
-    <mat-icon
-      >@if(player.status ===
-      PlayerStatus.NOTREADY){person}@else{check}</mat-icon
-    >
+    <mat-icon>@if(player.status ===
+      PlayerStatus.NOTREADY){person}@else{check}</mat-icon>
     <span>{{ player.name }}</span>
+    @if(isSpeaking){
+    <mat-icon>volume_up</mat-icon>
+    }
   </div>
-  <div class="fake-button" (click)="toggleCharacter()">Karakter</div>
+  @if(!volumeSettingsVisible){
+  <button class="fake-button" (click)="toggleCharacter()">Karakter</button>
+  @if(userId !== player.id && isConnected){
+  <div class="fake-button" style="position: relative;" (click)="toggleVolumeSetting()">
+    <mat-icon fontSet="material-symbols-outlined">
+      discover_tune
+    </mat-icon>
+  </div>
+  }
   @if(role === PlayerRole.HOST){
   <div class="fake-button" matTooltip="Kirúgás" (click)="kickPlayer()">
     <mat-icon>logout</mat-icon>
   </div>
   }
+  }
+  @else{
+  <div class="fake-button" style="position: relative;" (click)="toggleVolumeSetting()">
+    <mat-icon fontSet="material-symbols-outlined">
+      discover_tune
+    </mat-icon>
+  </div>
+  <form class="volumeSetting" [formGroup]="volumeForm">
+    <mat-label>Hangerő</mat-label>
+    <mat-slider min="0" max="1" step="0.01">
+      <input matSliderThumb formControlName="volume">
+    </mat-slider>
+  </form>
+  }
+
 </div>
 <div class="character-container" [ngClass]="{ show: showCharacter }">
-  <app-karakter-template
-    [character]="player.character!"
-    [isPublic]="true"
-  ></app-karakter-template>
+  <app-karakter-template [character]="player.character!" [isPublic]="true"></app-karakter-template>
 </div>

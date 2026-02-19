@@ -140,7 +140,8 @@ export enum GameErrorCauses {
   NPCInCombat,
   NoPermission,
   NPCNotFound,
-  GameUpdateError
+  GameUpdateError,
+  AlreadyInGame,
 }
 
 export enum CharacterCreationErrorCauses {

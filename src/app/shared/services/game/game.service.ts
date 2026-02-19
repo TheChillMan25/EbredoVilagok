@@ -213,25 +213,30 @@ export class GameService {
       if (gameData.ownerId === user.uid) {
         throw new Error('Nem csatlakozhatsz a saját játékodhoz mint játékos!');
       }
-      if (!gameData.isOpen) {
-        throw new Error('A csatlakozás nem engedélyezett (a játék zárva)!');
+      if (userData.inGame) {
+        throw new Error('Már csatlakozva vagy egy játékhoz!', {cause: GameErrorCauses.AlreadyInGame});
       }
-
       const currentPlayers = gameData.players || [];
-      if (currentPlayers.length >= gameData.maxPlayers) {
-        throw new Error('Nem lehet csatlakozni! Megtelt a lobby.');
-      }
       if (currentPlayers.some((p) => p.id === user.uid)) {
-        throw new Error('Már csatlakoztál ehhez a játékhoz.');
+        return { ...gameData };
+      } else {
+        if (!gameData.isOpen) {
+          throw new Error('A csatlakozás nem engedélyezett (a játék zárva)!');
+        } if (currentPlayers.length >= gameData.maxPlayers) {
+          throw new Error('Nem lehet csatlakozni! Betelt a létszám.');
+        }
+        const newPlayer: Player = {
+          ...player,
+          name: userData.username as string,
+          id: user.uid,
+        };
+        const batch = writeBatch(this.firestore);
+        batch.update(userDocRef, { inGame: true });
+        const updatedPlayers = [...currentPlayers, newPlayer];
+        batch.update(gameDocRef, { players: updatedPlayers });
+        await batch.commit();
+        return { ...gameData, players: updatedPlayers };
       }
-      const newPlayer: Player = {
-        ...player,
-        name: userData.username as string,
-        id: user.uid,
-      };
-      const updatedPlayers = [...currentPlayers, newPlayer];
-      await updateDoc(gameDocRef, { players: updatedPlayers });
-      return { ...gameData, players: updatedPlayers };
     } catch (error: any) {
       console.error('Join Error:', error);
       throw error;
@@ -244,6 +249,15 @@ export class GameService {
         this.authService.currentUser.pipe(take(1))
       );
       if (!user) throw new Error('Felhasználó nem található!');
+      const userDocRef = doc(this.firestore, 'Users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) throw new Error('Felhasználó nem található!');
+      const userData = userSnap.data() as User;
+
+      let updateUserData: Partial<User> = { inGame: false };
+
+      const batch = writeBatch(this.firestore);
+      batch.update(userDocRef, updateUserData);
 
       const gameDocRef = doc(this.firestore, 'Games', gameId);
       const gameDoc = await getDoc(gameDocRef);
@@ -270,17 +284,23 @@ export class GameService {
           break;
         case PlayerRole.PLAYER:
           const gameData = gameDoc.data() as Game;
+          const currentPlayer = gameData.playerOrder.find(
+            (i) =>
+              i.id !== gameData.currentPlayer &&
+              !i.finished,
+          )?.id || '';
           const newPlayers = gameData.players.filter((p) => p.id !== user.uid);
           const newPlayerOrder = gameData.playerOrder.filter((po) => po.id !== user.uid);
-          updateData = { players: newPlayers, playerOrder: newPlayerOrder };
+          updateData = { players: newPlayers, playerOrder: newPlayerOrder, currentPlayer };
           break;
         default:
           throw new Error('Nem lehet kezelni a szerepkört!');
       }
 
       if (updateData) {
-        await updateDoc(gameDocRef, updateData);
+        batch.update(gameDocRef, updateData);
       }
+      await batch.commit();
     } catch (error: any) {
       console.error('Hiba a játék elhagyásakor: ', error);
       error.cause = GameErrorCauses.GameUpdateError;

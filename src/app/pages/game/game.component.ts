@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import {
   Adventure,
@@ -32,6 +32,11 @@ import { setBackground } from '../../shared/functional/functions';
 import { Router, RouterOutlet } from '@angular/router';
 import { GameTemplateComponent } from './templates/game-template/game-template.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { isMobileView } from '../map/map.component';
+import { SmallScreenComponent } from '../../shared/functional/small-screen/small-screen.component';
+import { MatCardModule } from '@angular/material/card';
+import { NgClass } from '@angular/common';
+import { GameErrorCauses } from '../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-game',
@@ -46,6 +51,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     ReactiveFormsModule,
     RouterOutlet,
     MatCheckboxModule,
+    SmallScreenComponent,
+    MatCardModule,
+    NgClass
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
@@ -68,6 +76,14 @@ export class GameComponent {
   myAdventures: Adventure[] = [];
   myGames: Game[] = [];
   openGames: Game[] = [];
+  smallScreen = false;
+
+  helpVisible = false;
+  tutorials = {
+    menu: true,
+    lobby: false,
+    game: false,
+  }
 
   subscriptions: Subscription[] = [];
 
@@ -79,14 +95,21 @@ export class GameComponent {
   ) { }
 
   ngOnInit() {
+    this.checkVisit();
     setBackground('#222', true);
     this.initForms();
     this.loadData();
+    this.smallScreen = isMobileView();
   }
 
   ngOnDestroy() {
     if (this.subscriptions.length > 0)
       this.subscriptions.forEach((s) => s.unsubscribe());
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.smallScreen = isMobileView();
   }
 
   loadData() {
@@ -135,6 +158,16 @@ export class GameComponent {
       joinID: new FormControl('', [Validators.required, noWhitespaceValidator]),
       character: new FormControl('', Validators.required),
     });
+  }
+
+  checkVisit() {
+    const visited = localStorage.getItem('visitedGamePage');
+    if (!visited) this.helpVisible = true;
+    localStorage.setItem('visitedGamePage', 'true');
+  }
+
+  goHome() {
+    this.router.navigate(['/index']);
   }
 
   async createGame() {
@@ -268,11 +301,41 @@ export class GameComponent {
         this.gameService.PlayerRole = PlayerRole.PLAYER;
         this.router.navigate(['/jatek', gameId, 'lobby']);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.isLoading = false;
       console.error('Hiba a játékhoz csatlakozáskor: ', error);
-      this.joinError = 'Nem sikerült csatlakozni!';
+      if (error.cause === GameErrorCauses.AlreadyInGame) this.joinError = 'Már csatlakoztál egy játékhoz!';
+      else this.joinError = 'Nem sikerült csatlakozni!';
       return;
     }
   }
+
+  nextTutorialPage() {
+    const container = document.getElementById('tutorial');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (this.tutorials.menu) {
+      this.tutorials.menu = false;
+      this.tutorials.lobby = true;
+    } else if (this.tutorials.lobby) {
+      this.tutorials.lobby = false;
+      this.tutorials.game = true;
+    }
+  }
+
+  prevTutorialPage() {
+    const container = document.getElementById('tutorial');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (this.tutorials.game) {
+      this.tutorials.game = false;
+      this.tutorials.lobby = true;
+    } else if (this.tutorials.lobby) {
+      this.tutorials.lobby = false;
+      this.tutorials.menu = true;
+    }
+  }
 }
+

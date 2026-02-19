@@ -3,13 +3,20 @@
   grid-template-areas:
     "header header"
     "actions adventure"
-    ". adventure"
+    "voiceActions adventure"
     "players adventure";
   align-items: unset;
   justify-content: unset;
   gap: 1rem;
-  grid-template-rows: 1fr 1fr 1fr 15fr;
+  grid-template-rows: 10% repeat(2, calc(10% - 1rem)) calc(70% - 1rem);
   grid-template-columns: 3fr 5.5fr;
+
+  mat-progress-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
 
   #lobby-header {
     width: 100%;
@@ -22,7 +29,7 @@
     justify-items: center;
     font-size: x-large;
     width: 100%;
-    padding: 1rem;
+    padding: 0.75rem;
     background-color: #2a2a2a;
     z-index: 5;
 
@@ -68,6 +75,7 @@
 
   #players {
     #player-container {
+      height: calc(100% - 4.5rem);
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -98,10 +106,56 @@
     padding: 1rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
 
     button {
-      font-size: large
+      font-size: large;
+
+      &:nth-child(2) {
+        margin-left: auto;
+      }
     }
   }
+
+  #voiceActions {
+    margin: 0 auto;
+    width: fit-content;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    button {
+      padding: 0.5rem;
+      font-size: large;
+    }
+  }
+}
+
+#overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+
+  mat-card {
+    width: 20%;
+  }
+}
+
+app-small-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

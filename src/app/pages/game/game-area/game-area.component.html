@@ -3,6 +3,7 @@
     inspectNPC: player,
     loading: isLoading,
   }">
+  @if(!smallScreen){
   @if (!isLoading) {
   @if (showDiceRoller) {
   <app-dice-roller #diceRoller [diceTypes]="diceToRoll" [rollModifier]="rollModifier"
@@ -141,7 +142,7 @@
     @if (role === PlayerRole.PLAYER) {
     <div class="header" style="grid-area: header">Egyéb</div>
     <div class="body" style="grid-area: body" [ngClass]="{myTurn: myTurn && !isWaitingForGM()}">
-      @if (myTurn && !isWaitingForGM()) {
+      @if (myTurn && !isWaitingForGM() && !isReacting()) {
       <div class="fake-button" (click)="finishTurn()" matTooltip="Kör befejezése" style="grid-area: finishTurn;">
         <mat-icon>fast_forward</mat-icon>
       </div>
@@ -157,6 +158,36 @@
       <div class="fake-button" (click)="leaveGame()" matTooltip="Kilépés a játékból" style="grid-area: leave;">
         <mat-icon>logout</mat-icon>
       </div>
+      <div id="voiceControls" style="grid-area: voiceControls;">
+        @if(voiceStream){
+        <button class="fake-button" (click)="toggleMute()">
+          <mat-icon>
+            @if(isMuted()){mic_off}
+            @else{mic}
+          </mat-icon>
+        </button>
+        <button class="fake-button" (click)="toggleDeafen()">
+          <mat-icon>
+            @if(isDeafened()){volume_off}
+            @else{volume_up}
+          </mat-icon>
+        </button>
+        @if(connectedPeers.length > 0){
+        <button class="fake-button" (click)="showPanel('sound', $event)">
+          <mat-icon fontSet="material-symbols-outlined">discover_tune</mat-icon>
+        </button>
+        }
+        <button class="fake-button" (click)="leaveCall()">
+          <mat-icon>call_end</mat-icon>
+        </button>
+        }@else {
+        <button class="fake-button" (click)="joinVoiceChat()">
+          <mat-icon>
+            call
+          </mat-icon>
+        </button>
+        }
+      </div>
     </div>
     } @else if (role === PlayerRole.HOST) {
     <div class="header" style="grid-area: header">Egyéb</div>
@@ -169,8 +200,62 @@
       <div class="fake-button" (click)="leaveGame()" matTooltip="Játék bezárása">
         Bezárás<mat-icon>close</mat-icon>
       </div>
+      <div id="voiceControls" style="grid-area: voiceControls;">
+        @if(voiceStream){
+        <button class="fake-button" (click)="toggleMute()">
+          <mat-icon>
+            @if(isMuted()){mic_off}
+            @else{mic}
+          </mat-icon>
+        </button>
+        <button class="fake-button" (click)="toggleDeafen()">
+          <mat-icon>
+            @if(isDeafened()){volume_off}
+            @else{volume_up}
+          </mat-icon>
+        </button>
+        @if(connectedPeers.length > 0){
+        <button class="fake-button" (click)="showPanel('sound', $event)">
+          <mat-icon fontSet="material-symbols-outlined">discover_tune</mat-icon>
+        </button>
+        }
+        <button class="fake-button" (click)="leaveCall()">
+          <mat-icon>call_end</mat-icon>
+        </button>
+        }@else {
+        <button class="fake-button" (click)="joinVoiceChat()">
+          <mat-icon>
+            call
+          </mat-icon>
+        </button>
+        }
+      </div>
     </div>
     }
+  </div>
+  <div id="soundUI" class="ui-container" [ngClass]="{show: soundControlVisible}"
+    (click)="showPanel('sound', $event, false)">
+    <form id="soundForm">
+      <span class="ui-title">Hangbeállítások</span>
+      @if(role === PlayerRole.PLAYER){
+      <div class="soundSetting">
+        <mat-label>{{game?.ownerName}}</mat-label>
+        <mat-slider min="0" max="1" step="0.01">
+          <input matSliderThumb [value]="getVolume(game?.ownerId!)" (valueChange)="setVolume(game?.ownerId!, $event)">
+        </mat-slider>
+      </div>
+      }
+      @for (item of game?.players; track $index) {
+      @if(item.id !== player?.id && connectedPeers.includes(item.id)){
+      <div class="soundSetting">
+        <mat-label>{{item.name}}</mat-label>
+        <mat-slider min="0" max="1" step="0.01">
+          <input matSliderThumb [value]="getVolume(item.id)" (valueChange)="setVolume(item.id, $event)">
+        </mat-slider>
+      </div>
+      }
+      }
+    </form>
   </div>
   <div id="votingUI" class="ui-container" [ngClass]="{show: voting}">
     @if(player?.name === game?.vote?.starter){
@@ -280,25 +365,17 @@
     <div class="header" style="grid-area: header">
       Hátizsák:
       <div id="inventory-pages">
-        <div class="page" [ngClass]="{ active: activeInventory === 's' }" (click)="selectInventory('s')">
-          <mat-icon fontSet="material-symbols-outlined" matTooltip="Különleges tárgyak">science</mat-icon>
-          <mat-icon fontSet="material-symbols-outlined" matTooltip="Különleges tárgyak">health_cross</mat-icon>
+        <div class="page" [ngClass]="{ active: activeInventory === 's' }" matTooltip="Különleges tárgyak"
+          (click)="selectInventory('s')">
+          <mat-icon fontSet="material-symbols-outlined">science</mat-icon>
+          <mat-icon id="medIcon" fontSet="material-symbols-outlined">health_cross</mat-icon>
         </div>
-        <div class="page" [ngClass]="{ active: activeInventory === 'f' }" (click)="selectInventory('f')">
-          <mat-icon fontSet="material-symbols-outlined" matTooltip="Étel(ek)">beer_meal</mat-icon>
+        <div class="page" [ngClass]="{ active: activeInventory === 'f' }" matTooltip="Étel(ek)" (click)="selectInventory('f')">
+          <mat-icon fontSet="material-symbols-outlined">beer_meal</mat-icon>
         </div>
-        <div class="page" [ngClass]="{ active: activeInventory === 'g' }" (click)="selectInventory('g')">
-          <mat-icon fontSet="material-symbols-outlined" matTooltip="Általános tárgyak">category</mat-icon>
+        <div class="page" [ngClass]="{ active: activeInventory === 'g' }" matTooltip="Általános tárgyak" (click)="selectInventory('g')">
+          <mat-icon fontSet="material-symbols-outlined">category</mat-icon>
         </div>
-        <!-- <div
-          class="page"
-          [ngClass]="{ active: activeInventory === 'e' }"
-          (click)="selectInventory('g')"
-        >
-          <mat-icon fontSet="material-symbols-outlined" matTooltip="Felszerelés"
-            >colorize</mat-icon
-          >
-        </div> -->
       </div>
     </div>
     <div class="body" style="grid-area: body">
@@ -567,14 +644,14 @@
     <mat-progress-spinner></mat-progress-spinner>
     }
   </div>
-  @if(reactionPanelVisible){
   <div id="reactionUI" class="ui-container" [ngClass]="{show: reactionPanelVisible}"
     (click)="showPanel('reaction', $event, false)">
-    <div id="reactionContainer" [ngClass]="{host: role === PlayerRole.HOST}">
+    <div id="reactionContainer" [ngClass]="{host: role === PlayerRole.HOST, cantReact: cantReact()}">
       <span class="ui-title" style="grid-area: title;">Reakció</span>
       <div class="fake-button" style="grid-area: noReact;" matTooltip="Nem reagálsz"
         (click)="reactToAttack('noReaction')"><mat-icon fontSet="material-symbols-outlined">close</mat-icon>
       </div>
+      @if(!cantReact()){
       <div class="fake-button" style="grid-area: dodge;" matTooltip="Kitérés (-1 SP)" (click)="reactToAttack('dodge')">
         <mat-icon fontSet="material-symbols-outlined">sprint</mat-icon>
       </div>
@@ -589,9 +666,9 @@
         <mat-icon fontSet="material-symbols-outlined">ifl</mat-icon>
       </div>
       }
+      }
     </div>
   </div>
-  }
   @if(role === PlayerRole.PLAYER){
   <div id="lootUI" class="ui-container" [ngClass]="{show: lootPanelVisible}">
     <div id="loot" style="grid-area: loot;">
@@ -686,7 +763,7 @@
     <div id="tradeAndSell" [ngClass]="{show: !sellItems}">
       <div id="tradeAndSellControl">
         <div style="display: flex; align-items: center; gap: 0.5rem;" matTooltip="Érmék">
-          <mat-icon style="color: #f2c480" fontSet="material-symbols-outlined">money_bag</mat-icon>
+          <mat-icon style="color: #f2c480" fontSet="material-symbols-outlined">toll</mat-icon>
           {{this.player?.character?.coins}}
         </div>
         <mat-icon fontSet=" material-symbols-outlined" matTooltip="Megvásárolandó tárgyak" (click)="sellItems = false"
@@ -830,17 +907,6 @@
             <div class="page" [ngClass]="{ active: activeInventory === 'g' }" (click)="selectInventory('g')">
               <mat-icon fontSet="material-symbols-outlined" matTooltip="Általános tárgyak">category</mat-icon>
             </div>
-            <!-- <div
-              class="page"
-              [ngClass]="{ active: activeInventory === 'e' }"
-              (click)="selectInventory('g')"
-            >
-              <mat-icon
-                fontSet="material-symbols-outlined"
-                matTooltip="Felszerelés"
-                >colorize</mat-icon
-              >
-            </div> -->
           </div>
         </div>
         <div class="body" style="grid-area: body">
@@ -874,12 +940,12 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Időtartam (kör)</mat-label>
-        <input matInput type="number" formControlName="duration" min="1" max="100" step="1" />
+        <input matInput type="number" formControlName="duration" min="1" max="99999" step="1" />
       </mat-form-field>
       @if (['BLEED', 'BURN', 'POISON'].includes(addStatusForm.get('type')?.value)) {
       <mat-form-field appearance="outline">
         <mat-label>Módosító érték</mat-label>
-        <input matInput type="number" formControlName="value" min="1" max="1000" step="1" />
+        <input matInput type="number" formControlName="value" min="1" max="99999" step="1" />
         <mat-icon fontSet="material-symbols-outlined" matSuffix
           matTooltip="Egyes státuszok ennyi HP-t csökkentenek körönként">help</mat-icon>
       </mat-form-field>
@@ -1202,5 +1268,8 @@
   }
   } @else {
   <mat-progress-spinner mode="indeterminate" style="grid-area: loading"></mat-progress-spinner>
+  }}
+  @else{
+  <app-small-screen (goBackToIndexEvent)="goHome()"></app-small-screen>
   }
 </div>

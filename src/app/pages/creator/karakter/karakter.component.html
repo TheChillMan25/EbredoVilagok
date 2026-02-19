@@ -6,21 +6,14 @@
         <mat-label>Név (min. 3)</mat-label>
         <input matInput type="text" formControlName="name" />
       </mat-form-field>
-      <button
-        class="fake-button"
-        matTooltip="Random karakter"
-        matTooltipPosition="above"
-        (click)="createRandomCharacter()"
-      >
+      <button class="fake-button" matTooltip="Random karakter" matTooltipPosition="above"
+        (click)="createRandomCharacter()">
         <mat-icon>shuffle</mat-icon>
       </button>
     </div>
     <mat-form-field appearance="outline">
       <mat-label>Faj</mat-label>
-      <mat-select
-        formControlName="species"
-        (selectionChange)="setRelevantSpeciesData($event.value)"
-      >
+      <mat-select formControlName="species" (selectionChange)="setRelevantSpeciesData($event.value)">
         @for (nation of speciesList; track $index) {
         <mat-option value="{{ nation }}">{{ nation }}</mat-option>
         }
@@ -42,22 +35,18 @@
           @for (item of currentSpeciesProperties; track $index) {
           <mat-option class="padded-option" [value]="$index">{{
             item.desc
-          }}</mat-option>
+            }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Otthon</mat-label>
-        <mat-select
-          formControlName="home"
-          (selectionChange)="selectHome($event.value)"
-        >
+        <mat-select formControlName="home" (selectionChange)="selectHome($event.value)">
           @for (item of currentSpeciesHomes; track $index) {
           <mat-option class="padded-option" [value]="$index">{{
             item.desc
-          }}</mat-option>
-          }</mat-select
-        >
+            }}</mat-option>
+          }</mat-select>
       </mat-form-field>
       <div id="other-properties">
         <span id="bonus-text">Bónusz ismeretek</span>
@@ -71,37 +60,24 @@
     </div>
     <div id="create">
       <span id="error">{{ errorMessage }}</span>
-      <button
-        id="createBtn"
-        class="fake-button"
-        (click)="createCharacter()"
-        [ngClass]="{ disabled: isLoading }"
-      >
+      <button id="createBtn" class="fake-button" (click)="createCharacter()" [ngClass]="{ disabled: isLoading }">
         Létrehozás
       </button>
     </div>
   </div>
   <div id="stats" class="container" formGroupName="stats" style="grid-area: stats;">
-    <span class="groupName">Tulajdonságok </span>
+    <span class="groupName" style="grid-area: title;">Tulajdonságok</span>
     @for (item of statsForm; track $index) {
-    <div
-      [id]="item.controlName"
-      [formGroupName]="item.controlName"
-      class="stat-container"
-    >
+    <div [id]="item.controlName" [formGroupName]="item.controlName" class="stat-container"
+      [style.gridArea]="item.controlName">
       @for (field of item.fields; track $index) {
       <mat-form-field appearance="outline">
         <mat-label>{{ field.labelText }}</mat-label>
-        <input
-          type="number"
-          [min]="item.interval.min"
-          [max]="item.interval.max"
-          matInput
-          [formControlName]="field.groupName"
-        />
+        <input type="number" [min]="item.interval.min" [max]="item.interval.max" matInput
+          [formControlName]="field.groupName" />
         <mat-icon matSuffix fontSet="material-symbols-outlined">{{
           field.icon
-        }}</mat-icon>
+          }}</mat-icon>
       </mat-form-field>
       }
     </div>
@@ -146,7 +122,7 @@
           @for (weapon of weapons; track weapon.id) {
           <mat-option class="padded-option" [value]="weapon.id">{{
             weapon.name
-          }}</mat-option>
+            }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -158,7 +134,7 @@
           @for (weapon of weapons; track weapon.id) {
           <mat-option class="padded-option" [value]="weapon.id">{{
             weapon.name
-          }}</mat-option>
+            }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -170,9 +146,7 @@
           @for (armour of armours; track armour.id) {
           <mat-option class="padded-option" [value]="armour.id">
             {{ armour.name }}
-            <mat-icon matTooltip="Védelmi érték: {{ armour.defValue }}"
-              >shield</mat-icon
-            >
+            <mat-icon matTooltip="Védelmi érték: {{ armour.defValue }}">shield</mat-icon>
           </mat-option>
           }
         </mat-select>
@@ -185,9 +159,7 @@
       <mat-label>Élelem</mat-label>
       <mat-select [formControl]="getInputs('items.food').at(0)">
         @for (item of foods; track $index) {
-        <mat-option [value]="item.id"
-          >{{ item.name }} - {{ item.uses }} fejadag</mat-option
-        >
+        <mat-option [value]="item.id">{{ item.name }} - {{ item.uses }} fejadag</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -272,12 +244,5 @@
         </mat-select>
       </mat-form-field>
     </div>
-  </div>
-  <div id="dice-rolling-menu" [ngClass]="{ show: showDiceMenu }">
-    <div class="fake-button">d4</div>
-    <div class="fake-button">d6</div>
-    <div class="fake-button">d10</div>
-    <div class="fake-button">d20</div>
-    <div class="fake-button">d100</div>
   </div>
 </form>

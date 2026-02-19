@@ -9,6 +9,7 @@ import {
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -163,6 +164,15 @@ export class UserService {
     } catch (error) {
       console.error('Hiba a felhasználó lekérdezésekor: ', error);
       return null;
+    }
+  }
+
+  async updateUser(userId: string, updateData: Partial<User>): Promise<void> {
+    try {
+      const userDocRef = doc(this.firestore, 'Users', userId);
+      await updateDoc(userDocRef, updateData);
+    } catch (error) {
+      console.error('Hiba a felhasználó frissítésekor: ', error);
     }
   }
 }

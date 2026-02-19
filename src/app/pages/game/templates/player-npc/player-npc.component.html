@@ -69,7 +69,8 @@
     }
   </div>
   @if(isRaid && role === "host"){
-  <div class="fake-button remove" (click)="removeRaider($event)" matTooltip="Törlés"><mat-icon>delete</mat-icon></div>
+  <button class="fake-button remove" (click)="removeRaider($event)"
+    matTooltip="Törlés"><mat-icon>delete</mat-icon></button>
   }
   <div class="action-indicator" style="grid-area: actionsLeft" [ngClass]="{camping: isCamping && !object?.inCombat}"
     [matTooltip]="isCamping ? 'Tábori akciók' : 'Akciók'" matTooltipPosition="above">

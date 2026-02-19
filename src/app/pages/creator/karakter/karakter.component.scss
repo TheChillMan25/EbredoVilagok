@@ -1,8 +1,7 @@
 #content {
   display: grid;
   grid-template-columns:
-    calc(25% - 1rem) calc(25% - 1rem) calc(25% - 1rem)
-    calc(25% - 1rem);
+    calc(25% - 1rem) calc(25% - 1rem) calc(25% - 1rem) calc(25% - 1rem);
   gap: 1rem;
   grid-template-rows: calc(50% - 0.5rem) calc(50% - 0.5rem);
   grid-template-areas:
@@ -21,8 +20,13 @@
     gap: 1rem;
   }
 
+  >.container {
+    overflow-y: auto;
+  }
+
   #main {
     flex-direction: column;
+
     #specialProperties {
       display: flex;
       flex-direction: column;
@@ -42,6 +46,7 @@
         padding: 0.5rem;
       }
     }
+
     #create {
       display: flex;
       flex-direction: column;
@@ -49,12 +54,15 @@
       gap: 1rem;
       width: 100%;
       margin-top: auto;
+
       .fake-button {
         font-size: x-large;
         border: 0.2rem solid #f2c480;
+
         &:hover {
           border: 0.2rem solid #444;
         }
+
         &.disabled {
           opacity: 0.75;
           pointer-events: none;
@@ -69,12 +77,15 @@
       }
     }
   }
+
   #stats {
     position: relative;
     display: grid;
     gap: 0.5rem;
     grid-template-rows: 1fr 6fr;
-    grid-template-columns: auto auto auto;
+    grid-template-areas:
+      "title title title"
+      "physical mental main";
     align-items: center;
 
     .groupName {
@@ -100,6 +111,7 @@
       }
     }
   }
+
   #virtues {
     flex-direction: column;
 
@@ -163,6 +175,7 @@
       background-color: transparent;
     }
   }
+
   --mat-sys-on-surface-variant: #f5f5f5;
 
   #dice-rolling-menu {
@@ -181,6 +194,7 @@
     }
   }
 }
+
 .padded-option {
   padding: 0.5rem;
 }
@@ -198,7 +212,6 @@ div.mat-mdc-select-panel {
   font-size: 1.7rem;
   color: #f2c480;
   text-align: center;
-  margin-bottom: 1rem;
 }
 
 #diceMenu {
@@ -225,21 +238,16 @@ div.mat-mdc-select-panel {
   }
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1446px) {
   #content {
-    #stat-virtue-container {
-      #stats {
-        grid-template-columns: auto auto;
-        > div:nth-child(4) {
-          grid-column: span 2;
-          flex-direction: row;
-          gap: 0.7rem;
-        }
+    #stats {
+      grid-template-areas:
+        "title title"
+        "physical mental"
+        "main main";
 
-        #diceMenu,
-        .groupName {
-          grid-column: span 2;
-        }
+      #main {
+        flex-direction: row;
       }
     }
   }
@@ -253,6 +261,11 @@ div.mat-mdc-select-panel {
 
 @media (max-width: 1080px) {
   #content {
+    grid-template-areas:
+      "main stats"
+      "main virtues"
+      "equipment items";
+    grid-template-rows: 50% 50% 100%;
     grid-template-columns: 49% 49%;
     row-gap: 1rem;
   }
@@ -261,9 +274,17 @@ div.mat-mdc-select-panel {
 @media (max-width: 530px) {
   #content {
     grid-template-columns: 100%;
+    grid-template-areas: 
+      "main"
+      "stats"
+      "virtues"
+      "equipment"
+      "items";
+      grid-template-rows: 100% repeat(2, 50%) repeat(2, 100%);
 
     #equipment {
       gap: 1rem;
+
       .rect,
       #shield {
         height: fit-content;
@@ -271,6 +292,7 @@ div.mat-mdc-select-panel {
 
       #shield {
         height: 10rem;
+
         #armour-field {
           position: static;
         }

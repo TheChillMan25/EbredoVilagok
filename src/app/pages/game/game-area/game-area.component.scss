@@ -3,6 +3,10 @@
     position: absolute;
   }
 
+  .fake-button {
+    padding: clamp(0.25rem, 0.75rem, 1rem);
+  }
+
   padding: 1rem;
   display: grid;
   gap: 1rem;
@@ -25,7 +29,7 @@
       "players pControl current-event npcs"
       "players pControl current-event npcs"
       "players pControl current-event npcs"
-      ". pControl current-event other";
+      "players pControl current-event other";
 
     &.inspectNPC {
       grid-template-areas:
@@ -226,6 +230,14 @@
         display: flex;
         justify-content: space-between;
       }
+
+      &#soundForm{
+        .soundSetting{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
     }
 
     >#reactionContainer {
@@ -243,6 +255,12 @@
           "noReact dodge"
           "attackBack parry"
           "random random";
+      }
+
+      &.cantReact {
+        grid-template-areas:
+          "title"
+          "noReact";
       }
     }
 
@@ -624,7 +642,7 @@
       grid-template-rows: 2rem 2fr 5fr;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       font-size: large;
-      gap: 0.5rem;
+      gap: clamp(.25rem, 1vw, 0.5rem);
 
       #character-name {
         font-size: larger;
@@ -639,6 +657,11 @@
 
       #speciesSpecial {
         font-size: medium;
+        display: -webkit-box;
+        -webkit-line-clamp: clamp(1, 3, 4);
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       #home-bonuses {
@@ -694,7 +717,7 @@
       }
 
       #stats {
-        padding: 1rem;
+        padding: clamp(.25rem, 1vw, .5rem);
         height: 100%;
         width: 100%;
         display: grid;
@@ -702,14 +725,14 @@
           "str int"
           "dex cun"
           "end wil";
-        gap: 0.5rem;
+        gap: clamp(.25rem, 1vw, 1rem);
         align-items: center;
         justify-items: center;
 
         .stat {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: clamp(.25rem, 1vw, 1rem);
 
           mat-icon {
             color: #f2c480;
@@ -770,13 +793,25 @@
     .body {
       align-items: center;
       justify-items: center;
-      grid-template-areas: "leave";
+      grid-template-areas:
+        "leave"
+        "voiceControls";
+
+      #voiceControls {
+        display: flex;
+        gap: 1rem;
+
+        .fake-button {
+          padding: .5rem;
+        }
+      }
 
       &.myTurn {
         grid-template-areas:
           "finishTurn finishTurn"
           "roll lastRoll"
-          "leave leave";
+          "leave leave"
+          "voiceControls voiceControls";
       }
     }
   }
@@ -934,4 +969,45 @@
   user-select: none;
   pointer-events: none;
   opacity: 0.75;
+}
+
+@media(max-width: 1300px) {
+  #content {
+    #character {
+      .body {
+        grid-template-areas:
+          "name name class class"
+          "sSpec sSpec eq eq"
+          "home home stats stats"
+          "money money stats stats";
+
+        #speciesSpecial {
+          font-size: smaller;
+        }
+      }
+    }
+
+    #inventory {
+      .header {
+        #inventory-pages {
+          .page {
+            #medIcon {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+app-small-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

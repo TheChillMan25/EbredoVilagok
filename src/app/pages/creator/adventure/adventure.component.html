@@ -364,7 +364,7 @@
     <div id="traderUI" class="ui-container" [ngClass]="{show: true}">
       <div class="header">
         <div class="header-text">Kereskedő beállítások</div>
-        <div class="fake-button" (click)="hideUIs('trader')"><mat-icon>close</mat-icon></div>
+        <button class="fake-button" (click)="hideUIs('trader')"><mat-icon>close</mat-icon></button>
       </div>
       <form class="body" [formGroup]="traderForm" (ngSubmit)="setTraderSettings()">
         <span class="group-title" style="grid-area: foodTitle;">
@@ -467,7 +467,7 @@
     <div id="newItemUI" class="ui-container" [ngClass]="{show: true}">
       <div class="header">
         <div class="header-text">Új tárgy hozzáadása</div>
-        <div class="fake-button" (click)="hideUIs('newItem')"><mat-icon>close</mat-icon></div>
+        <button class="fake-button" (click)="hideUIs('newItem')"><mat-icon>close</mat-icon></button>
       </div>
       <form [formGroup]="newItemForm" (ngSubmit)="addNewItemToTradableItems()">
         <mat-form-field appearance="outline">
