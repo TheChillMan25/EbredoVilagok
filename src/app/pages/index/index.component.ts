@@ -25,7 +25,7 @@ export class IndexComponent {
 
   async ngOnInit() {
     setBackground('bg');
-    await this.uploadItems();
+    //await this.uploadItems();
     await this.initItems();
   }
 
