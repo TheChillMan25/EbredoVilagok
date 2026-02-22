@@ -150,7 +150,7 @@ export enum PlayerStatus {
 export interface GameParticipant {
   id: string;
   name: string;
-  character?: Character;
+  character: Character;
   lastAction: {
     performer: { id: string; name: string };
     primary: GameAction;

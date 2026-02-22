@@ -86,7 +86,7 @@
       </span>
       @if(role === PlayerRole.HOST && (game?.camp?.raid?.length === 0 || (isRaid() && allRaidersDead()))){
       <div class="fake-button" style="grid-area: checkCamp"
-        [ngClass]="{disabled: !playersFinishedCampActions && !isWaitingForGM()}" fontSet="material-symbols-outl"
+        [ngClass]="{disabled: !playersFinishedCampActions || !isWaitingForGM()}" fontSet="material-symbols-outl"
         (click)="checkCamp()"
         [matTooltip]=" isRaid() && allRaidersDead() ? 'Táborozás befejezése' : 'Tábor ellenőrzése'">
         <mat-icon>check</mat-icon>
@@ -272,10 +272,6 @@
         <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
       </div>
       <div class="votes" style="grid-area: votes;">
-        <div class="vote">
-          <span>{{game?.vote?.starter}}</span>
-          <mat-icon fontSet="material-symbols-outlined">check</mat-icon>
-        </div>
         @for (vote of game?.vote?.votes; track $index) {
         <div class="vote">
           <span>{{vote.player}}</span>
@@ -297,10 +293,10 @@
     <div class="header" style="grid-area: header">Karakter</div>
     <div class="body" style="grid-area: body">
       <span id="character-name" style="grid-area: name">
-        {{ player.character?.name }}
+        {{ player.character.name }}
       </span>
       <span id="character-class" style="grid-area: class">
-        {{ player.character?.class }}
+        {{ player.character.class }}
       </span>
       <span id="speciesSpecial" style="grid-area: sSpec">
         {{ myCharacterSpecs?.speciesSpecial?.desc }}
@@ -357,7 +353,7 @@
       </div>
       <div id="characterMoney" style="grid-area: money">
         <mat-icon fontSet="material-symbols-outlined">money_bag</mat-icon>
-        {{ player.character?.coins }}
+        {{ player.character.coins }}
       </div>
     </div>
   </div>
@@ -401,17 +397,17 @@
       </div>
       @if(!game?.camp?.isCamping && !isRaid() && !isReacting() && !player.inCombat){
       <div class="fake-button" (click)="showActionPanel($event, ActionType.CAMP)" matTooltip="Táborozás"
-        style="grid-area: camp" [ngClass]="{ disabled: !player.actionsLeft.primary || !myTurn }">
+        style="grid-area: camp" [ngClass]="{ disabled: !myTurn }">
         <mat-icon fontSet="material-symbols-outlined">camping</mat-icon>
       </div>
       <div class="fake-button" (click)="showActionPanel($event, ActionType.TRADE)" matTooltip="Kereskedés" [ngClass]="{
                 disabled:
-                  !hasTrader() || !player.actionsLeft.primary ||isReacting() || !myTurn,
+                  !hasTrader() || isReacting() || !myTurn,
               }" style="grid-area: trade">
         <mat-icon fontSet="material-symbols-outlined">storefront</mat-icon>
       </div>
       <div class="fake-button" (click)="showActionPanel($event, ActionType.LOOT)" matTooltip="Kifosztás" [ngClass]="{
-                disabled: !player.actionsLeft.primary || isReacting() || !hasDead() || !myTurn,
+                disabled:  isReacting() || !hasDead() || !myTurn,
               }" style="grid-area: loot">
         <mat-icon fontSet="material-symbols-outlined">money_bag</mat-icon>
       </div>
@@ -579,7 +575,7 @@
       <mat-form-field appearance="outline" style="grid-area: customCA"
         matTooltip="Ha nem szeretnél teljes TA árat fizetni az akicóért. Ha nem költenek rá elég pontot, nem teljesül az akció.">
         <mat-label>Egyedi érték</mat-label>
-        <input matInput type="number" formControlName="customCA" [min]="0"
+        <input matInput type="number" formControlName="customCA" [min]="0" (keydown)="preventDecimals($event)"
           [max]="getCampActionCost(actionForm.get('type')?.value)" step="1" />
       </mat-form-field>
       }
@@ -589,7 +585,7 @@
         <mat-label>Altípus</mat-label>
         <mat-select formControlName="caSubType">
           @for (item of campActionSubtypes; track $index) {
-          <mat-option [value]="item.value">{{item.viewValue}}</mat-option>
+          <mat-option [value]="item.value" [matTooltip]="item.desc" matTooltipPosition="after">{{item.viewValue}}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -605,7 +601,7 @@
           <mat-optgroup [label]="group.label">
             @for (item of group.items; track $index) {
             <mat-option [value]="item.id" [matTooltip]="item.effectDesc ? item.effectDesc : item.desc"
-              matTooltipPosition="before">
+              matTooltipPosition="after">
               {{ item.name }} {{ $any(item).combat ? "(HK)" : "" }}
             </mat-option>
             }

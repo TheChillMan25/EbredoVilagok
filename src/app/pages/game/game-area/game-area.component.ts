@@ -339,23 +339,23 @@ export class GameAreaComponent implements CanComponentDeactivate {
   campActionCosts = {
     fire: 3, tents: 5, traps: 5, guard: 8, calm: 2, gather: 3, hunt: 4, useitem: 1
   }
-  campActionSubtypes: { value: string, viewValue: string }[] = [];
-  campActionSubTypeMap: Record<string, { value: string, viewValue: string, roll: number, check: string, bonus: number, bonusName: string }[]> = {
+  campActionSubtypes: { value: string, viewValue: string, desc: string }[] = [];
+  campActionSubTypeMap: Record<string, { value: string, viewValue: string, roll: number, check: string, bonus: number, bonusName: string, desc: string }[]> = {
     [StandardCampActions.CALM_OTHERS]: [
-      { value: 'jokes', viewValue: 'Vicc mesélés', roll: 6, check: 'int', bonus: 1, bonusName: 'heal_sp' },
-      { value: 'story', viewValue: 'Történet mesélés', roll: 10, check: 'cun', bonus: 2, bonusName: 'heal_sp' },
-      { value: 'sing', viewValue: 'Éneklés', roll: 14, check: 'end', bonus: 3, bonusName: 'heal_sp' },
-      { value: 'music', viewValue: 'Zenélés', roll: 16, check: 'dex', bonus: 4, bonusName: 'heal_sp' },
+      { value: 'jokes', viewValue: 'Vicc mesélés', roll: 6, check: 'int', bonus: 1, bonusName: 'heal_sp', desc: 'CÉ 6 (Ész): +1 stressz gyógyulás' },
+      { value: 'story', viewValue: 'Történet mesélés', roll: 10, check: 'cun', bonus: 2, bonusName: 'heal_sp', desc: 'CÉ 10 (Fortély): +2 stressz gyógyulás' },
+      { value: 'sing', viewValue: 'Éneklés', roll: 14, check: 'end', bonus: 3, bonusName: 'heal_sp', desc: 'CÉ 14 (Kitartás): +3 stressz gyógyulás' },
+      { value: 'music', viewValue: 'Zenélés', roll: 16, check: 'dex', bonus: 4, bonusName: 'heal_sp', desc: 'CÉ 16 (Ügyesség): +4 stressz gyógyulás' },
     ],
     [StandardCampActions.GATHER_PLANTS]: [
-      { value: 'spices', viewValue: 'Fűszerek gyűjtése', roll: 5, check: 'dex', bonus: 1, bonusName: 'food' },
-      { value: 'drugs', viewValue: 'Füvek gyűjtése', roll: 10, check: 'dex', bonus: 1, bonusName: 'heal_sp' },
-      { value: 'herbs', viewValue: 'Gyógynövények gyűjtése', roll: 15, check: 'int', bonus: 1, bonusName: 'heal_s_w' },
+      { value: 'spices', viewValue: 'Fűszerek gyűjtése', roll: 5, check: 'dex', bonus: 1, bonusName: 'food', desc: 'CÉ 5 (Ügyesség): +1 fejadag a meglévő ételekhez' },
+      { value: 'drugs', viewValue: 'Füvek gyűjtése', roll: 10, check: 'dex', bonus: 1, bonusName: 'heal_sp', desc: 'CÉ 10 (Ügyesség): +1 stressz gyógyulás' },
+      { value: 'herbs', viewValue: 'Gyógynövények gyűjtése', roll: 15, check: 'int', bonus: 1, bonusName: 'heal_s_w', desc: 'CÉ 15 (Ész): 1 kis seb gyógyítás' },
     ],
     [StandardCampActions.HUNT]: [
-      { value: 'small', viewValue: 'Kis állatok', roll: 5, check: 'dex', bonus: 2, bonusName: 'food' },
-      { value: 'medium', viewValue: 'Közepes állat', roll: 10, check: 'end', bonus: 5, bonusName: 'food' },
-      { value: 'large', viewValue: 'Nagy állat', roll: 15, check: 'str', bonus: 8, bonusName: 'food' },
+      { value: 'small', viewValue: 'Kis állatok', roll: 5, check: 'dex', bonus: 2, bonusName: 'food', desc: 'CÉ 5 (Ügyesség): +2 fejadag az ételekhez' },
+      { value: 'medium', viewValue: 'Közepes állat', roll: 10, check: 'end', bonus: 5, bonusName: 'food', desc: 'CÉ 10 (Kitartás): +5 fejadag az ételekhez' },
+      { value: 'large', viewValue: 'Nagy állat', roll: 15, check: 'str', bonus: 8, bonusName: 'food', desc: 'CÉ 15 (Erő): +8 fejadag az ételekhez' },
     ]
   }
 
@@ -513,7 +513,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
       target: [''],
       item: [''],
       caSubType: [''],
-      customCA: [0]
+      customCA: [0, [Validators.pattern('^[0-9]+$')]]
     });
     this.addStatusForm = this.fb.group({
       type: [StatusType.BLEED, [Validators.required]],
@@ -753,20 +753,23 @@ export class GameAreaComponent implements CanComponentDeactivate {
           if (!this.playersFinishedCampActions) this.openSnackBar('A táborozás kiértékelhető.')
           this.playersFinishedCampActions = true;
         }
-        if (game.vote.theme && game.vote.votes.length === game.players.length - 1) {
+        if (game.vote.theme && game.vote.votes.length === game.players.length) {
           let result = this.evaluateVote();
           this.game?.players.forEach(p => {
             p.isVoting = false;
           })
           this.game.camp.isCamping = result
+          this.game.vote = { theme: '', starter: '', votes: [] };
           if (result) {
             this.calculateCampActions();
+            await this.startNewTurn();
+          }else{
+            await this.gameService.updateGame(this.gameId, {
+              vote: this.game.vote,
+              players: this.game?.players,
+              camp: this.game.camp
+            });
           }
-          await this.gameService.updateGame(this.gameId, {
-            vote: { theme: '', starter: '', votes: [] },
-            players: this.game?.players,
-            camp: this.game.camp
-          });
         }
         this.currentPlayer = game.players.find(
           (p) => p.id === game.currentPlayer)! ??
@@ -882,7 +885,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       alert('Nem sikerült csatlakozni. Engedélyezd a mikrofon használatát, és próbáld újra!');
     }
   }
-
   toggleMute() {
     switch (this.voiceService.muted()) {
       case true:
@@ -893,49 +895,32 @@ export class GameAreaComponent implements CanComponentDeactivate {
         break;
     }
   }
-
   isPhone(): boolean {
     return window.innerWidth <= 768 || window.innerHeight <= 605;
   }
-
   isMuted(): boolean {
     return this.voiceService.muted();
   }
-
   toggleDeafen() {
     this.voiceService.toggleDeafen(!this.voiceService.deafened());
   }
-
   isDeafened(): boolean {
     return this.voiceService.deafened();
   }
-
   leaveCall() {
     this.voiceStream = undefined;
     this.voiceService.destroy();
   }
-
   showSoundSettings(visible: boolean = true) {
     this.soundControlVisible = visible;
   }
-
   setVolume(id: string, volume: number) {
     console.log(volume);
     if (volume < 0 || volume > 1) return;
     this.voiceService.setPeerVolume(id, volume);
   }
-
   getVolume(id: string): number {
     return this.voiceService.getPeerVolume(id);
-  }
-
-  evaluateVote(): boolean {
-    let y = 0, n = 0;
-    this.game?.vote.votes.forEach(v => {
-      if (v.vote) y += 1;
-      else n += 1;
-    })
-    return y > n;
   }
 
   openDiceRoller(dice: string[] = ['d20']): Promise<number> {
@@ -959,11 +944,9 @@ export class GameAreaComponent implements CanComponentDeactivate {
       }, 100);
     }, this.diceRollTimeOut);
   }
-
   closeDiceRoller() {
     this.showDiceRoller = false;
   }
-
   rollCheck(statMod: number) {
     if (!this.myTurn || statMod === undefined) return Promise.resolve(0);
     this.rollModifier = statMod;
@@ -1138,7 +1121,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
         break;
     }
   }
-  /* GETTERS */
   openSnackBar(msg: string) {
     this.snackBarQueue.push(msg);
     if (!this.isSnackBarShowing) {
@@ -1159,6 +1141,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.showNextSnackBar();
     });
   }
+  /* GETTERS */
   getActionName(type: ActionType | MandatoryCampActions | StandardCampActions) {
     switch (type) {
       case ActionType.USEITEM:
@@ -1885,7 +1868,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
           await this.useItem(isPrimary);
           break;
         case ActionType.CAMP:
-          await this.askForCamp();
+          await this.askForCamp(isPrimary);
           break;
         case ActionType.ATTACK:
           await this.attack(isPrimary);
@@ -1959,7 +1942,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
-
   manageActions(isPrimary: boolean, type: ActionType | MandatoryCampActions | StandardCampActions) {
     const itemName = this.selectedItem?.name || 'Ismeretlen tárgy';
     if (this.player) {
@@ -2019,6 +2001,17 @@ export class GameAreaComponent implements CanComponentDeactivate {
             };
           }
           break;
+        case ActionType.CAMP:
+          if (isPrimary) {
+            this.player.lastAction.primary = {
+              type: type,
+            };
+          } else {
+            this.player.lastAction.secondary = {
+              type: type,
+            };
+          }
+          break;
       }
       if ((!this.game?.camp.isCamping || this.isRaid()) && isPrimary) {
         this.player.actionsLeft.primary = false;
@@ -2028,7 +2021,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.game!.currentAction = this.player?.lastAction;
     }
   }
-
   async useItem(isPrimary: boolean) {
     if (this.player) {
       if (!this.selectedItem) throw new Error('Nincs kiválasztva tárgy!');
@@ -2068,7 +2060,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       }
     }
   }
-
   async manageItemUses(isPrimary: boolean) {
     try {
       if (this.player && this.selectedItem) {
@@ -2109,7 +2100,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
-
   applyItemEffect(effect: ItemEffect, partyWide: boolean = false, teamTarget: Player | null = null) {
     const target = effect.target === 'self' ? this.player : effect.target === 'target' ? this.selectedTarget : partyWide ? teamTarget : 'party';
     if (target && target !== 'party' && target.character) {
@@ -2241,6 +2231,14 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
+  evaluateVote(): boolean {
+    let y = 0, n = 0;
+    this.game?.vote.votes.forEach(v => {
+      if (v.vote) y += 1;
+      else n += 1;
+    })
+    return y > n;
+  }
   async vote(vote: boolean) {
     try {
       let playerVote = this.game?.vote.votes?.find(v => v.player === this.player?.name)
@@ -2256,28 +2254,36 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
-
-  async askForCamp() {
-    try {
-      if (this.game?.players.some(p => p.inCombat)) {
-        this.openSnackBar('Nem kezdeményezhető táborozás harc közben!');
-        return;
+  async askForCamp(isPrimary: boolean) {
+    if(isPrimary && this.player?.actionsLeft.primary === false) {
+      throw new Error('Nincs elsődleges akciód!');
+    }
+    if(!isPrimary && this.player?.actionsLeft.secondary === false) {
+      throw new Error('Nincs másodlagos akciód!');
+    }
+    if (this.game?.players.some(p => p.inCombat)) {
+      throw new Error('Nem kezdeményezhető táborozás harc közben!');
       }
+    try {
       if (this.game?.players.length === 1) {
         this.game.camp.isCamping = true;
-        this.calculateCampActions()
-        await this.gameService.updateGame(this.gameId, {
-          camp: this.game.camp, players: this.game?.players
-        })
+        this.calculateCampActions();
+        await this.startNewTurn();
         this.actionPanelVisible = false;
         return;
       }
       this.game?.players.forEach(p => p.isVoting = true)
-      await this.gameService.updateGame(this.gameId,
-        {
-          vote: { theme: 'Táborozás', starter: this.player?.name!, votes: [] },
-          players: this.game?.players
-        }
+      this.manageActions(isPrimary, ActionType.CAMP);
+        await this.gameService.updateGame(this.gameId,
+          {
+            vote: { theme: 'Táborozás', starter: this.player?.name!, votes: [
+              {
+                player: this.player?.name!,
+                vote: true,
+              }
+            ] },
+            players: this.game?.players
+          }
       )
       this.actionPanelVisible = false;
     } catch (error) {
@@ -2286,6 +2292,80 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
+  async checkCamp() {
+    if (this.game?.camp.raid.every(r => r.character?.activeStatuses.some(s => s.type === StatusType.DEAD)) && this.game?.camp.raid.length > 0) {
+      await this.finishCamping();
+      return;
+    }
+    if (this.game?.playerOrder.some(i => !i.finished)) {
+      this.openSnackBar('Nem minden játékos végzet!')
+      return;
+    }
+    const prevCheckStr = localStorage.getItem('campCheckRoll');
+    let prevCheck = 0;
+    if (prevCheckStr) {
+      prevCheck = parseInt(prevCheckStr);
+    }
+    let notDone = [];
+    if (this.game?.camp.campActions.fire! < this.campActionCosts.fire) notDone.push(1);
+    if (this.game?.camp.campActions.tents! < this.campActionCosts.tents) notDone.push(2);
+    if (this.game?.camp.campActions.traps! < this.campActionCosts.traps) notDone.push(3);
+    if (this.game?.camp.campActions.guard! < this.campActionCosts.guard) notDone.push(4);
+    if (prevCheck) {
+      if (this.raiders.length === 0) {
+        this.openSnackBar('Nincsenek rajtaütő NPC-k! Adj meg legalább egyet.')
+        return;
+      }
+      this.openSnackBar('Rajtaütés');
+      this.canPublishRaiders = true;
+      return;
+    }
+    if (notDone.length > 0) {
+      await this.openDiceRoller(['d4']);
+      if (notDone.includes(this.lastRoll)) {
+        if (this.raiders.length === 0) {
+          this.openSnackBar('Nincsenek rajtaütő NPC-k! Adj meg legalább egyet.')
+          localStorage.setItem('campCheckRoll', `${this.lastRoll}`)
+          return;
+        }
+        this.openSnackBar('Rajtaütés');
+        this.canPublishRaiders = true;
+        return;
+      }
+    }
+    localStorage.removeItem('campCheckRoll');
+    await this.finishCamping().catch(error => {
+      console.error('Hiba a táborozás lezárásakor: ', error);
+      this.openSnackBar('Hiba a táborozás lezárásakor.');
+    })
+
+  }
+  async finishCamping() {
+    try {
+      this.game?.players.forEach((p) => {
+        if (p.inCombat) p.inCombat = false;
+        p.character.activeStatuses = p.character.activeStatuses?.filter(s=>[StatusType.DEAD, StatusType.INSANE, StatusType.PROSTHETIC].includes(s.type)) ?? [];
+      });
+      this.game!.playerOrder! = this.game?.playerOrder.filter(po => this.game?.players.some(p => p.id === po.id)) ?? [];
+      this.game!.camp.isCamping = false;
+      this.game!.camp.raid = [];
+      this.game!.camp.campActions = {
+        fire: 0,
+        tents: 0,
+        traps: 0,
+        guard: 0,
+      }
+      await this.gameService.updateGame(this.gameId, {
+        camp: this.game?.camp,
+        players: this.game?.players,
+        playerOrder: this.game?.playerOrder
+      });
+      await this.startNewTurn();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   lootItem(type: 'loot' | 'putback', item: Item | Food | SpecialItem) {
     if (type === 'loot') {
       this.loot = this.loot.filter(i => i.id !== item.id);
@@ -2362,7 +2442,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       return;
     }
   }
-
   addToTrade(type: 'buy' | 'sell', action: 'add' | 'remove', item: Food | SpecialItem | Item, moveAll: boolean = false) {
     let itemsArray = type === 'buy' ? this.itemsToBuy : this.itemsToSell;
     let originalItem;
@@ -2937,17 +3016,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
-  calculateCampActions() {
-    if (this.game) {
-      const pC = this.game.players.length;
-      const ca = Math.ceil(21 / pC) + 4;
-      this.game?.players.forEach(p => {
-        const end = p.character?.stats?.physical.end ?? 0;
-        p.campActionPoints = ca + end
-      })
-    }
-  }
-
   async toggleNPCVisibility(id: string) {
     try {
       if (this.role !== PlayerRole.HOST) {
@@ -2980,6 +3048,17 @@ export class GameAreaComponent implements CanComponentDeactivate {
     return apLeft - apReq >= 0;
   }
 
+
+  calculateCampActions() {
+    if (this.game) {
+      const pC = this.game.players.length;
+      const ca = Math.ceil(21 / pC) + 4;
+      this.game?.players.forEach(p => {
+        const end = p.character?.stats?.physical.end ?? 0;
+        p.campActionPoints = ca + end
+      })
+    }
+  }
   async performMandatoryCampAction(type: MandatoryCampActions, customValue: number = 0) {
     try {
       if ('campActionPoints' in this.player! && this.player.campActionPoints > 0) {
@@ -3252,6 +3331,10 @@ export class GameAreaComponent implements CanComponentDeactivate {
           (i) => i.id === this.game?.currentPlayer,
         );
         if (current) {
+          let noEnemies = true;
+          if (this.game?.playerOrder.some(p => p.id.includes('-'))) {
+            noEnemies = false;
+          }
           current.finished = true;
           this.game?.playerOrder.sort((a, b) => b.initiative - a.initiative);
           const next = this.game?.playerOrder.find(
@@ -3260,8 +3343,12 @@ export class GameAreaComponent implements CanComponentDeactivate {
               !i.finished,
           );
           if (next) {
+            for (const p of this.game?.players!) {
+              if (noEnemies) p.inCombat = false;
+            }
             await this.gameService.updateGame(this.gameId, {
               currentPlayer: next.id,
+              players: this.game?.players,
               adventure: this.game?.adventure,
               playerOrder: this.game?.playerOrder,
               currentAction: {
@@ -3271,7 +3358,22 @@ export class GameAreaComponent implements CanComponentDeactivate {
               }
             });
           } else {
-            await this.startNewTurn()
+            if (this.game?.camp.isCamping && !this.isRaid()) {
+              for (const p of this.game?.players!) {
+                p.campActionPoints = 0;
+              }
+              await this.gameService.updateGame(this.gameId, {
+                players: this.game?.players,
+                playerOrder: this.game?.playerOrder,
+                currentAction: {
+                  performer: { id: '', name: '' },
+                  primary: {} as GameAction,
+                  secondary: {} as GameAction,
+                }
+              });
+            } else {
+              await this.startNewTurn();
+            }
           }
         }
       }
@@ -3282,87 +3384,11 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
-  async checkCamp() {
-    if (this.game?.camp.raid.every(r => r.character?.activeStatuses.some(s => s.type === StatusType.DEAD)) && this.game?.camp.raid.length > 0) {
-      await this.finishCamping();
-      return;
-    }
-    if (this.game?.playerOrder.some(i => !i.finished)) {
-      this.openSnackBar('Nem minden játékos végzet!')
-      return;
-    }
-    const prevCheckStr = localStorage.getItem('campCheckRoll');
-    let prevCheck = 0;
-    if (prevCheckStr) {
-      prevCheck = parseInt(prevCheckStr);
-    }
-    let notDone = [];
-    if (this.game?.camp.campActions.fire! < this.campActionCosts.fire) notDone.push(1);
-    if (this.game?.camp.campActions.tents! < this.campActionCosts.tents) notDone.push(2);
-    if (this.game?.camp.campActions.traps! < this.campActionCosts.traps) notDone.push(3);
-    if (this.game?.camp.campActions.guard! < this.campActionCosts.guard) notDone.push(4);
-    if (prevCheck) {
-      if (this.raiders.length === 0) {
-        this.openSnackBar('Nincsenek rajtaütő NPC-k! Adj meg legalább egyet.')
-        return;
-      }
-      this.openSnackBar('Rajtaütés');
-      this.canPublishRaiders = true;
-      return;
-    }
-    if (notDone.length > 0) {
-      await this.openDiceRoller(['d4']);
-      if (notDone.includes(this.lastRoll)) {
-        if (this.raiders.length === 0) {
-          this.openSnackBar('Nincsenek rajtaütő NPC-k! Adj meg legalább egyet.')
-          localStorage.setItem('campCheckRoll', `${this.lastRoll}`)
-          return;
-        }
-        this.openSnackBar('Rajtaütés');
-        this.canPublishRaiders = true;
-        return;
-      }
-    }
-    localStorage.removeItem('campCheckRoll');
-    await this.finishCamping().catch(error => {
-      console.error('Hiba a táborozás lezárásakor: ', error);
-      this.openSnackBar('Hiba a táborozás lezárásakor.');
-    })
-
-  }
-
-  async finishCamping() {
-    try {
-      this.game?.players.forEach((p) => {
-        if (p.inCombat) p.inCombat = false;
-      });
-      this.game!.playerOrder! = this.game?.playerOrder.filter(po => this.game?.players.some(p => p.id === po.id)) ?? [];
-      this.game!.camp.isCamping = false;
-      this.game!.camp.raid = [];
-      this.game!.camp.campActions = {
-        fire: 0,
-        tents: 0,
-        traps: 0,
-        guard: 0,
-      }
-      await this.gameService.updateGame(this.gameId, {
-        camp: this.game?.camp,
-        players: this.game?.players,
-        playerOrder: this.game?.playerOrder
-      });
-      await this.startNewTurn();
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async startNewTurn() {
     try {
-      if (!this.game?.camp.isCamping || this.isRaid()) {
-        this.game?.playerOrder.forEach((i) => {
-          i.finished = false;
-        });
-      }
+      this.game?.playerOrder.forEach((i) => {
+        i.finished = false;
+      });
       let noEnemies = true;
       if (this.game?.playerOrder.some(p => p.id.includes('-'))) {
         noEnemies = false;
@@ -3370,7 +3396,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
       this.game?.players.forEach(
         (p) => {
           const limbsLost = p.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
-          console.log(limbsLost);
           if (limbsLost === 0) p.actionsLeft = { primary: true, secondary: true };
           else if (limbsLost === 1) p.actionsLeft = { primary: true, secondary: false };
           else p.actionsLeft = { primary: false, secondary: false };
@@ -3380,13 +3405,11 @@ export class GameAreaComponent implements CanComponentDeactivate {
             secondary: {} as GameAction,
           }
           if (noEnemies) p.inCombat = false;
-          if (this.game?.camp?.isCamping) p.campActionPoints = 0;
         },
       );
       if (this.isRaid()) {
         this.game?.camp.raid.forEach(r => {
           const limbsLost = r.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
-          console.log(limbsLost);
           if (limbsLost === 0) r.actionsLeft = { primary: true, secondary: true };
           else if (limbsLost === 1) r.actionsLeft = { primary: true, secondary: false };
           else r.actionsLeft = { primary: false, secondary: false };
@@ -3400,7 +3423,6 @@ export class GameAreaComponent implements CanComponentDeactivate {
         this.currentEvent?.NPCs.forEach(
           (n) => {
             const limbsLost = n.character?.activeStatuses.filter(s => s.type === StatusType.LOST_LIMB).length ?? 0;
-            console.log(limbsLost);
             if (limbsLost === 0) n.actionsLeft = { primary: true, secondary: true };
             else if (limbsLost === 1) n.actionsLeft = { primary: true, secondary: false };
             else n.actionsLeft = { primary: false, secondary: false };
@@ -3426,6 +3448,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         playerOrder: this.game?.playerOrder,
         players: this.game?.players,
         camp: this.game?.camp,
+        vote: this.game?.vote,
       });
     } catch (error) {
       throw error;
@@ -3444,6 +3467,12 @@ export class GameAreaComponent implements CanComponentDeactivate {
     } catch (error) {
       this.isLoading = false;
       console.error('Hiba a játék elhagyásakor: ', error);
+    }
+  }
+  
+  preventDecimals(event: KeyboardEvent) {
+    if (['.', ',', 'e', 'E'].includes(event.key)) {
+      event.preventDefault();
     }
   }
 }

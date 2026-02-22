@@ -5,11 +5,11 @@
     canSelect: myTurn || role === 'host'
   }">
   @if(role === "host" && $any(object).isVisible !== undefined){
-  @if(($any(object)).isVisible){
+  @if(($any(object)).isVisible && !isRaid){
   <div class="fake-button" id="toggleVisibility" (click)="toggleVisibility($event)" style="grid-area: tV;">
     <mat-icon>visibility</mat-icon>
   </div>
-  }@else{
+  }@else if(!isRaid){
   <div class="fake-button" id="toggleVisibility" (click)="toggleVisibility($event)" style="grid-area: tV;">
     <mat-icon>visibility_off</mat-icon>
   </div>

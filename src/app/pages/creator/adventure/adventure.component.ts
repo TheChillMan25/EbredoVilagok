@@ -668,7 +668,7 @@ export class AdventureComponent implements CanComponentDeactivate {
 
     if (this.modify && this.modifyingIndex !== null) {
       let modifiedNPC = this.selectedAdventureEvent?.NPCs[this.modifyingIndex];
-      let character = this.myCharacters.concat(this.newNPCCharacters).find(c => c.id === npcValues.character)
+      let character = this.myCharacters.concat(this.newNPCCharacters).find(c => c.id === npcValues.character)!
       if (modifiedNPC) {
         modifiedNPC.name = npcValues.name;
         modifiedNPC.attitude = npcValues.attitude;
@@ -682,9 +682,9 @@ export class AdventureComponent implements CanComponentDeactivate {
     } else {
       let character = this.myCharacters.find(
         (char) => char.id === npcValues.character
-      ) ?? this.newNPCCharacters.find(
+      )! ?? this.newNPCCharacters.find(
         (char) => char.id === npcValues.character
-      )
+      )!
       const isTrader = (npcValues.attitude === 'neutral' && npcValues.isTrader) as boolean;
       if (isTrader && !this.canSetTrades()) {
         this.npcError = 'Egy kereskedőnek legalább egy árucikke kell, hogy legyen!';

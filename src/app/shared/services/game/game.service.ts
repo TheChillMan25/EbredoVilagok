@@ -280,6 +280,11 @@ export class GameService {
               primary: {} as GameAction,
               secondary: {} as GameAction,
             },
+            vote: {
+              theme: '',
+              starter: '',
+              votes: [],
+            },
           };
           break;
         case PlayerRole.PLAYER:
