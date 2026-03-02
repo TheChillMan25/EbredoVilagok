@@ -1,12 +1,13 @@
 <div class="game">
-  <span class="game-name">{{ game.name }}</span>
+  <span class="game-name" style="grid-area: title;">{{ game.name }}</span>
   @if(game.isPublic && type === 'myGame'){
-  <mat-icon matTooltip="Publikus">public</mat-icon>
+  <mat-icon matTooltip="Publikus" style="grid-area: icon;">public</mat-icon>
   }
   @else if(!game.isPublic && type === 'myGame'){
-  <mat-icon matTooltip="Privát">lock</mat-icon>
+  <mat-icon matTooltip="Privát" style="grid-area: icon;">lock</mat-icon>
   }
-  <span class="game-players"><span class="current-players">
+  <span class="game-players" style="grid-area: players;">
+    <span class="current-players">
       {{ game.players.length }}
     </span>
     /
@@ -15,7 +16,7 @@
     </span>
     <mat-icon>person</mat-icon>
   </span>
-  <div class="fake-button" (click)="buttonClicked()">
+  <div class="fake-button" (click)="buttonClicked()" style="grid-area: start;">
     <mat-icon>
       @if(type === 'general'){
       login
@@ -26,7 +27,7 @@
     </mat-icon>
   </div>
   @if(type === 'myGame'){
-  <div class="fake-button" (click)="deleteClicked()">
+  <div class="fake-button" (click)="deleteClicked()" style="grid-area: delete;">
     <mat-icon>delete</mat-icon>
   </div>
   }

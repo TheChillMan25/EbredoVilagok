@@ -2651,7 +2651,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
     }
   }
 
-  manageDeathAndInsane(type: 'death' | 'insane', target: Player | NPC) {
+  async manageDeathAndInsane(type: 'death' | 'insane', target: Player | NPC) {
     let status!: ActiveStatus;
     if (type === 'death') {
       target.character!.stats.main.hp = 0;
@@ -2668,19 +2668,32 @@ export class GameAreaComponent implements CanComponentDeactivate {
         duration: 9999,
       };
     }
-    if (status)
-      target.character!.activeStatuses.push(status);
+    if (status) target.character!.activeStatuses.push(status);
     target.inCombat = false;
     this.game!.playerOrder = this.game?.playerOrder.filter(po => po.id !== target.id) ?? [];
+
     let combatEnded = true;
     this.game!.playerOrder.forEach(po => {
       const gameMember = this.currentEvent?.NPCs.find(p => p.id === po.id) ??
         this.game?.camp.raid.find(r => r.id === po.id) ??
         this.game?.players.find(p => p.id === po.id) ?? null;
       if (gameMember && gameMember.inCombat) combatEnded = false;
-    })
+    });
+
     if (combatEnded) {
       this.game?.players.forEach(p => p.inCombat = false);
+    }
+    try {
+      await this.gameService.updateGame(this.gameId, {
+        players: this.game?.players,
+        camp: this.game?.camp,
+        playerOrder: this.game?.playerOrder,
+        adventure: this.game?.adventure,
+        currentAction: this.game?.currentAction,
+        currentPlayer: this.game?.currentPlayer,
+      });
+    } catch (err) {
+      console.error('Hiba a halál/megőrülés kezelése után a mentéskor: ', err);
     }
   }
   async rollForWound(character: Character, target: Player | NPC) {
@@ -2713,7 +2726,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         return;
       } else {
         this.openSnackBar(`${target.name} túl sok sérülést szenvedett el, ezért meghalt.`);
-        this.manageDeathAndInsane('death', target);
+        await this.manageDeathAndInsane('death', target);
         return;
       }
     }
@@ -2908,7 +2921,7 @@ export class GameAreaComponent implements CanComponentDeactivate {
         if (!confirm('A karaktered a megőrülés szélén áll. Biztosan folytatod?')) {
           return;
         }
-        this.manageDeathAndInsane('insane', this.player);
+        await this.manageDeathAndInsane('insane', this.player);
         await this.gameService.updateGame(this.gameId, {
           players: this.game?.players,
           camp: this.game?.camp,
