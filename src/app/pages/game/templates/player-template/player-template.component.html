@@ -1,7 +1,12 @@
 <div class="player" [ngClass]="{ showCharacter: showCharacter }">
   <div class="player-header">
-    <mat-icon>@if(player.status ===
-      PlayerStatus.NOTREADY){person}@else{check}</mat-icon>
+    <mat-icon>
+      @if(player.status === PlayerStatus.NOTREADY){
+        person
+      }@else{
+        check
+      }
+    </mat-icon>
     <span>{{ player.name }}</span>
     @if(isSpeaking){
     <mat-icon>volume_up</mat-icon>

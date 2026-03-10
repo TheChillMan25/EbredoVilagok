@@ -2,20 +2,24 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: #333;
-  display: flex;
+  display: grid;
+  grid-template-areas: 
+  "title title title start"
+  "icon players players delete";
+  grid-template-columns: 1fr 1fr 1fr 5fr;
   align-items: center;
-  justify-content: space-between;
+  justify-items: center;
   gap: 0.5rem;
   font-size: large;
 
   .game-name {
+    justify-self: start;
     color: #f2c480;
   }
 
   .game-players {
     display: flex;
     align-items: center;
-    margin-left: auto;
 
     .current-players {
       color: whitesmoke;
@@ -24,5 +28,6 @@
 
   .fake-button {
     padding: 0.3rem;
+    justify-self: end;
   }
 }
