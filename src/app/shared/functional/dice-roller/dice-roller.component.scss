@@ -20,7 +20,7 @@ canvas {
   transform: translate(-50%, -10%);
   color: white;
   text-align: center;
-  pointer-events: none; // Hogy át lehessen kattintani rajta (kivéve a gombokat)
+  pointer-events: none;
   font-family: "Roboto", sans-serif;
   text-shadow: 0 0 15px black;
 

@@ -35,7 +35,7 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   private rollStartTime: number = 0;
   private debugArrow: THREE.ArrowHelper | null = null;
   private allStoppedSince: number | null = null;
-  private readonly finalStableWindowMs = 600; // 0.6s
+  private readonly finalStableWindowMs = 600;
   private lastTime = 0;
 
   private _rollModifier: number = 0;
@@ -81,10 +81,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.initThree();
     this.initPhysics();
-    /* this.cannonDebugger = CannonDebugger(this.scene, this.world, {
-      color: 0xff0000,
-      scale: 1.0,
-    }); */
     this.loadAndCreateDice();
     this.lastTime = performance.now();
     this.animate();
@@ -144,7 +140,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
 
   private initPhysics() {
     this.world = new CANNON.World();
-    //this.world.gravity.set(0, 0, 0);
     this.world.gravity.set(0, -3 * 10, 0);
     this.world.broadphase = new CANNON.NaiveBroadphase();
     (this.world.solver as CANNON.GSSolver).iterations = 20;
@@ -314,7 +309,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     const wallHeight = 3;
     const wallThickness = 1;
 
-    // Segédfüggvény egy fal létrehozásához
     const addWall = (x: number, z: number, w: number, d: number) => {
       const shape = new CANNON.Box(
         new CANNON.Vec3(w / 2, wallHeight / 2, d / 2),
@@ -328,13 +322,9 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       this.world.addBody(body);
     };
 
-    // 1. Bal fal
     addWall(-width / 2, 0, wallThickness, depth);
-    // 2. Jobb fal
     addWall(width / 2, 0, wallThickness, depth);
-    // 3. Felső fal (Hátsó)
     addWall(0, -depth / 2, width, wallThickness);
-    // 4. Alsó fal (Elülső)
     addWall(0, depth / 2, width, wallThickness);
   }
 
@@ -435,7 +425,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     this.isRolling = true;
     this.resultText = '';
 
-    // 1. Idő rögzítése a "biztonsági ablakhoz" (hogy ne álljon meg túl hamar)
     this.rollStartTime = Date.now();
 
     const dist = this.camera.position.y;
@@ -445,53 +434,37 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
     const visibleWidth = visibleHeight * aspect;
     const minDimension = Math.min(visibleWidth, visibleHeight);
     const throwRadius = minDimension * 0.4;
-    const throwHeight = 3; // Ilyen magasról
+    const throwHeight = 3;
 
     this.diceObjects.forEach((obj, i) => {
-      // --- RESET ---
       obj.stopped = false;
       obj.stableCount = 0;
       obj.body.allowSleep = true;
       obj.body.sleepSpeedLimit = 0.08;
       obj.body.sleepTimeLimit = 0.7;
 
-      obj.body.wakeUp(); // Felébresztjük a fizikai testet
-
-      // --- 2. POZÍCIÓ KISZÁMÍTÁSA (KÖR ALAKBAN) ---
-      // Véletlen szög a kör mentén (0 - 360 fok)
+      obj.body.wakeUp();
+      
       const angle = Math.random() * Math.PI * 2;
 
-      // Kiszámoljuk a start koordinátákat a kör szélén
       const startX = Math.cos(angle) * throwRadius;
       const startZ = Math.sin(angle) * throwRadius;
 
-      // Beállítjuk a test pozícióját
-      // A 'i * 1.5' azért kell, hogy ne egymásba, hanem egymás fölé kerüljenek kicsit startkor
-      //obj.body.position.set(0, 1, 0);
       obj.body.position.set(startX, throwHeight + i * 1.5, startZ);
 
-      // --- 3. CÉLZÁS A KÖZÉPPONTBA ---
-      // Nem pont a 0,0-ba, teszünk bele kicsi szórást (+-2 egység), hogy természetesebb legyen
       const targetX = Math.random() * 4 - 2;
       const targetZ = Math.random() * 4 - 2;
 
-      // A vektor, ami a starttól a célig mutat:
       const velocityX = targetX - startX;
       const velocityZ = targetZ - startZ;
 
-      // Távolság kiszámítása (Pitagorasz tétel)
       const distance = Math.sqrt(velocityX * velocityX + velocityZ * velocityZ);
 
-      // Sebesség szorzó: minél messzebb van, annál nagyobbat kell lökni rajta.
-      // A 0.6 - 0.8 közötti érték általában jó. Ha túlrepülnek, vedd lejjebb (pl. 0.5).
       const speedMultiplier = distance * 2;
 
-      // Normalizáljuk a vektort és megszorozzuk az erővel
       const velX = (velocityX / distance) * speedMultiplier;
       const velZ = (velocityZ / distance) * speedMultiplier;
 
-      // --- 4. ERŐK ALKALMAZÁSA ---
-      // Velocity-t használunk, ami felülírja az eddigi mozgást (tiszta indítás)
       obj.body.velocity.set(velX, 10, velZ);
       obj.body.angularVelocity.set(
         Math.random() * 10 - 5,
@@ -499,28 +472,21 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
         Math.random() * 10 - 5,
       );
 
-      // Kezdő forgatás (véletlenszerűen álljon a levegőben)
       obj.body.quaternion.setFromEuler(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
         Math.random() * Math.PI,
       );
 
-      // --- 5. AZONNALI SZINKRONIZÁLÁS (Wrapper nélkül) ---
-      // Ez nagyon fontos! Mivel a fizikai testet most teleportáltuk a kör szélére,
-      // a mesh-t is azonnal oda kell raknunk, különben egy "csíkot húzva" repülne oda
-      // a következő képkockában.
       obj.mesh.position.copy(obj.body.position as any);
       obj.mesh.quaternion.copy(obj.body.quaternion as any);
     });
 
-    // Indítjuk az ellenőrzést
     this.checkRollingStatus();
   }
 
   private checkRollingStatus() {
     const checkInterval = setInterval(() => {
-      // 1.5 mp-ig mindenképp hagyjuk gurulni (biztonsági időablak)
       if (Date.now() - this.rollStartTime < 1500) {
         return;
       }
@@ -530,22 +496,18 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       this.diceObjects.forEach((obj) => {
         if (obj.stopped) return;
 
-        // 1. Fizikai Alvás állapota (Cannon.js döntése)
         const isSleeping = obj.body.sleepState === CANNON.Body.SLEEPING;
 
-        // 2. Kézi sebességmérés (Ha a Cannon nem akarná elaltatni, de már lassú)
         const speed = obj.body.velocity.length();
         const angularSpeed = obj.body.angularVelocity.length();
-        const isSlow = speed < 0.05 && angularSpeed < 0.05; // Küszöbérték
+        const isSlow = speed < 0.05 && angularSpeed < 0.05; 
 
-        // Ha alszik VAGY nagyon lassú, akkor növeljük a számlálót
         if (isSleeping || isSlow) {
           obj.stableCount++;
         } else {
-          obj.stableCount = 0; // Ha megmozdul, nullázzuk
+          obj.stableCount = 0; 
         }
 
-        // Ha már 10 ellenőrzés óta (kb 0.5 mp) lassú vagy alszik, akkor megállítjuk
         if (obj.stableCount > 10) {
           obj.stopped = true;
         } else {
@@ -556,16 +518,14 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
       if (allStopped) {
         if (this.allStoppedSince === null) {
           this.allStoppedSince = Date.now();
-          return; // Elkezdjük mérni a végső nyugalmi időt
+          return; 
         }
 
-        // Csak akkor hirdetünk eredményt, ha a csoport X ideje stabil
         if (Date.now() - this.allStoppedSince >= this.finalStableWindowMs) {
           clearInterval(checkInterval);
           requestAnimationFrame(() => this.finishRoll());
         }
       } else {
-        // Ha bármelyik kocka újra megmozdul, a csoportos időzítőt nullázzuk
         this.allStoppedSince = null;
       }
     }, 50);
@@ -641,7 +601,6 @@ export class DiceRollerComponent implements AfterViewInit, OnDestroy {
         bestWorldNormal = worldNormal;
       }
     }
-    //this.updateDebugArrow(body.position, bestWorldNormal);
 
     console.log(
       `Kocka: ${obj.type
