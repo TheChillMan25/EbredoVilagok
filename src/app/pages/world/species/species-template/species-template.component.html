@@ -1,32 +1,28 @@
 <div id="content">
-  @for (item of currentSpecies; track $index) {
+  @for (item of currentSpeciesGroup; track $index) {
   <div class="species-container">
     <div class="img-container">
-      <img
-        src="/assets/img/nations/{{ item.img }}"
-        alt="{{ item.name }}"
-        title="{{ item.name }}"
-      />
+      <img src="/assets/img/nations/{{ item.img }}" alt="{{ item.name }}" title="{{ item.name }}" />
     </div>
     <div class="species-desc-container">
       <span class="species-name">{{ item.name }}</span>
       <hr />
       <div class="species-desc">{{ item.desc }}</div>
-      <span class="species-other fake-button" (click)="showProperties(item.id)"
-        >Egyéb tulajdonságok</span
-      >
+      <button class="species-other fake-button" (click)="showProperties(item.id)">
+        Egyéb tulajdonságok
+      </button>
     </div>
   </div>
   }
 </div>
 
+@if(propertiesVisible && currentSpecies) {
 <div id="ui-container" (click)="hideProperties()">
-  @for (item of currentSpecies; track $index) {
-  <div id="{{ item.id }}-container" class="species-properties-container">
+  <div class="species-properties-container">
     <div class="properties">
       <h3>Népi tulajdonságok</h3>
       <div class="property-inner-container">
-        @for (element of item.speciesSpecial; track $index) {
+        @for (element of currentSpecies.speciesSpecial; track $index) {
         <p>{{ $index + 1 }} - {{ element.desc }}</p>
         }
       </div>
@@ -34,7 +30,7 @@
     <div class="homes">
       <h3>Otthon</h3>
       <div class="property-inner-container">
-        @for (element of item.homes; track $index) {
+        @for (element of currentSpecies.homes; track $index) {
         <p>{{ $index + 1 }} - {{ element.desc }}</p>
         <ul>
           @for (bonus of element.bonus; track $index) {
@@ -45,5 +41,5 @@
       </div>
     </div>
   </div>
-  }
 </div>
+}

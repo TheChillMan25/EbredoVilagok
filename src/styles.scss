@@ -69,9 +69,7 @@ app-mobile-navbar {
 }
 
 #content {
-  position: absolute;
-  top: 4rem;
-  left: 0;
+  position: relative;
   width: 100%;
   height: calc(100% - 4rem);
   display: flex;
@@ -217,6 +215,10 @@ div.mat-mdc-form-field-subscript-wrapper {
   display: none !important;
 }
 
+div.mat-mdc-tooltip-surface {
+  padding: 0.5rem;
+}
+
 mat-card {
   min-width: 50%;
   max-width: 75%;
@@ -234,7 +236,7 @@ mat-card {
   }
 
   mat-card-content {
-    text-align: justify;
+    text-align: left;
   }
 }
 

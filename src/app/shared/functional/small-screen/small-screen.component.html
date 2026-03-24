@@ -1,0 +1,13 @@
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Figyelmeztetés</mat-card-title>
+        <mat-card-subtitle>Túl kicsi képernyő</mat-card-subtitle>
+        <mat-icon fontSet="material-symbols-outlined">screenshot_monitor</mat-icon>
+    </mat-card-header>
+    <mat-card-content>
+        Az alábbi oldal nem kompatibilis ezzel a kijelző mérettel. Válts nagyobb képernyőre és próbáld újra.
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-flat-button (click)="emitEvent()">OK</button>
+    </mat-card-actions>
+</mat-card>

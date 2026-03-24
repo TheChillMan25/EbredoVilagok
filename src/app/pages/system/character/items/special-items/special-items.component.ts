@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { specialDrinks } from '../../../../../shared/models/items';
+import { Component, Input } from '@angular/core';
+import { SpecialItem } from '../../../../../shared/models/game_interfaces';
+import { ItemService } from '../../../../../shared/services/item/item.service';
 
 @Component({
   selector: 'app-special-items',
@@ -8,5 +9,10 @@ import { specialDrinks } from '../../../../../shared/models/items';
   styleUrls: ['./special-items.component.scss', '../../../system_shared.scss'],
 })
 export class SpecialItemsComponent {
-  specialDrinks = specialDrinks;
+  _specialDrinks?: SpecialItem[];
+  @Input() set specialDrinks(value: SpecialItem[] | undefined) {
+    if (value && value.length > 0) {
+      this._specialDrinks = value;
+    }
+  }
 }

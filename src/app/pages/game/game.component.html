@@ -1,95 +1,210 @@
 <div id="content">
-  <div id="players">
-    <span class="headerText">Játékosok</span>
-    @for (player of players; track $index) {
-    <div id="{{ player.userId }}" class="player">
-      <div class="player-header">
-        <span class="player-name">{{ player.username }}</span>
-        <span
-          >HP: {{ player.character.stats.main.hp }} SP:
-          {{ player.character.stats.main.sp }}</span
-        >
-      </div>
-      <span class="effect">Hatás: {{ player.effect }}</span>
-      <div class="player-action">
-        Kör: <span>{{ player.turn }}</span>
-      </div>
-    </div>
-    }
+  @if(!smallScreen){
+  @if(!isLoading){
+  <div id="create-game" class="menus" style="grid-area: create;">
+    <span class="menu-name">Játék létrehozása</span>
+    <form [formGroup]="newGameForm" (ngSubmit)="createGame()">
+      <mat-form-field appearance="outline">
+        <mat-label>Játék neve
+          {{ newGameForm.get("name")?.value.length }}/20</mat-label>
+        <input matInput type="text" formControlName="name" maxlength="20" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Kaland</mat-label>
+        <mat-select formControlName="adventure">
+          @for (item of myAdventures; track item.id) {
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Max játékos (db)</mat-label>
+        <input matInput type="number" formControlName="maxPlayers" min="1" max="6" />
+      </mat-form-field>
+      <mat-checkbox formControlName="isPublic">Publikus</mat-checkbox>
+      <mat-error class="error-message">@if(newGameForm.get('name')?.hasError('whitespace') &&
+        newGameForm.get('name')?.value.length > 0){ Nem lehet üres a név!
+        }@else{ {{ createError }} }</mat-error>
+      <button mat-flat-button type="submit">Létrehozás</button>
+    </form>
   </div>
-  <div id="backpack">
-    <span class="headerText">Hátizsák</span>
-    <div id="food-container" class="item-container">
-      <span class="headerText">Élelem</span>
-      @for (item of players[0].character.items.food; track $index) {
-      <div class="item">
-        {{ getItem("food", item).name }}
-      </div>
-      }
-    </div>
-    <div id="special-item-container" class="item-container">
-      <span class="headerText">Különleges tárgyak</span>
-      @for (item of players[0].character.items.specialItems; track $index) {
-      <div class="item">
-        {{ getItem("specialItems", item).name }}
-      </div>
-      }
-    </div>
-    <div id="item-container" class="item-container">
-      <span class="headerText">Tárgyak</span>
-      @for (item of players[0].character.items.otherItems; track $index) {
-      <div class="item">
-        {{ getItem("otherItems", item).name }}
-      </div>
-      }
+  <div id="continue-game" class="menus" style="grid-area: load;">
+    <span class="menu-name">Játékaim</span>
+    <div id="myGames" class="games-container">
+      @if(myGames.length > 0){ @for (item of myGames; track item.id) {
+      <app-game-template [game]="item" type="myGame" (deleteGameEvent)="deleteGame($event)"
+        (gameEvent)="controlGameEvent($event)"></app-game-template>
+      } }@else { <span>Nincsenek játékok</span> }
     </div>
   </div>
-  <div id="actions">
-    <span class="headerText">Akciók</span>
-    <div id="action-container">
-      <div class="fake-button">
-        <mat-icon>close</mat-icon>
-        <div class="tooltip">Támadás az elsődleges fegyverrel</div>
-      </div>
-      <div class="fake-button">
-        <mat-icon>electric_bolt</mat-icon>
-        <div class="tooltip">Elektromos csapás.</div>
-      </div>
+  <div id="join-form-container" class="menus" style="grid-area: join;">
+    <span class="menu-name">Csatlakozás játékhoz</span>
+    <form [formGroup]="joinGameForm" (ngSubmit)="joinGame()">
+      <mat-form-field appearance="outline">
+        <mat-label>Csatlakozási kód</mat-label>
+        <input matInput type="text" formControlName="joinID" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Karakter</mat-label>
+        <mat-select formControlName="character">
+          @for (item of myCharacters; track item.id) {
+          <mat-option [value]="item.id">{{ item.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-error>@if(joinGameForm.get('joinID')?.hasError('whitespace') &&
+        joinGameForm.get('joinID')?.value.length > 0){ Nem lehet üres a kód!
+        }@else{{{ joinError}}}</mat-error>
+      <button mat-flat-button type="submit">Csatlakozás</button>
+    </form>
+  </div>
+  <div class="open-games" class="menus" style="grid-area: public;">
+    <span class="menu-name">Elérhető játékok</span>
+    <div id="public-games" class="games-container">
+      @if(openGames.length > 0){ @for (item of openGames; track item.id) {
+      <app-game-template [game]="item" type="general" (gameEvent)="controlGameEvent($event)"></app-game-template>
+      } }@else { <span>Nincsenek játékok</span> }
     </div>
   </div>
-  <div id="npcs">
-    <span class="headerText">NPC-k és ellenfelek</span>
-    @for (npc of npcs; track $index) {
-    <div id="{{ npc.npc.character?.id }}" class="npc">
-      <div class="npc-header">
-        <span class="npc-name">{{ npc.npc.name }}</span>
-        <span
-          >HP: {{ npc.npc.character?.stats?.main?.hp }} SP:
-          {{ npc.npc.character?.stats?.main?.sp }}</span
-        >
-      </div>
-      <span class="effect">Hatás: {{ npc.effect }}</span>
-      <div class="npc-action">
-        Kör: <span>{{ npc.turn }}</span>
-      </div>
-    </div>
-    }
-  </div>
-  <div id="map"></div>
-  <div id="warning">
+  <button id="help" class="fake-button" (click)="helpVisible = true">
+    <mat-icon fontSet="material-symbols-outlined">question_mark</mat-icon>
+  </button>
+  @if(helpVisible){
+  <div id="helpUI" class="ui-container">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-icon>warning</mat-icon>
-        <mat-card-title>Figyelmeztetés</mat-card-title>
-        <mat-card-subtitle>Túl kicsi képernyő</mat-card-subtitle>
+        <mat-card-title>Útmutató</mat-card-title>
+        <mat-card-subtitle>
+          @if(tutorials.menu){
+          A menü
+          }@else if(tutorials.lobby){
+          A játék várószobája
+          }@else {
+          A játékfelület
+          }
+        </mat-card-subtitle>
       </mat-card-header>
-      <mat-card-content>
-        A kijelződ túl kicsi a játék megfelelő működéséhez. Válts nagyobb
-        képernyőre a játék működése érdekében.
+      <mat-card-content id="tutorial" [ngClass]="{menu: tutorials.menu, lobby: tutorials.lobby, game: tutorials.game}">
+        @if(tutorials.menu){
+        <span style="grid-area: text; justify-self: left;">Játékot létrehozni, vagy egyhez csatlakozni a menüben lehet.
+          A menü két részből
+          áll.</span>
+        <span style="grid-area: hostText;">Játék létrehozásához adj nevet a játéknak, válassz egy kalandot, állítsd
+          be a maximális játékosszámot és add meg, hogy pulbikus-e a játék. <span style="font-style: italic;">(Ha egy
+            játék publikus, ahhoz mások is csatlakozhatnak anélkül, hogy elküldenéd nekik a csatlakozási
+            kódot.)</span> <br> Miután létrehoztál egy játékot, azok a <strong
+            style="color: #f2c480">"Játékaim"</strong>
+          menüben
+          jelennek meg. Itt
+          tudod elindítani és törölni őket.</span>
+        <img src="assets/img/game_tutorial/menu/host.jpg" alt="Játék létrehozása" style="grid-area: hostImg;">
+        <img src="assets/img/game_tutorial/menu/join.png" alt="Játékhoz csatlakozás" style="grid-area: joinImg;">
+        <span style="grid-area: joinText;">Egy játékhoz két féle képpen tudsz csatlakozni. Ha publikus, akkor az
+          <strong style="color: #f2c480">"Elérhető játékok"</strong> menüben jelennek meg, míg ha privát, akkor a játék
+          létrehozójától kapott
+          csatlakozási
+          kóddal tudsz csatlakozni. Csatlakozás előtt ki kell választanod egy karaktert, mert enélkül nem
+          fogsz tudni csatlakozni.</span>
+        }
+        @if(tutorials.lobby){
+        <span style="grid-area: text;">Minden játék során egy hanghívás folyik. Ahhoz, hogy csatlakozni tudj hozzá,
+          engedélyezned kell a mikrofon használatát az oldalon.
+          Mivel a játék lényege a beszéd, ezért ez ajánlott, kivéve, ha más alternativát találtok a
+          beszélgetésre.</span>
+        <span style="grid-area: joinCodeText;">A játék létrehozójaként, ha privát játékot indítottál, akkor ahhoz hogy
+          mások is tudjanak csatlakozni, meg kell osztanod velük a csatlakozási kódot.</span>
+        <img id="joinCodeImg" src="assets/img/game_tutorial/lobby/joinCode.jpg" alt="Csatlakozási kód"
+          style="grid-area: joinCodeImg; border: .2rem solid #292929;">
+        <span style="grid-area: controlText;">A játék és a hanghívás vezérlését a játékvezető és a játékosok kis
+          különbséggel végzik. Játékvezetőként addig nem indíthatod el a játékot,
+          amig minden játékos kész nem áll. Játékosként itt tudod állítani a játékvezető hangjának erősségét is.</span>
+        <img id="hostControlImg" src="assets/img/game_tutorial/lobby/hostControl.jpg" alt="Játékvezető vezérlés"
+          matTooltip="Játékvezető vezérlés" matTooltipPosition="above" style="grid-area: hostControlImg;">
+        <img id="playerControlImg" src="assets/img/game_tutorial/lobby/playerControl.jpg" alt="Játékos vezérlés"
+          matTooltip="Játékos vezérlés" matTooltipPosition="above" style="grid-area: playerControlImg;">
+        <span style="grid-area: playersText;">A játékhoz csatlakozott játékosok is láthatóak mindenki számára. Ha
+          csatlakoztál a híváshoz, lehetőséged
+          van itt állítani az adott játékos hangerejét. Míg játékvezetőként akár ki is rúghatod őket.</span>
+        <img id="playersImg" src="assets/img/game_tutorial/lobby/players.jpg" alt="Játékosok"
+          style="grid-area: playersImg;">
+        <span style="grid-area: advText;">A játék során játszott kaland is szemrevételezhető mind a játékosok és a
+          játékvezető számára is.</span>
+        <img id="advImg" src="assets/img/game_tutorial/lobby/adv.jpg" alt="Játék során játszott kaland"
+          style="grid-area: advImg; border: .2rem solid #292929;">
+        }
+        @if(tutorials.game){
+        <span style="grid-area: text;">A játék oldalán a játékvezető és a játékosok két különböző felállításban képesek
+          vezérlésre.
+          A játékvezető (majdnem) mindenre képes, amire a játékosok képesek, de csak akkor, ha éppen egy npc-t irányít.
+          Emellett képes mélyebben belenyúlni a játék folyamatába. A játék során figyelmeztetések is megjelennek a
+          képernyő alján,
+          illetve bizonyos elemekre ráhúzva a kurzort egy kis leírás jelenik meg.</span>
+        <span style="grid-area: currentEventText;">A jelenlegi esemény, mely a játékvezető és a játékosok számára is
+          látható, tartalmazza a kaland során történő események tulajdonságait.
+          A játékvezetó a cím mellett megjelenő nyilakkal tudja váltani a következő és előző eseményeket</span>
+        <img id="currentEventImg" src="assets/img/game_tutorial/game/currentEvent.jpg" alt="Jelenlegi esemény"
+          style="grid-area: currentEventImg;">
+        <span style="grid-area: gameMemberText;">A játékosokat a bal oldalon, míg az NPC-ket a jobb oldalon találod,
+          nagyon hasonló kialakításban. Itt látszódnak a hátralévő akciók, HP és SP pontok, illetve a sebek. Az éppen
+          soronlévő
+          játékos vagy NPC egy élénk kerettel rendelkezik, ha pedig kiválasztottál egy célpontot, annak szaggatott
+          szürke körvonala lesz.
+          Ha reakció van folyamatban, akkor a támadó játékos pontozott szürke vonallal jelenik meg, míg a reagál kapja
+          meg az élénk keretet.</span>
+        <img id="playersImg" style="grid-area: playersImg;" src="assets/img/game_tutorial/game/players.jpg"
+          alt="Játékosok">
+        <img id="npcImg" style="grid-area: npcImg;" src="assets/img/game_tutorial/game/playerNPCs.jpg" alt="NPC-k">
+        <span style="grid-area: backpackText;">A karakter tárgyait a hátizsákban találold. A hátizsák három oldalra van
+          osztva, <span style="font-style: italic">különleges tárgyak, ételek, általános tárgyak</span>.
+          Ezek között az ikonokra kattintva tudsz váltani.</span>
+        <img src="assets/img/game_tutorial/game/backpack.jpg" alt="Hátizsák" id="backpackImg"
+          style="grid-area: backpackImg">
+        <span style="grid-area: characterText;">Játékosként a karaktered adatait a <strong
+            style="color: #f2c480;">"Karakter"</strong> részen
+          találod meg.
+          Itt van a felszerelésed, a tulajdonságaid (ezekre kattintva próbára dobhatsz egy 20 oldalú kockával),
+          az érmék, melyeket kereskedésre használhatsz, illetve egyéb információk.</span>
+        <img src="assets/img/game_tutorial/game/character.jpg" alt="Karakter" id="characterImg"
+          style="grid-area: characterImg">
+        <span style="grid-area: playerControlText;">Játékvezetőként nyomon követheted a játékosok akcióit.
+          Tárgyakat adhatsz nekik és részben módosíthatod a karaktereik állapotát.</span>
+        <img src="assets/img/game_tutorial/game/playerControl.jpg" alt="Játékvezető vezérlés"
+          style="grid-area: playerControlImg;">
+        <span style="grid-area: actionsText;">Az akciók a bal sarokban találhatóak. Ezek gombok, melyekre kattintva egy
+          megerősíti ablak jelenik meg, ahol véglegesítheted a döntésedet. Ha valami hiba van az akcióval, egy
+          figyelmeztető üzenet jelenik
+          meg képernyő alján. Ha egy akció nem végezhető el a gomb elhalványul és nem lesz kattintható. Ha egy olyan
+          akciót választasz,
+          aminek a gombja el van halványodva, akkor figyelmeztetést kapsz.
+        </span>
+        <img src="assets/img/game_tutorial/game/actions.jpg" alt="Akciók" style="grid-area: actionsImg;">
+        <span style="grid-area: otherText;">Egyéb vezérlési lehetőségek a jobb alsó sarokban találhatóak. Itt tudod
+          befejezni a körödet,
+          egy 20 oldalú kockával dobni, megnézni az utolsó dobásod étrékét és kilépni a játékból. Mindemellett a hívás
+          vezérlését is itt
+          tudod végezni, némítani, süketíteni, hangerőt szabályozni és lecsatlakozni, vagy éppen vissza
+          csatlakozni.</span>
+        <img src="assets/img/game_tutorial/game/otherControls.jpg" alt="Egyéb vezérlés" style="grid-area: otherImg;">
+        }
       </mat-card-content>
       <mat-card-actions>
-        <button mat-flat-button routerLink="/index">Vissza a főildalra</button>
+        <button mat-flat-button (click)="helpVisible = false">OK</button>
+        <button mat-flat-button style="margin-left: auto;" [disabled]="tutorials.menu" (click)="prevTutorialPage()">
+          <mat-icon style="margin: 0;">arrow_back</mat-icon>
+        </button>
+        <button mat-flat-button [disabled]="tutorials.game" (click)="nextTutorialPage()">
+          <mat-icon style="margin: 0;">arrow_forward</mat-icon>
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>
+  }
+  } @if(isLoading){
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  }
+  }
+  @else {
+  <app-small-screen style="grid-area: warning;" (goBackToIndexEvent)="goHome()"></app-small-screen>
+  }
 </div>
+<router-outlet></router-outlet>

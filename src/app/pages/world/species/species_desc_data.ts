@@ -1211,7 +1211,7 @@ export interface SpeciesInterface {
   name: string;
   desc: string;
   img: string;
-  speciesSpecial: Array<{ desc: string }>;
+  speciesSpecial: { desc: string }[];
   homes: { desc: string; bonus: { name: string; mod: string }[] }[];
 }
 

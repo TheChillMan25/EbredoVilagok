@@ -41,7 +41,7 @@ export class AdventureService {
       }
 
       const adventuresColRef = collection(this.firestore, 'Adventures');
-      const adventureDocRef = doc(adventuresColRef); // előre generált ID
+      const adventureDocRef = doc(adventuresColRef);
 
       const newAdventure: Adventure = {
         ...adventure,

@@ -50,7 +50,7 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(){
+  ngOnInit() {
     setBackground('bg');
   }
 
@@ -93,6 +93,11 @@ export class RegisterComponent {
         console.error('Hiba a regisztráció során: ', error);
         this.isLoading = false;
         this.showForm = true;
+
+        if (error.cause === 'TakenUsername') {
+          this.registerError = 'A felhasználónév már foglalt!';
+          return;
+        }
 
         switch (error.code) {
           case 'auth/email-already-in-use':

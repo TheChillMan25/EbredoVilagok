@@ -39,6 +39,11 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/Users/$(request.auth.uid)).data;
     }
 
+    match /Usernames/{username} {
+      allow get: if true; // Bárki megnézheti, hogy létezik-e a név
+      allow create: if isSignedIn(); // Csak a regisztrációs folyamat (vagy admin) írhatja
+    }
+
     match /Users/{userId} {
       
       // OLVASÁS:
@@ -144,6 +149,22 @@ service cloud.firestore {
           );
         }
       }
+    }
+
+    match /Metadata/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /Items/{itemId}{
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    match /Games/{ownerId} {
+      allow read, update, delete: if true
+      allow create: if isSignedIn() 
+                    && request.resource.data.ownerId == request.auth.uid;
     }
   }
 }

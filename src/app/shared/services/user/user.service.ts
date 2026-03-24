@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from '../auth/auth.service';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { firstValueFrom, from, Observable, of, switchMap, take } from 'rxjs';
 import { Adventure, Character, User } from '../../models/models';
 import {
   collection,
@@ -9,6 +9,7 @@ import {
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -25,22 +26,19 @@ export class UserService {
     characters: Character[] | [];
     adventures: Adventure[] | [];
   }> {
-    return (
-      this,
-      this.authService.currentUser.pipe(
-        switchMap((authUser) => {
-          if (!authUser) {
-            return of({
-              user: null,
-              username: '',
-              email: '',
-              characters: [] as Character[],
-              adventures: [] as Adventure[],
-            });
-          }
-          return from(this.fetchUserWidthData(authUser.uid));
-        })
-      )
+    return this.authService.currentUser.pipe(
+      switchMap((authUser) => {
+        if (!authUser) {
+          return of({
+            user: null,
+            username: '',
+            email: '',
+            characters: [] as Character[],
+            adventures: [] as Adventure[],
+          });
+        }
+        return from(this.fetchUserWidthData(authUser.uid));
+      })
     );
   }
 
@@ -92,16 +90,18 @@ export class UserService {
             stats: characterData?.['stats'] ?? {},
             equipment: characterData?.['equipment'] ?? {},
             virtues: characterData?.['virtues'] ?? {},
+            coins: 200,
             items: characterData?.['items'] ?? {
               food: [],
               specialItems: [],
-              otherItems: [],
-              weaponItems: [],
+              generalItems: [],
+              equipmentItems: [],
             },
             wounds: characterData?.['wounds'] ?? {
               small: 0,
               large: 0,
             },
+            activeStatuses: [],
           };
           characters.push(character);
         });
@@ -123,8 +123,6 @@ export class UserService {
             userId: adventureData?.['userId'] ?? '',
             name: adventureData?.['name'] ?? '',
             events: adventureData?.['events'] ?? '',
-            players: adventureData?.['players'] ?? '',
-            currentPlayer: adventureData?.['currentPlayer'] ?? '',
           };
           adventures.push(adventure);
         });
@@ -149,5 +147,32 @@ export class UserService {
     }
   }
 
-  deleteUser() {}
+  async getUserById(id: string): Promise<User | null> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+      if (!user) {
+        return null;
+      }
+      const userDocRef = doc(this.firestore, 'Users', id);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        return null;
+      }
+      return { ...userDoc.data(), id: userDoc.id } as User;
+    } catch (error) {
+      console.error('Hiba a felhasználó lekérdezésekor: ', error);
+      return null;
+    }
+  }
+
+  async updateUser(userId: string, updateData: Partial<User>): Promise<void> {
+    try {
+      const userDocRef = doc(this.firestore, 'Users', userId);
+      await updateDoc(userDocRef, updateData);
+    } catch (error) {
+      console.error('Hiba a felhasználó frissítésekor: ', error);
+    }
+  }
 }

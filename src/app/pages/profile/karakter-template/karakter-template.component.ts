@@ -31,22 +31,19 @@ export class KarakterTemplateComponent {
   showSpecDescs: boolean = false;
   showWarning: boolean = false;
 
-  speciesSpecial!: { desc: string };
-  home!: { desc: string; bonus: { name: string; mod: string }[] };
+  speciesSpecial = { desc: '' };
+  home = {
+    desc: '',
+    bonus: [
+      { name: '', mod: '' },
+      { name: '', mod: '' },
+    ],
+  };
 
   stats: { name: string; value: string }[] = [];
   mainStats: { name: string; value: number }[] = [];
 
-  constructor(private charService: CharacterService, private router: Router) {
-    this.speciesSpecial = { desc: '' };
-    this.home = {
-      desc: '',
-      bonus: [
-        { name: '', mod: '' },
-        { name: '', mod: '' },
-      ],
-    };
-  }
+  constructor(private charService: CharacterService, private router: Router) {}
 
   ngOnInit() {
     this.createStats();
@@ -64,33 +61,27 @@ export class KarakterTemplateComponent {
     if (this.character) {
       this.stats.push({
         name: 'Erő',
-        value: this.convertStatNumToString(this.character.stats.physical.ero),
+        value: this.convertStatNumToString(this.character.stats.physical.str),
       });
       this.stats.push({
         name: 'Ügyesség',
-        value: this.convertStatNumToString(
-          this.character.stats.physical.ugyesseg
-        ),
+        value: this.convertStatNumToString(this.character.stats.physical.dex),
       });
       this.stats.push({
         name: 'Kitartás',
-        value: this.convertStatNumToString(
-          this.character.stats.physical.kitartas
-        ),
+        value: this.convertStatNumToString(this.character.stats.physical.end),
       });
       this.stats.push({
         name: 'Ész',
-        value: this.convertStatNumToString(this.character.stats.mental.esz),
+        value: this.convertStatNumToString(this.character.stats.mental.int),
       });
       this.stats.push({
         name: 'Fortély',
-        value: this.convertStatNumToString(this.character.stats.mental.fortely),
+        value: this.convertStatNumToString(this.character.stats.mental.cun),
       });
       this.stats.push({
         name: 'Akaraterő',
-        value: this.convertStatNumToString(
-          this.character.stats.mental.akaratero
-        ),
+        value: this.convertStatNumToString(this.character.stats.mental.wil),
       });
       this.mainStats.push({
         name: 'HP',

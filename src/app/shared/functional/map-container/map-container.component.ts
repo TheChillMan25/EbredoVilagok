@@ -6,6 +6,7 @@ import {
   hillLocations,
   Location,
   LocationIconType,
+  locationsMap,
   mountainLocations,
   otherLocations,
   townLocations,
@@ -32,15 +33,7 @@ export class MapContainerComponent {
 
   map!: L.Map;
 
-  locationsMap: Record<string, Location[]> = {
-    cities: cityLocations,
-    towns: townLocations,
-    waters: waterLocations,
-    hills: hillLocations,
-    mountains: mountainLocations,
-    forests: forestLocations,
-    others: otherLocations,
-  };
+  locationsMap= locationsMap;
 
   icons: L.Icon[] = [];
 
@@ -219,10 +212,12 @@ export class MapContainerComponent {
     }
   }
 
-  locatePoint(location: Location) {
+  locatePoint(location: Location, openPopup: boolean = true) {
     this.map.flyTo([location.location.y, location.location.x], 1);
-    let marker = this.markerReference.get(location.id);
-    marker?.openPopup();
+    if (openPopup) {
+      let marker = this.markerReference.get(location.id);
+      marker?.openPopup();
+    }
   }
 
   selectLocation(location: string) {

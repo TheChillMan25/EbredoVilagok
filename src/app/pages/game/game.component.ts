@@ -1,165 +1,341 @@
-import { Component } from '@angular/core';
-import { getItem, setBackground } from '../../shared/functional/functions';
-import { Character, NPC } from '../../shared/models/models';
+import { Component, HostListener } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import {
-  MatCard,
-  MatCardHeader,
-  MatCardTitle,
-  MatCardSubtitle,
-  MatCardContent,
-  MatCardActions,
-} from '@angular/material/card';
-import { MatButton } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+  Adventure,
+  Character,
+  Game,
+  GameAction,
+  Player,
+  PlayerStatus,
+} from '../../shared/models/models';
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  FormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { AdventureService } from '../../shared/services/adventure/adventure.service';
+import { CharacterService } from '../../shared/services/character/character.service';
+import {
+  PlayerRole,
+  GameService,
+} from '../../shared/services/game/game.service';
+import { noWhitespaceValidator } from '../forum/post-template/post-template.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { setBackground } from '../../shared/functional/functions';
+import { Router, RouterOutlet } from '@angular/router';
+import { GameTemplateComponent } from './templates/game-template/game-template.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { isMobileView } from '../map/map.component';
+import { SmallScreenComponent } from '../../shared/functional/small-screen/small-screen.component';
+import { MatCardModule } from '@angular/material/card';
+import { NgClass } from '@angular/common';
+import { GameErrorCauses } from '../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-game',
   imports: [
+    GameTemplateComponent,
     MatIconModule,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
-    MatCardContent,
-    MatCardActions,
-    MatButton,
-    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
+    RouterOutlet,
+    MatCheckboxModule,
+    SmallScreenComponent,
+    MatCardModule,
+    NgClass
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })
 export class GameComponent {
-  role: string = 'player';
+  isLoading = false;
+  currentGame!: string;
+  currentPlayer!: Omit<Player, 'userId' | 'username'> | null;
 
-  players: {
-    userId: string;
-    username: string;
-    character: Character;
-    effect: string;
-    turn: string;
-  }[] = [
-    {
-      userId: 'jatekos-1',
-      username: 'Játékos 1',
-      effect: '',
-      turn: 'Várakozás',
-      character: {
-        currentAdventure: '',
-        id: 'karakter-1',
-        name: 'Karakter 1',
-        class: 'Ördöglakatos',
-        specialProperties: {
-          speciesProperty: 0,
-          home: 0,
-        },
-        equipment: {
-          left: 0,
-          right: -1,
-          armour: 1,
-        },
-        level: 1,
-        stats: {
-          physical: {
-            ero: 0,
-            ugyesseg: 0,
-            kitartas: 0,
-          },
-          mental: {
-            esz: 0,
-            fortely: 0,
-            akaratero: 0,
-          },
-          main: {
-            hp: 5,
-            sp: 8,
-          },
-        },
-        species: 'Folyóköz',
-        virtues: {
-          virtues: [0, 1],
-          disadv: [0],
-        },
-        items: {
-          food: [0],
-          specialItems: [0, 1, 2],
-          otherItems: [0, 1, 2, 3, 4],
-          weaponItems: [],
-        },
-        wounds: {
-          small: 0,
-          large: 0,
-        },
-      },
-    },
-  ];
+  createError = '';
+  continueError = '';
+  joinError = '';
 
-  npcs: { id: string; effect: string; turn: string; npc: NPC }[] = [
-    {
-      id: 'npc-1',
-      effect: 'Égés',
-      turn: 'Vége',
-      npc: {
-        id: 'npc-1',
-        name: 'NPC1',
-        actions: [],
-        attitude: 'neutral',
-        character: {
-          currentAdventure: '',
-          id: 'karakter-1',
-          name: 'Karakter 1',
-          class: 'Ördöglakatos',
-          specialProperties: {
-            speciesProperty: 0,
-            home: 0,
-          },
-          equipment: {
-            left: 0,
-            right: -1,
-            armour: 1,
-          },
-          level: 1,
-          stats: {
-            physical: {
-              ero: 0,
-              ugyesseg: 0,
-              kitartas: 0,
-            },
-            mental: {
-              esz: 0,
-              fortely: 0,
-              akaratero: 0,
-            },
-            main: {
-              hp: 5,
-              sp: 8,
-            },
-          },
-          species: 'Folyóköz',
-          virtues: {
-            virtues: [0, 1],
-            disadv: [0],
-          },
-          items: {
-            food: [0],
-            specialItems: [0, 1, 2],
-            otherItems: [0, 1, 2, 3, 4],
-            weaponItems: [],
-          },
-          wounds: {
-            small: 0,
-            large: 0,
-          },
-        },
-      },
-    },
-  ];
+  fb = new FormBuilder();
+  newGameForm!: FormGroup;
+  continueGameForm!: FormGroup;
+  joinGameForm!: FormGroup;
+
+  myCharacters: Character[] = [];
+  myAdventures: Adventure[] = [];
+  myGames: Game[] = [];
+  openGames: Game[] = [];
+  smallScreen = false;
+
+  helpVisible = false;
+  tutorials = {
+    menu: true,
+    lobby: false,
+    game: false,
+  }
+
+  subscriptions: Subscription[] = [];
+
+  constructor(
+    private gameService: GameService,
+    private advService: AdventureService,
+    private charService: CharacterService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
-    setBackground('paper_bg');
+    this.checkVisit();
+    setBackground('#222', true);
+    this.initForms();
+    this.loadData();
+    this.smallScreen = isMobileView();
   }
 
-  getItem(which: 'food' | 'specialItems' | 'otherItems', index: number) {
-    return getItem(which, index);
+  ngOnDestroy() {
+    if (this.subscriptions.length > 0)
+      this.subscriptions.forEach((s) => s.unsubscribe());
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.smallScreen = isMobileView();
+  }
+
+  loadData() {
+    this.subscriptions.push(
+      this.charService.getAllCharacters().subscribe((value) => {
+        this.myCharacters = value;
+      })
+    );
+    this.subscriptions.push(
+      this.advService.getAllAdventures().subscribe((value) => {
+        this.myAdventures = value;
+      })
+    );
+    this.subscriptions.push(
+      this.gameService.getMyGames().subscribe((value) => {
+        this.myGames = value;
+      })
+    );
+    this.subscriptions.push(
+      this.gameService.getOpenPublicGames().subscribe((value) => {
+        this.openGames = value;
+      })
+    );
+  }
+
+  initForms() {
+    this.newGameForm = this.fb.group({
+      name: new FormControl('', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(20),
+        noWhitespaceValidator,
+      ]),
+      adventure: new FormControl('', [Validators.required]),
+      maxPlayers: new FormControl('', [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(6),
+      ]),
+      isPublic: new FormControl(false, [Validators.required]),
+    });
+    this.continueGameForm = this.fb.group({
+      game: new FormControl('', [Validators.required]),
+    });
+    this.joinGameForm = this.fb.group({
+      joinID: new FormControl('', [Validators.required, noWhitespaceValidator]),
+      character: new FormControl('', Validators.required),
+    });
+  }
+
+  checkVisit() {
+    const visited = localStorage.getItem('visitedGamePage');
+    if (!visited) this.helpVisible = true;
+    localStorage.setItem('visitedGamePage', 'true');
+  }
+
+  goHome() {
+    this.router.navigate(['/index']);
+  }
+
+  async createGame() {
+    try {
+      this.createError = '';
+      if (this.newGameForm.invalid) {
+        this.createError = 'Töltsd ki a kötelező mezőket!';
+        return;
+      }
+      this.isLoading = true;
+      const newGameValue = this.newGameForm.value;
+      const newGame: Omit<Game, 'id' | 'ownerId' | 'ownerName'> = {
+        name: newGameValue.name || '',
+        adventure: this.myAdventures.find(
+          (a) => a.id === newGameValue.adventure
+        ),
+        maxPlayers: newGameValue.maxPlayers || 1,
+        isPublic: newGameValue.isPublic || false,
+        prevPlayer: '',
+        currentPlayer: '',
+        currentEvent: 0,
+        players: [],
+        playerOrder: [],
+        isOpen: false,
+        started: false,
+        camp: {
+          isCamping: false,
+          raid: [],
+          campActions: { fire: 0, tents: 0, traps: 0, guard: 0 },
+        },
+        currentAction: {
+          performer: { id: '', name: '' },
+          primary: {} as GameAction,
+          secondary: {} as GameAction,
+        },
+        vote: { theme: '', starter: '', votes: [], },
+      };
+      await this.gameService.createGame(newGame);
+
+      this.newGameForm.reset({
+        name: '',
+        adventure: '',
+        maxPlayers: '',
+      });
+      this.createError = 'A játék sikeresen létrehozva!';
+      this.isLoading = false;
+    } catch (error) {
+      this.isLoading = false;
+      console.error('Hiba a játék létrehozásakor: ', error);
+      this.createError = 'Hiba a játék létrehozásakor!';
+      return;
+    }
+  }
+
+  async deleteGame(gameId: string) {
+    await this.gameService.deleteGame(gameId).catch(error => {
+      console.error(error);
+      this.createError = 'Nem sikerült törölni a játékot.'
+    })
+  }
+
+  controlGameEvent(value: { type: 'myGame' | 'general'; gameId: string }) {
+    switch (value.type) {
+      case 'myGame':
+        this.loadGame(value.gameId);
+        break;
+      case 'general':
+        this.joinGame(value.gameId);
+        break;
+      default:
+        console.warn('Nem lehet csatlakozni');
+    }
+  }
+
+  async loadGame(id: string) {
+    try {
+      this.isLoading = true;
+      let g = await this.gameService.updateGame(id, { isOpen: true });
+      if (g) {
+        this.gameService.PlayerRole = PlayerRole.HOST;
+        this.router.navigate(['/jatek', id, 'lobby']);
+      }
+    } catch (error) {
+      this.isLoading = false;
+      console.error('Hiba a játék betöltésekor: ', error);
+      this.continueError = 'Hiba a játék betöltésekor!';
+      return;
+    }
+  }
+
+  async joinGame(id: string | null = null) {
+    try {
+      const characterId = this.joinGameForm.get('character')?.value;
+      if (!characterId) {
+        this.joinError = 'Válassz egy karaktert a csatlakozáshoz!';
+        return;
+      }
+
+      if (id === null && this.joinGameForm.invalid) {
+        this.joinError = 'Töltsd ki a kötelező mezőket!';
+        return;
+      }
+      this.isLoading = true;
+      const gameId: string = id ? id : this.joinGameForm.get('joinID')?.value;
+      const selectedCharacter = this.myCharacters.find(
+        (c) => c.id === characterId
+      );
+      if (!selectedCharacter) {
+        this.isLoading = false;
+        this.joinError = 'A kiválasztott karakter nem található!';
+        return;
+      }
+
+      const player: Omit<Player, 'id' | 'name'> = {
+        character: selectedCharacter,
+        status: PlayerStatus.NOTREADY,
+        initiative: null,
+        actionsLeft: { primary: true, secondary: true },
+        lastAction: {
+          performer: { id: '', name: '' },
+          primary: {} as GameAction,
+          secondary: {} as GameAction,
+        },
+        inCombat: false,
+        isVoting: false,
+        campActionPoints: 0,
+      };
+
+      let g = await this.gameService.joinGame(gameId, player);
+      if (g) {
+        this.gameService.PlayerRole = PlayerRole.PLAYER;
+        this.router.navigate(['/jatek', gameId, 'lobby']);
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error('Hiba a játékhoz csatlakozáskor: ', error);
+      if (error.cause === GameErrorCauses.AlreadyInGame) this.joinError = 'Már csatlakoztál egy játékhoz!';
+      else this.joinError = 'Nem sikerült csatlakozni!';
+      return;
+    }
+  }
+
+  nextTutorialPage() {
+    const container = document.getElementById('tutorial');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (this.tutorials.menu) {
+      this.tutorials.menu = false;
+      this.tutorials.lobby = true;
+    } else if (this.tutorials.lobby) {
+      this.tutorials.lobby = false;
+      this.tutorials.game = true;
+    }
+  }
+
+  prevTutorialPage() {
+    const container = document.getElementById('tutorial');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (this.tutorials.game) {
+      this.tutorials.game = false;
+      this.tutorials.lobby = true;
+    } else if (this.tutorials.lobby) {
+      this.tutorials.lobby = false;
+      this.tutorials.menu = true;
+    }
   }
 }
+

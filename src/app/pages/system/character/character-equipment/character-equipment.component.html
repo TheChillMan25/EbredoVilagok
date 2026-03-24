@@ -4,14 +4,16 @@
   lecserélheted természetesen és nem kötelező két fegyver választása sem.
 </p>
 <div id="weapons" class="table-container">
-  <mat-table [dataSource]="weaponsDataSource">
+  <mat-table [dataSource]="weaponsDataSource!">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Fegyver</mat-header-cell>
       <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="dice">
       <mat-header-cell *matHeaderCellDef>Sebzés</mat-header-cell>
-      <mat-cell *matCellDef="let element">{{ element.dice }}</mat-cell>
+      <mat-cell *matCellDef="let element"
+        >{{ element.diceCount }}{{ element.damage }}</mat-cell
+      >
     </ng-container>
     <ng-container matColumnDef="price">
       <mat-header-cell *matHeaderCellDef>Ár</mat-header-cell>
@@ -23,7 +25,7 @@
   </mat-table>
 </div>
 <div id="armours" class="table-container" style="margin-top: 1rem">
-  <mat-table [dataSource]="armourDataSource">
+  <mat-table [dataSource]="armourDataSource!">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Páncél</mat-header-cell>
       <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>

@@ -3,7 +3,7 @@
   <div class="event-details">
     <p><span class="p-title">Helyszín:</span> {{ event.location }}</p>
     @if(event.NPCs.length > 0){
-    <div class="fake-button" (click)="showNPCs()">NPC-k:</div>
+    <button class="fake-button" (click)="showNPCs()">NPC-k:</button>
     }@else {
     <span>Nincsenek NPC-k</span>
     }
@@ -19,18 +19,12 @@
 
     <div class="npc">
       <span>{{ npc.name }}</span>
-      <mat-icon fontSet="material-symbols-outlined"
-        >@if(npc.attitude === 'neutral'){handshake}@else{swords}</mat-icon
-      >
+      <mat-icon fontSet="material-symbols-outlined">@if(npc.attitude === 'neutral'){handshake}@else{swords}</mat-icon>
     </div>
     }
   </div>
   }
-  <div
-    class="fake-button close-npcs"
-    (click)="hideNPCs()"
-    [ngClass]="{ show: visibleNPCs }"
-  >
+  <div class="fake-button close-npcs" (click)="hideNPCs()" [ngClass]="{ show: visibleNPCs }">
     <mat-icon>close</mat-icon>
   </div>
 </div>

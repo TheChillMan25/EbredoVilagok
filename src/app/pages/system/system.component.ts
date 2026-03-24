@@ -31,6 +31,15 @@ import {
   MatCardActions,
 } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';
+import { ItemService } from '../../shared/services/item/item.service';
+import {
+  Armour,
+  Cigar,
+  Food,
+  Item,
+  SpecialItem,
+  Weapon,
+} from '../../shared/models/game_interfaces';
 
 @Component({
   selector: 'app-system',
@@ -81,17 +90,45 @@ export class SystemComponent {
   mainPageIndexes = {
     char: 0,
     adv: 5,
-    act: 7,
+    act: 6,
+  };
+  items?: {
+    weapons: Weapon[];
+    armours: Armour[];
+    generalItems: Item[];
+    foodRations: Food[];
+    medicalItems: SpecialItem[];
+    specialDrinks: SpecialItem[];
+    cigars: Cigar[];
   };
 
-  ngOnInit(): void {
+  constructor(private itemService: ItemService) { }
+
+  async ngOnInit() {
     setBackground('table');
+    await this.itemService.initItems();
+    this.setUpItems();
     this.setActiveSegment('character');
     this.checkFirstVisit();
   }
 
+  setUpItems() {
+    this.items = {
+      weapons: this.itemService.getItemGroup('weapons') as Weapon[],
+      armours: this.itemService.getItemGroup('armours') as Armour[],
+      generalItems: this.itemService.getItemGroup('general') as Item[],
+      foodRations: this.itemService.getItemGroup('food') as Food[],
+      medicalItems: this.itemService.getItemGroup('heal') as SpecialItem[],
+      specialDrinks: this.itemService.getItemGroup(
+        'specDrinks'
+      ) as SpecialItem[],
+      cigars: this.itemService.getItemGroup('cigars') as Cigar[],
+    };
+    console.log(this.items);
+  }
+
   setActiveSegment(segment: 'character' | 'adventure' | 'actions'): void {
-    this.handleMarkerVisualization(segment);
+    this.activeSegmentName = segment;
     this.activePageIndex = 0;
     switch (segment) {
       case 'character': {
@@ -135,23 +172,15 @@ export class SystemComponent {
 
   checkPage() {
     if (this.activePageIndex < this.mainPageIndexes['adv']) {
-      this.handleMarkerVisualization('character');
+      this.activeSegmentName = 'character';
     } else if (
       this.activePageIndex >= this.mainPageIndexes['adv'] &&
       this.activePageIndex < this.mainPageIndexes['act']
     ) {
-      this.handleMarkerVisualization('adventure');
+      this.activeSegmentName = 'adventure';
     } else {
-      this.handleMarkerVisualization('actions');
+      this.activeSegmentName = 'actions';
     }
-  }
-
-  handleMarkerVisualization(segment: 'character' | 'adventure' | 'actions') {
-    document
-      .getElementById(this.activeSegmentName)
-      ?.classList.remove('selectedMarker');
-    this.activeSegmentName = segment;
-    document.getElementById(segment)?.classList.add('selectedMarker');
   }
 
   toggleMarkers() {
