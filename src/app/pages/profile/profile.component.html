@@ -7,52 +7,57 @@
       <span id="username">{{ username }}</span>
       <span id="email"><span>Email:</span> {{ email }}</span>
     </div>
+    <button class="fake-button" id="delete" (click)="showDeleteUI = true">
+      <mat-icon>delete</mat-icon>
+      <span>Felhasználó törlése</span>
+    </button>
   </div>
   <div id="main-container">
     <div id="containers">
-      <div
-        id="character-container"
-        class="container"
-        [ngClass]="{ show: showCharacter }"
-      >
+      <div id="character-container" class="container" [ngClass]="{ show: showCharacter }">
         @if(characters.length > 0){ @for (character of characters; track character.id)
         {
-        <app-karakter-template
-          [character]="character"
-          (deletedCharacter)="loadCharAdvData()"
-        ></app-karakter-template>
+        <app-karakter-template [character]="character" (deletedCharacter)="loadCharAdvData()"></app-karakter-template>
         }}@else {
         <span class="emptyWarning">Nincsenek megjeleníthető karakterek</span> }
       </div>
-      <div
-        id="adventure-container"
-        class="container"
-        [ngClass]="{ show: !showCharacter }"
-      >
+      <div id="adventure-container" class="container" [ngClass]="{ show: !showCharacter }">
         @if(adventures.length > 0){ @for (adventure of adventures; track adventure.id)
         {
-        <app-kaland-template
-          [adventure]="adventure"
-          (deletedAdventure)="loadCharAdvData()"
-        ></app-kaland-template>
+        <app-kaland-template [adventure]="adventure" (deletedAdventure)="loadCharAdvData()"></app-kaland-template>
         }}@else {<span class="emptyWarning">Nincsenek megjeleníthető kalandok</span>}
       </div>
     </div>
     <div id="button-container">
-      <div
-        class="fake-button"
-        (click)="showContainer('character')"
-        [ngClass]="{ selected: showCharacter }"
-      >
+      <div class="fake-button" (click)="showContainer('character')" [ngClass]="{ selected: showCharacter }">
         Karakterek
       </div>
-      <div
-        class="fake-button"
-        (click)="showContainer()"
-        [ngClass]="{ selected: !showCharacter }"
-      >
+      <div class="fake-button" (click)="showContainer()" [ngClass]="{ selected: !showCharacter }">
         Kalandok
       </div>
     </div>
   </div>
+  @if(showDeleteUI){
+  <div id="ui-container">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Felhasználói fiók törlése</mat-card-title>
+        <mat-icon matSuffix>warning</mat-icon>
+        <mat-card-subtitle>Ez a művelet nem visszafordítható!</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Biztosan törölni szeretnéd a felhasználói fiókodat? A törlés után nem lesz visszaállítható! A törlés
+          jóváhagyásához írd be a jelszavadat.</p>
+        <mat-form-field>
+          <mat-label>Jelszó megerősítése</mat-label>
+          <input matInput type="password" [formControl]="confirmPSW" />
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-flat-button color="error" (click)="confirmDeleteUser()">Törlés</button>
+        <button mat-flat-button color="error" (click)="showDeleteUI = false">Mégse</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  }
 </div>

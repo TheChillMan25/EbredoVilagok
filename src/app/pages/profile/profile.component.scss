@@ -1,6 +1,7 @@
 #content {
   flex-direction: row;
   justify-content: center;
+
   #profile-panel {
     width: 20%;
     height: 95%;
@@ -15,6 +16,10 @@
 
     #img-container {
       width: 80%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       img {
         width: 100%;
         border-radius: 50%;
@@ -31,6 +36,7 @@
       #username {
         font-size: 2rem;
       }
+
       #email {
         font-size: 1.3rem;
         display: block;
@@ -41,6 +47,7 @@
       }
     }
   }
+
   #main-container {
     height: 95%;
     width: 75%;
@@ -53,6 +60,7 @@
       height: 85%;
       background-color: rgba(51, 51, 51, 0.425);
       border-radius: 0 0.5rem 0.5rem 0;
+
       .container {
         padding: 1rem;
         display: none;
@@ -79,6 +87,7 @@
         display: flex;
       }
     }
+
     #button-container {
       display: flex;
       align-items: center;
@@ -101,18 +110,45 @@
       }
     }
   }
+
+  #ui-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    mat-card {
+      mat-card-content {
+        mat-form-field {
+          width: 100%;
+        }
+      }
+
+      mat-card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+    }
+  }
 }
 
 @media (max-width: 1024px) {
   #content {
     #profile-panel {
       width: 25%;
+
       #profile-data {
         #username {
           font-size: 1.5rem;
         }
       }
     }
+
     #main-container {
       width: 70%;
     }
@@ -123,6 +159,7 @@
   #content {
     padding: 1rem;
     flex-direction: column;
+
     #profile-panel {
       width: 100%;
       height: 15%;
@@ -133,36 +170,65 @@
         width: 4rem;
         height: 4rem;
       }
+
       #profile-data {
         width: 100%;
         align-items: start;
         gap: 0;
+
         #username {
           font-size: 2rem;
         }
+
         #email {
           display: block;
         }
       }
+
+      #delete {
+        margin-left: auto;
+
+        >span {
+          font-size: large;
+        }
+      }
     }
+
     #main-container {
       height: 85%;
       width: 100%;
+
       #containers {
         border-radius: 0 0 0.5rem 0.5rem;
         flex: 2;
+
         #character-container {
           app-karakter-template {
             width: 100%;
           }
         }
       }
+
       #button-container {
         justify-content: space-around;
         padding: 0.5rem;
         width: 100%;
+
         .fake-button {
           font-size: large;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  #content {
+    #profile-panel {
+
+      #delete {
+        >span {
+          display: none;
         }
       }
     }
@@ -172,10 +238,12 @@
 @media (max-width: 375px) {
   #content {
     #profile-panel {
+
       #profile-data {
         #username {
           font-size: 1.25rem;
         }
+
         #email {
           font-size: 1rem;
         }

@@ -32,6 +32,7 @@ html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: "Modern Antiqua", sans-serif;
@@ -155,27 +156,34 @@ app-card-container {
 mat-table {
   font-family: "Modern Aniqua, serif";
 }
+
 mat-header-row {
   background-color: #222 !important;
 }
+
 mat-row:nth-child(odd) {
   background-color: $primary-background;
 }
+
 mat-row:nth-child(even) {
   background-color: #444;
 }
+
 mat-header-cell {
   color: $text-secondary;
   font-size: larger;
 }
+
 mat-cell,
 mat-header-cell {
   justify-content: left;
   font-family: "Modern Antiqua, serif";
 }
+
 mat-cell:nth-child(odd) {
   color: $text-secondary;
 }
+
 mat-cell:nth-child(even) {
   color: $text-primary;
 }
@@ -219,6 +227,10 @@ div.mat-mdc-tooltip-surface {
   padding: 0.5rem;
 }
 
+mat-icon {
+  flex-shrink: 0;
+}
+
 mat-card {
   min-width: 50%;
   max-width: 75%;
@@ -254,10 +266,11 @@ mat-card {
     width: 18rem !important;
     margin: 1rem 0.5rem;
 
-    > div {
+    >div {
       text-align: center;
       width: 100%;
     }
+
     .popup-title {
       font-size: large;
       color: #f2c480;
@@ -336,12 +349,15 @@ mat-card {
 @media (max-height: 685px) and (orientation: landscape) {
   #content {
     overflow-y: auto;
+
     .title {
       font-size: 2rem;
     }
+
     .subtitle {
       font-size: 2rem;
     }
+
     #bottom-text {
       font-size: medium;
     }
@@ -369,6 +385,7 @@ mat-card {
 @media (max-height: 670px) and (orientation: landscape) and (max-width: 900px) {
   #content {
     gap: 0.5rem;
+
     app-card-container {
       height: 70%;
       flex-direction: row;
@@ -392,12 +409,15 @@ mat-card {
       width: 0;
     }
   }
+
   .title {
     font-size: 3rem;
   }
+
   .subtitle {
     font-size: 2rem;
   }
+
   #bottom-text {
     font-size: large;
   }
@@ -413,6 +433,7 @@ mat-card {
       mat-card-title {
         font-size: x-large !important;
       }
+
       mat-card-subtitle {
         font-size: large !important;
       }

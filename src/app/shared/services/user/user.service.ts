@@ -5,6 +5,7 @@ import { firstValueFrom, from, Observable, of, switchMap, take } from 'rxjs';
 import { Adventure, Character, User } from '../../models/models';
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -12,12 +13,13 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService) { }
 
   getUserProfile(): Observable<{
     user: User | null;
@@ -173,6 +175,24 @@ export class UserService {
       await updateDoc(userDocRef, updateData);
     } catch (error) {
       console.error('Hiba a felhasználó frissítésekor: ', error);
+    }
+  }
+
+  async deleteUser(password: string): Promise<void> {
+    try {
+      const user = await firstValueFrom(
+        this.authService.currentUser.pipe(take(1))
+      );
+
+      if (!user) throw new Error('Nem található felhasználó!');
+
+      const credential = EmailAuthProvider.credential(user.email!, password);
+      await reauthenticateWithCredential(user, credential);
+
+      await deleteUser(user);
+    } catch (error) {
+      console.error('Hiba a felhasználó törlésekor: ', error);
+      throw error;
     }
   }
 }
