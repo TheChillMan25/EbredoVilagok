@@ -8,10 +8,17 @@ import { NgClass } from '@angular/common';
 import { KalandTemplateComponent } from './kaland-template/kaland-template.component';
 import { CharacterService } from '../../shared/services/character/character.service';
 import { AdventureService } from '../../shared/services/adventure/adventure.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from "@angular/material/card";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  imports: [KarakterTemplateComponent, NgClass, KalandTemplateComponent],
+  imports: [KarakterTemplateComponent, NgClass, KalandTemplateComponent, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -22,6 +29,8 @@ export class ProfileComponent {
   adventures: Adventure[] = [];
   username: string = '';
   email: string = '';
+  confirmPSW: FormControl = new FormControl('');
+  showDeleteUI: boolean = false;
 
   isLoading: boolean = false;
   private profileSubscription: Subscription | null = null;
@@ -30,7 +39,8 @@ export class ProfileComponent {
   constructor(
     private userService: UserService,
     private charService: CharacterService,
-    private advService: AdventureService
+    private advService: AdventureService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -89,5 +99,18 @@ export class ProfileComponent {
     if (container === 'character') this.showCharacter = true;
     else this.showCharacter = false;
     localStorage.setItem('visibleContainerOnProfile', this.showCharacter ? 'characters' : 'events');
+  }
+
+  confirmDeleteUser() {
+    const psw = this.confirmPSW.value;
+    if (!psw || psw.trim() === '') {
+      alert('Add meg a jelszavad a törlés megerősítéséhez!');
+      return;
+    }
+    this.userService.deleteUser(psw).then(() => {
+      this.router.navigateByUrl('/index');
+    }).catch(err => {
+      alert('Hiba a felhasználó törlésekor!');
+    })
   }
 }

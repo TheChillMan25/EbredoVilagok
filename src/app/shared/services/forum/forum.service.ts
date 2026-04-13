@@ -36,7 +36,7 @@ import {
   providedIn: 'root',
 })
 export class ForumService {
-  constructor(private firestore: Firestore, private authService: AuthService) {}
+  constructor(private firestore: Firestore, private authService: AuthService) { }
 
   async addPost(
     postData: Omit<ForumPost, 'id' | 'poster' | 'posterUID' | 'createdAt'>
@@ -168,27 +168,7 @@ export class ForumService {
         postID
       );
 
-      const commentsColRef = collection(
-        this.firestore,
-        'Forums',
-        subForum,
-        'Posts',
-        postID,
-        'Comments'
-      );
-
-      while (true) {
-        const snap = await getDocs(query(commentsColRef, limit(450)));
-        if (snap.empty) break;
-
-        const batch = writeBatch(this.firestore);
-        snap.forEach((doc) => batch.delete(doc.ref));
-        await batch.commit();
-      }
-
-      const finalBatch = writeBatch(this.firestore);
-      finalBatch.delete(postDocRef);
-      await finalBatch.commit();
+      await deleteDoc(postDocRef);
     } catch (error) {
       console.error('Hiba a poszt törlésekor: ', error);
       throw error;
