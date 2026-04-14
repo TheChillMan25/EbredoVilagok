@@ -1,17 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as L from 'leaflet';
 import {
-  cityLocations,
-  forestLocations,
-  hillLocations,
   Location,
   LocationIconType,
   locationsMap,
-  mountainLocations,
-  otherLocations,
-  townLocations,
   trackPath,
-  waterLocations,
 } from '../../models/map_locations';
 
 @Component({

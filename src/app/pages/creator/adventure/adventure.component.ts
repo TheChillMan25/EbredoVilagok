@@ -523,7 +523,6 @@ export class AdventureComponent implements CanComponentDeactivate {
         story: eventValues.story,
         NPCs: [],
         completed: false,
-        finished: false,
       };
       this.events.push(event);
     }

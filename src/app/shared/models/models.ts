@@ -89,17 +89,6 @@ export type PublicCharacter = Omit<
   'id' | 'currentAdventure' | 'userId'
 >;
 
-export interface Forum {
-  adventureForum: SubForum;
-  characterForum: SubForum;
-}
-
-export interface SubForum {
-  id: string;
-  topic: string;
-  posts: string[];
-}
-
 export interface ForumPost {
   id: string;
   forumID: ForumTopic;
@@ -127,7 +116,6 @@ export interface AdventureEvent {
   location: string;
   NPCs: NPC[];
   completed: boolean;
-  finished: boolean;
 }
 
 export interface Adventure {
@@ -139,7 +127,7 @@ export interface Adventure {
 
 export type PublicAdventure = Omit<
   Adventure,
-  'id' | 'players' | 'currentPlayer' | 'userId'
+  'id' | 'userId'
 >;
 
 export enum PlayerStatus {
